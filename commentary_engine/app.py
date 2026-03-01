@@ -94,12 +94,12 @@ else:
 
 st.sidebar.markdown("---")
 st.sidebar.title("🤖 Model Selection")
-# Allow user to switch models in case of quota issues
+# Gemini 1.5 Flash has higher free-tier limits than 2.0
 selected_model = st.sidebar.selectbox(
     "Choose Gemini Model:",
-    ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"],
+    ["gemini-1.5-flash", "gemini-1.5-flash-8b", "gemini-2.0-flash", "gemini-1.5-pro"],
     index=0,
-    help="Switch to 1.5-flash if 2.0 hits rate limits."
+    help="Switch to 1.5-flash if 2.0 hits rate limits (Free Tier of 2.0 is very strict)."
 )
 
 # Read Local Knowledge Base
