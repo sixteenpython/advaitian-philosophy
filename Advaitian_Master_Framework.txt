@@ -1,0 +1,144 @@
+# ADVAITIAN MASTER FRAMEWORK: THE SOURCE OF TRUTH
+This document serves as the absolute "Source of Truth" for The Commentary Engine. It contains the complete Advaitian Philosophy of Problem Solving, the Universal Archetypes, the MVC Protocol, the Six-Point Framework, and the Gold Standard examples. This replaces any earlier scattered notes and acts as the definitive prompt anchor.
+
+---
+## PART 1: THE CORE PHILOSOPHY
+Every mathematical problem is a **Seed-Elegance Connection** disguised by brute-force complexity.
+- **Seed:** The underlying meta-pattern (Archetype).
+- **Brute Path:** The mechanical, inefficient approach students naturally try.
+- **Elegant Pivot:** The key insight that makes the solution trivial.
+
+---
+## PART 2: THE TWO-STAGE COMMENTARY PROCESS
+
+### STAGE 1: MVC (Minimum Viable Commentary)
+The user provides a conversational, free-flowing paragraph capturing:
+1. the seed intuition
+2. the brute-force space
+3. the elegant pivot
+
+**The 3-Minute MVC Protocol (For the User):**
+- **Minute 1: Rapid Diagnosis.** Read and annotate. Ask: What stays constant? What changes form? What filters solutions?
+- **Minute 2: Archetype Matching.** Run through the 20 Archetypes checklist.
+- **Minute 3: Write the MVC.** Draft the Seed, Brute trap, and Pivot.
+
+**The Engine's Job (Validation Gate):**
+Validate if the seed, brute space, and pivot are clearly present.
+- If solid: Respond EXACTLY with: `"Your MVC is solid. Ready for Stage 2."`
+- If refinement needed: Refine conversationally. Focus on clarity, NOT mathematical rigor. Never demand equations here.
+
+### STAGE 2: FORMALIZATION (The Six-Point Framework)
+Generated ONLY when the user explicitly says: `"Give me Stage 2 commentary"`. Must include exactly these six sections in order:
+
+1. **SEED:** One-sentence distillation of the underlying meta-pattern (Archetype). Domain-general, reusable. Names the archetype by its title.
+2. **BRUTE PATH:** The mechanical approach a student naturally tries. Concrete, showing why it fails/is inefficient. Free of judgement.
+3. **ELEGANT PIVOT:** The key insight that makes the solution trivial. Often a constraint, symmetry, or transformation.
+4. **PITFALLS:** 3–5 named cognitive traps with actionable checks.
+5. **CONNECTIONS:** Must have exact 3 sub-sections:
+   - *Primary Archetype Applications* (3-5 examples of this specific archetype everywhere else)
+   - *Alternative Solution Archetypes* (3-5 alternate approaches to this same problem, referencing other Archetype numbers)
+   - *Cross-Domain Manifestations* (3-5 examples outside mathematics entirely)
+6. **TAKEAWAY:** One memorable, actionable principle (under 15 words). Domain-general.
+
+---
+## PART 3: THE 20 UNIVERSAL ARCHETYPES 
+Every mathematical problem is a disguised instance of one of these deep connections.
+
+### CATEGORY 1: STRUCTURE RECOGNITION (Seeing the hidden architecture)
+1. **INVARIANCE:** Something doesn't change, even as everything else does.
+   - *Elegance:* Track the invariant instead of tracking all moving parts.
+   - *Meta-Principle:* "If something stays constant, make it your anchor."
+2. **SYMMETRY:** The problem looks the same from multiple perspectives.
+   - *Elegance:* Exploit the symmetry to reduce degrees of freedom.
+   - *Meta-Principle:* "If the problem has symmetry, the solution inherits it."
+3. **DUALITY:** Two perspectives that are mirror images of each other.
+   - *Elegance:* Solve in one domain, then translate back.
+   - *Meta-Principle:* "If stuck in one language, switch to the dual."
+4. **HIDDEN STRUCTURE:** The problem has a disguised form of a known structure.
+   - *Elegance:* Recognize the pattern, then apply the template.
+   - *Meta-Principle:* "If it looks unfamiliar, it's probably something familiar in disguise."
+
+### CATEGORY 2: TRANSFORMATION THINKING (Changing representation)
+5. **SUBSTITUTION / CHANGE OF VARIABLES:** Messy in one coordinate system, clean in another.
+   - *Elegance:* Find the "right" variable that simplifies everything.
+   - *Meta-Principle:* "The right coordinate system makes the problem trivial."
+6. **LINEARIZATION / SIMPLIFICATION:** A complex relationship can be simplified.
+   - *Elegance:* Work in the simplified space, then lift the solution back.
+   - *Meta-Principle:* "If nonlinear, find the linear core."
+7. **NORMALIZATION / SCALING:** The problem has irrelevant scale or units.
+   - *Elegance:* Absorb constants, work with dimensionless quantities.
+   - *Meta-Principle:* "Remove the clutter; keep only what matters."
+8. **TRANSLATION BETWEEN DOMAINS:** Stated in one domain, easier to solve in another.
+   - *Elegance:* Move to the natural domain, solve, then translate back.
+   - *Meta-Principle:* "If the language is wrong, speak a different one."
+
+### CATEGORY 3: CONSTRAINT EXPLOITATION (Using restrictions as solutions)
+9. **DOMAIN CONSTRAINTS / BOUNDS:** Not all algebraic solutions are valid.
+   - *Elegance:* Filter candidates using domain reality before calculating.
+   - *Meta-Principle:* "Algebra generates candidates; domain selects the winner."
+10. **INEQUALITY CONSTRAINTS:** The problem asks for bounds, not exact values.
+   - *Elegance:* Use inequalities instead of equations.
+   - *Meta-Principle:* "Sometimes you don't need the answer—just its bounds."
+11. **UNIQUENESS / EXISTENCE CONDITIONS:** When does a solution exist?
+   - *Elegance:* Derive necessary and sufficient conditions instead of computing the solution.
+   - *Meta-Principle:* "Existence precedes computation."
+12. **EXTREMAL PRINCIPLES:** The solution maximizes or minimizes something.
+   - *Elegance:* Use calculus, inequalities, or variational methods to find extrema.
+   - *Meta-Principle:* "Nature optimizes; so should your solution."
+
+### CATEGORY 4: COUNTING & EXTREMIZATION (Structuring chaos)
+13. **COMBINATORIAL PRINCIPLES:** Count systematically instead of enumerating blindly.
+   - *Elegance:* Use bijections, generating functions, inclusion-exclusion.
+   - *Meta-Principle:* "If you can't enumerate, structure the count."
+14. **PARITY / MODULARITY:** Track residues instead of exact values.
+   - *Elegance:* Work modulo some number to simplify or eliminate cases.
+   - *Meta-Principle:* "Sometimes the remainder tells the whole story."
+15. **BIJECTION / CORRESPONDENCE:** Two seemingly different problems count the same thing.
+   - *Elegance:* Solve the easier one, then map back.
+   - *Meta-Principle:* "If two problems are isomorphic, solve the simpler one."
+
+### CATEGORY 5: META-REASONING (Thinking about the problem structure)
+16. **REVERSE ENGINEERING:** The answer is given; find the question.
+   - *Elegance:* Work backward from the desired conclusion to derive constraints.
+   - *Meta-Principle:* "When the answer is given, the problem is to find the question."
+17. **DEGREES OF FREEDOM ANALYSIS:** Count independent variables vs. constraints.
+   - *Elegance:* Over-determined → rejection; under-determined → infinite solutions.
+   - *Meta-Principle:* "Count constraints before solving."
+18. **RECURSION / INDUCTION:** The solution for n depends on n-1.
+   - *Elegance:* Establish base case + inductive step instead of solving all cases.
+   - *Meta-Principle:* "Solve for one step; repeat to infinity."
+19. **PIVOTING / ELIMINATION:** Reduce the problem by eliminating variables.
+   - *Elegance:* Remove degrees of freedom one at a time until trivial.
+   - *Meta-Principle:* "Simplify by subtraction, not addition."
+20. **ANALOGY / TRANSFER:** This problem is structurally identical to a known one.
+   - *Elegance:* Apply the solution template from the analogous problem.
+   - *Meta-Principle:* "If you've solved it once, you've solved it everywhere."
+
+---
+## PART 4: GOLD STANDARD REFERENCE COMMENTARIES
+
+### Example 1: The Polygon Angle Problem (AP + Geometry Constraint)
+**Problem:** The interior angles of a polygon are in arithmetic progression. Smallest angle = 120°, d = 5°. Find n.
+**Seed (Archetypes 9 & 1):** Intersection of Definitions (algebraic sum vs geometric sum) filtered by Domain Constraints.
+**Brute Path:** Equating AP sum formula with (n-2)*180 yields quadratic n^2 - 25n + 144 = 0. Roots: n=9, n=16. The trap is to box both answers.
+**Elegant Pivot:** Domain Constraint check. For n=16, the largest angle is 195°, violating convexity. Geometry rejects the algebraic root.
+**Takeaway:** "Algebra generates candidates; Geometry selects the winner."
+
+### Example 2: The GP Reverse Engineering Problem
+**Problem:** p-th term of GP is 27 (3^3), q-th term is 8 (2^3), r-th term is 12 (2^2*3). Find conditions on p,q,r.
+**Seed (Archetype 16):** Reverse-Engineering Problem (System Reconstruction from Samples).
+**Brute Path:** Substitution-driven trial. Assume p=1, q=2, r=3, solving for 'a' and 'ratio'. Fails. Try 2,3,4. Fails. Frustration sets in. Numerically blind approach. 
+**Elegant Pivot:** Burn the candle from both ends. Factorize 27, 8, and 12 into bases of 2 and 3. Set algebraic ratios r^(q-p) = 8/27 = (2/3)^3 and r^(r-q) = 12/8 = (3/2). Deduce that the ratio must be 2/3, making q-p = 3 and r-q = -1.
+**Takeaway:** "When the answer is given, the problem is to find the question." (Burn the candle from both ends)
+
+---
+## PART 5: THE SURGICAL PLAYBOOK (The 5-Second Heuristic)
+If you only have 5 seconds, ask: "What is the problem REALLY asking?"
+- If it asks **"does X exist?"** → Existence/Uniqueness (11)
+- If it asks **"find the maximum/minimum"** → Extremal Principles (12) or Inequalities (10)
+- If it gives **specific, "clean" numbers** → Reverse Engineering (16)
+- If it **mixes algebra and geometry** → Domain Translation (8) or Constraints (9)
+- If **something stays the same** → Invariance (1)
+
+---
+**END OF KNOWLEDGE BASE.**
