@@ -92,6 +92,15 @@ else:
     firebase_cred_path = st.sidebar.text_input("Firebase JSON Path", help="Path to your serviceAccountKey.json file")
     firebase_cred = firebase_cred_path
 
+st.sidebar.markdown("---")
+st.sidebar.title("🤖 Model Selection")
+# Allow user to switch models in case of quota issues
+selected_model = st.sidebar.selectbox(
+    "Choose Gemini Model:",
+    ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"],
+    index=0,
+    help="Switch to 1.5-flash if 2.0 hits rate limits."
+)
 
 # Read Local Knowledge Base
 @st.cache_data
@@ -109,11 +118,9 @@ knowledge_base = load_knowledge_base()
 # --- INITIALIZE GEMINI ---
 def get_gemini_model(system_instruction):
     genai.configure(api_key=api_key)
-    # Using the standard gemini-2.0-flash as the "Thinking" variant
-    model_name = "gemini-2.0-flash" 
     
     generation_config = {
-      "temperature": 0.2, # Low temp for rigorous framework adherence
+      "temperature": 0.2, 
       "top_p": 0.95,
       "top_k": 40,
       "max_output_tokens": 8192,
@@ -121,7 +128,7 @@ def get_gemini_model(system_instruction):
     }
     
     return genai.GenerativeModel(
-        model_name=model_name,
+        model_name=selected_model,
         generation_config=generation_config,
         system_instruction=system_instruction
     )
