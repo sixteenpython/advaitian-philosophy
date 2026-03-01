@@ -107,13 +107,23 @@ selected_model = st.sidebar.selectbox(
 # Read Local Knowledge Base
 @st.cache_data
 def load_knowledge_base():
-    # Adjust this path if the knowledge base is located elsewhere relative to this script
-    kb_path = os.path.join(os.path.dirname(__file__), "..", "Advaitian_Master_Framework.txt")
-    try:
-        with open(kb_path, "r", encoding="utf-8") as file:
-            return file.read()
-    except Exception as e:
-        return f"Error loading Knowledge Base: {e}. Please ensure Advaitian_Master_Framework.txt exists in the parent directory."
+    kb_dir = os.path.join(os.path.dirname(__file__), "..", "knowledge_base")
+    if not os.path.exists(kb_dir):
+        return "Warning: knowledge_base directory not found."
+    
+    aggregated_kb = ""
+    for filename in sorted(os.listdir(kb_dir)):
+        if filename.endswith((".txt", ".md")):
+            file_path = os.path.join(kb_dir, filename)
+            try:
+                with open(file_path, "r", encoding="utf-8") as file:
+                    aggregated_kb += f"\n--- SOURCE: {filename} ---\n"
+                    aggregated_kb += file.read()
+                    aggregated_kb += "\n"
+            except Exception as e:
+                aggregated_kb += f"\nError loading {filename}: {e}\n"
+    
+    return aggregated_kb if aggregated_kb else "Knowledge base is empty."
 
 knowledge_base = load_knowledge_base()
 
