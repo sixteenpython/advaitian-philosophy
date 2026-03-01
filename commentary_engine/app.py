@@ -94,12 +94,12 @@ else:
 
 st.sidebar.markdown("---")
 st.sidebar.title("🤖 Model Selection")
-# Gemini 1.5 Flash has higher free-tier limits than 2.0
+# Gemini 1.5 Flash is the most stable high-quota free tier model
 selected_model = st.sidebar.selectbox(
     "Choose Gemini Model:",
-    ["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-2.0-flash", "gemini-1.5-pro"],
+    ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"],
     index=0,
-    help="Switch to 1.5-flash-8b for the highest rate limits (most stable for Free Tier)."
+    help="Gemini 1.5-Flash has the highest free-tier limits."
 )
 
 # Read Local Knowledge Base
@@ -217,7 +217,7 @@ with col1:
                         st.warning("Validation Failed or Needs Refinement.")
                 except Exception as e:
                     if "429" in str(e) or "quota" in str(e).lower():
-                        st.error(f"⚠️ **Quota Exceeded (429) on {selected_model}:** Please switch to **gemini-1.5-flash-8b** in the sidebar and try again.")
+                        st.error(f"⚠️ **Quota Exceeded (429) on {selected_model}:** Please switch to **gemini-1.5-flash** in the sidebar (it has much higher limits) and try again.")
                     else:
                         st.error(f"API Error: {e}")
 
@@ -238,7 +238,7 @@ with col2:
                     st.session_state.stage2_generated = True
                 except Exception as e:
                     if "429" in str(e) or "quota" in str(e).lower():
-                        st.error(f"⚠️ **Quota Exceeded (429) on {selected_model}:** Please switch to **gemini-1.5-flash-8b** in the sidebar and try again.")
+                        st.error(f"⚠️ **Quota Exceeded (429) on {selected_model}:** Please switch to **gemini-1.5-flash** in the sidebar (it has much higher limits) and try again.")
                     else:
                         st.error(f"API Error: {e}")
                     
