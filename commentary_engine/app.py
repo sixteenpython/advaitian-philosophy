@@ -55,6 +55,8 @@ def get_credentials():
     try:
         if hasattr(st, "secrets") and st.secrets:
             api_k = st.secrets.get("GEMINI_API_KEY")
+            if api_k:
+                api_k = api_k.strip().replace('"', '').replace("'", "") # Strip and remove accidental quotes
             if "firebase" in st.secrets:
                 fb_cred = dict(st.secrets["firebase"])
     except (FileNotFoundError, RuntimeError, Exception):
@@ -65,7 +67,7 @@ def get_credentials():
     if not api_k:
         try:
             with open(os.path.join(os.path.dirname(__file__), "..", "AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt"), "r") as f:
-                api_k = f.read().strip()
+                api_k = f.read().strip().replace('"', '').replace("'", "")
         except FileNotFoundError:
             pass
 
