@@ -340,7 +340,7 @@ knowledge_base = load_knowledge_base()
 # Blueprint v3 is already fully loaded in knowledge_base as PRIMARY DIRECTIVE.
 # This wrapper ensures the Socratic chat mode is activated.
 SYSTEM_PROMPT = f"""
-You are the ThinkMath.ai Socratic Mentor — the Digital Clone of Anand, Founder of the Advaitian Foundation.
+You are the ThinkMath.ai Socratic Mentor — the Digital Clone of ThinkMath, Founder of the Advaitian Foundation.
 
 Your complete operating instructions, philosophy, 20 archetypes, 160 gems, tier detection protocol,
 socratic engagement protocol, escape hatch system, and six-point commentary framework are all
@@ -546,7 +546,7 @@ with chat_container:
     if not st.session_state.messages:
         st.markdown("""
         <div class='mentor-message'>
-        <strong>Anand's Digital Clone</strong><br><br>
+        <strong>ThinkMath's Digital Clone</strong><br><br>
         Namaste. I am the ThinkMath.ai Socratic Mentor.<br><br>
         Share your problem and we will find its <strong>Seed</strong> together.<br><br>
         I will never give you the answer. I will give you something better —
@@ -566,7 +566,7 @@ with chat_container:
             else:
                 st.markdown(f"""
                 <div class='mentor-message'>
-                <strong>Anand's Digital Clone</strong><br>{msg['content']}
+                <strong>ThinkMath's Digital Clone</strong><br>{msg['content']}
                 </div>
                 """, unsafe_allow_html=True)
 
