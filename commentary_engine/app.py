@@ -266,6 +266,18 @@ def get_credentials():
                 api_k = clean_key(f.read())
         except: pass
 
+    if not groq_k:
+        try:
+            with open(os.path.join(os.path.dirname(__file__), "..", "groq_api_key.txt"), "r") as f:
+                groq_k = clean_key(f.read())
+        except: pass
+
+    if not samba_k:
+        try:
+            with open(os.path.join(os.path.dirname(__file__), "..", "samba_api_key.txt"), "r") as f:
+                samba_k = clean_key(f.read())
+        except: pass
+
     fb_path = os.path.join(os.path.dirname(__file__), "..", "advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json")
     if not fb_cred and os.path.exists(fb_path):
         fb_cred = fb_path
@@ -686,16 +698,19 @@ if user_input:
                 # Initialize appropriate wrapper
                 if provider == "Gemini":
                     if not api_key: 
+                        status.write(f"⚠️ {provider} API Key missing. Skipping...")
                         retry_count += 1
                         continue
-                    session = GeminiWrapper(model_name, SYSTEM_PROMPT)
+                    session = GeminiWrapper(f"models/{model_name}" if "/" not in model_name else model_name, SYSTEM_PROMPT)
                 elif provider == "Groq":
                     if not groq_api_key:
+                        status.write(f"⚠️ {provider} API Key missing. Skipping...")
                         retry_count += 1
                         continue
                     session = GroqWrapper(model_name, SYSTEM_PROMPT)
                 elif provider == "SambaNova":
                     if not samba_api_key:
+                        status.write(f"⚠️ {provider} API Key missing. Skipping...")
                         retry_count += 1
                         continue
                     session = SambaNovaWrapper(model_name, SYSTEM_PROMPT)
