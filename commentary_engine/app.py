@@ -248,55 +248,6 @@ def get_credentials():
 
 inferred_api_key, inferred_fb_cred = get_credentials()
 
-# --- SIDEBAR ---
-st.sidebar.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=90)
-st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
-
-# --- SIDEBAR CREDENTIALS ---
-if inferred_api_key:
-    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Gemini Connected</div>", unsafe_allow_html=True)
-    api_key = inferred_api_key
-else:
-    api_key = st.sidebar.text_input("Gemini API Key", type="password")
-
-if inferred_fb_cred:
-    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Firebase Connected</div>", unsafe_allow_html=True)
-    firebase_cred = inferred_fb_cred
-else:
-    firebase_cred_path = st.sidebar.text_input("Firebase JSON Path")
-    firebase_cred = firebase_cred_path
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("#### Engine Status")
-
-# Auto-initialize model if API key is present
-if api_key and not st.session_state.get("active_model"):
-    try:
-        get_gemini_model_with_fallback(SYSTEM_PROMPT)
-    except Exception as e:
-        st.sidebar.error(f"Engine Init Error: {e}")
-
-model_status = st.session_state.get("active_model", "Waiting for API Key...")
-st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Model: {model_status}</div>", unsafe_allow_html=True)
-
-st.sidebar.markdown("---")
-
-# --- PHASE INDICATOR ---
-def render_phase_indicator(current_phase):
-    phases = {
-        1: "Phase 1: Finding the Seed",
-        2: "Phase 2: Identifying Directions",
-        3: "Phase 3: Convergence"
-    }
-    st.sidebar.markdown("#### Session Progress")
-    for num, label in phases.items():
-        if num < current_phase:
-            st.sidebar.markdown(f"<span class='phase-complete'>✓ {label}</span>", unsafe_allow_html=True)
-        elif num == current_phase:
-            st.sidebar.markdown(f"<span class='phase-active'>▶ {label}</span>", unsafe_allow_html=True)
-        else:
-            st.sidebar.markdown(f"<span class='phase-inactive'>○ {label}</span>", unsafe_allow_html=True)
-
 # --- TIER DISPLAY ---
 TIER_LABELS = {
     0: "Tier 0 — Narrative (Ages 6–9)",
@@ -367,6 +318,7 @@ This allows the UI to track session progress. Do not explain this line to the st
 # --- GEMINI MODEL ORCHESTRATOR ---
 def get_gemini_model_with_fallback(system_instruction):
     """Try models in priority order until one works."""
+    # Note: 'api_key' must be defined in sidebar or passed in
     genai.configure(api_key=api_key)
     generation_config = {
         "temperature": 0.3,
@@ -399,6 +351,58 @@ def get_gemini_model_with_fallback(system_instruction):
     
     st.error("Engine failure: No models available in the priority list. Please check your API key or quota.")
     st.stop()
+
+
+# --- SIDEBAR ---
+st.sidebar.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=90)
+st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
+
+# --- SIDEBAR CREDENTIALS ---
+if inferred_api_key:
+    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Gemini Connected</div>", unsafe_allow_html=True)
+    api_key = inferred_api_key
+else:
+    api_key = st.sidebar.text_input("Gemini API Key", type="password")
+
+if inferred_fb_cred:
+    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Firebase Connected</div>", unsafe_allow_html=True)
+    firebase_cred = inferred_fb_cred
+else:
+    firebase_cred_path = st.sidebar.text_input("Firebase JSON Path")
+    firebase_cred = firebase_cred_path
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("#### Engine Status")
+
+# Auto-initialize model if API key is present
+if api_key and not st.session_state.get("active_model"):
+    try:
+        get_gemini_model_with_fallback(SYSTEM_PROMPT)
+    except Exception as e:
+        st.sidebar.error(f"Engine Init Error: {e}")
+
+model_status = st.session_state.get("active_model", "Waiting for API Key...")
+st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Model: {model_status}</div>", unsafe_allow_html=True)
+
+st.sidebar.markdown("---")
+
+# --- PHASE INDICATOR ---
+def render_phase_indicator(current_phase):
+    phases = {
+        1: "Phase 1: Finding the Seed",
+        2: "Phase 2: Identifying Directions",
+        3: "Phase 3: Convergence"
+    }
+    st.sidebar.markdown("#### Session Progress")
+    for num, label in phases.items():
+        if num < current_phase:
+            st.sidebar.markdown(f"<span class='phase-complete'>✓ {label}</span>", unsafe_allow_html=True)
+        elif num == current_phase:
+            st.sidebar.markdown(f"<span class='phase-active'>▶ {label}</span>", unsafe_allow_html=True)
+        else:
+            st.sidebar.markdown(f"<span class='phase-inactive'>○ {label}</span>", unsafe_allow_html=True)
+
+
 
 # --- FIREBASE ---
 def init_firebase():
