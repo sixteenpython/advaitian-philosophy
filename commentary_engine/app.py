@@ -22,52 +22,71 @@ st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_sta
 # Inject Custom CSS — Bright Academic Theme (Yellow/White)
 st.markdown("""
     <style>
-    /* ── BASE ── */
+    /* ── RESET & BASE ── */
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif !important;
-        font-size: 15px !important;
-        line-height: 1.7 !important;
-        color: #1a1a1a !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        font-size: 15px;
+        line-height: 1.75;
+        color: #2d1f0e;
     }
+
+    /* ── APP BACKGROUND ── */
     .stApp {
         background-color: #ffffff;
-        color: #1a1a1a;
     }
-    code, pre, .math, .katex {
-        font-family: 'Courier New', Courier, monospace !important;
-    }
-
-    /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 4px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
-
-    /* ── HEADINGS ── */
-    h1, h2, h3, h4, h5, h6 {
-        color: #1a1a1a !important;
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 700 !important;
-    }
-    h1 { font-size: 2rem !important; font-weight: 800 !important; }
-    .stMarkdown p { color: #1a1a1a; }
 
     /* ── SIDEBAR ── */
-    [data-testid="stSidebar"] {
-        background-color: #fafafa !important;
-        border-right: 1px solid #e0e0e0;
+    section[data-testid="stSidebar"] {
+        background-color: #f9f6f1 !important;
+        border-right: 1px solid #ddd5c0;
     }
-    [data-testid="stSidebar"] * { color: #1a1a1a !important; }
+    section[data-testid="stSidebar"] * {
+        color: #2d1f0e !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+    }
 
-    /* ── PHASE INDICATORS ── */
-    .phase-active {
-        color: #f9a825 !important;
-        font-weight: bold !important;
+    /* ── HEADINGS ── */
+    h1 {
+        color: #5c3d1e !important;
+        font-weight: 800 !important;
+        font-size: 1.8rem !important;
+        letter-spacing: -0.5px;
     }
-    .phase-inactive {
-        color: #aaaaaa !important;
+    h2, h3, h4, h5, h6 {
+        color: #5c3d1e !important;
+        font-weight: 700 !important;
     }
-    .phase-complete {
-        color: #2e7d32 !important;
+
+    /* ── TAGLINE ── */
+    .stMarkdown p em {
+        color: #7a6040;
+        font-style: italic;
+    }
+
+    /* ── CHAT MESSAGES ── */
+    .user-message {
+        background-color: #f4f0e8;
+        border-left: 4px solid #8db543;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 10px 0;
+        color: #2d1f0e;
+        box-shadow: 0 1px 4px rgba(92,61,30,0.08);
+    }
+    .mentor-message {
+        background-color: #faf7f2;
+        border-left: 4px solid #5c3d1e;
+        border-radius: 8px;
+        padding: 16px 20px;
+        margin: 10px 0;
+        color: #2d1f0e;
+        box-shadow: 0 1px 4px rgba(92,61,30,0.08);
+    }
+    .user-message strong, .mentor-message strong {
+        color: #5c3d1e;
+        font-size: 0.85em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     /* ── INPUT BOX ── */
@@ -75,132 +94,113 @@ st.markdown("""
     .stTextArea>div>div>textarea,
     [data-testid="stChatInput"] textarea {
         background-color: #ffffff !important;
-        color: #1a1a1a !important;
-        border: 1px solid #e0e0e0 !important;
+        color: #2d1f0e !important;
+        border: 1px solid #ddd5c0 !important;
         border-radius: 8px !important;
-        font-family: 'Inter', sans-serif !important;
-        transition: all 0.2s ease !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
     }
-    .stTextInput>div>div>input:focus,
-    .stTextArea>div>div>textarea:focus,
     [data-testid="stChatInput"] textarea:focus {
-        border: 2px solid #f9a825 !important;
-        box-shadow: none !important;
+        border: 2px solid #8db543 !important;
+        outline: none !important;
     }
 
-    /* ── BUTTONS — DEFAULT (secondary) ── */
+    /* ── BUTTONS ── */
     .stButton>button {
-        background-color: #ffffff !important;
-        color: #1a1a1a !important;
-        border: 1px solid #e0e0e0 !important;
-        border-radius: 6px !important;
-        font-family: 'Inter', sans-serif !important;
-        transition: all 0.2s ease !important;
+        background-color: #ffffff;
+        color: #5c3d1e;
+        border: 1px solid #ddd5c0;
+        border-radius: 6px;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        transition: all 0.2s ease;
     }
     .stButton>button:hover {
-        background-color: #fff8e1 !important;
-        border-color: #f9a825 !important;
-        color: #1a1a1a !important;
+        background-color: #f4f0e8;
+        border-color: #8db543;
+        color: #5c3d1e;
     }
-
-    /* ── PRIMARY BUTTON (Generate Stage 2) ── */
-    .stButton>button[kind="primary"],
-    button[data-testid="baseButton-primary"] {
-        background-color: #f9a825 !important;
-        color: #1a1a1a !important;
+    /* Primary button — Generate Stage 2 */
+    .stButton>button[kind="primary"] {
+        background-color: #8db543 !important;
+        color: #ffffff !important;
         border: none !important;
-        border-radius: 6px !important;
         font-weight: bold !important;
-        transition: all 0.2s ease !important;
     }
-    .stButton>button[kind="primary"]:hover,
-    button[data-testid="baseButton-primary"]:hover {
-        background-color: #ffb300 !important;
-        transform: translateY(-1px) !important;
+    .stButton>button[kind="primary"]:hover {
+        background-color: #7a9e3a !important;
     }
 
-    /* ── STUCK BUTTON ── */
-    .stuck-button>button {
-        background-color: #fff8e1 !important;
-        border: 1px solid #f9a825 !important;
-        color: #f9a825 !important;
-        font-size: 0.85em !important;
-        padding: 4px 12px !important;
-        border-radius: 8px !important;
+    /* ── PHASE INDICATOR ── */
+    .phase-active {
+        color: #8db543 !important;
+        font-weight: bold;
     }
-
-    /* ── SUPPORT BUTTON ── */
-    [data-testid="stLinkButton"] a,
-    .stLinkButton a {
-        background-color: #fff3f3 !important;
-        border: 1px solid #e53935 !important;
-        color: #e53935 !important;
-        border-radius: 8px !important;
+    .phase-complete {
+        color: #5c3d1e !important;
     }
-
-    /* ── CHAT MESSAGES ── */
-    .user-message {
-        background-color: #fff8e1;
-        border-left: 4px solid #f9a825;
-        padding: 16px 20px;
-        border-radius: 8px;
-        margin: 12px 0;
-        color: #1a1a1a;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-        transition: all 0.2s ease;
-    }
-    .mentor-message {
-        background-color: #f5f5f5;
-        border-left: 4px solid #1a1a1a;
-        padding: 16px 20px;
-        border-radius: 8px;
-        margin: 12px 0;
-        color: #1a1a1a;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-        transition: all 0.2s ease;
+    .phase-inactive {
+        color: #bbb0a0 !important;
     }
 
     /* ── TIER BADGE ── */
     .tier-badge {
-        background-color: #fff8e1;
-        border: 1px solid #f9a825;
+        background-color: #f4f0e8;
+        border: 1px solid #8db543;
+        color: #8db543;
         border-radius: 20px;
         padding: 4px 12px;
-        font-size: 0.75em;
-        color: #f9a825;
+        font-size: 0.8em;
         display: inline-block;
-        margin-bottom: 10px;
-    }
-
-    /* ── ENGINE STATUS BADGE ── */
-    .stAlert {
-        border-radius: 6px !important;
-        padding: 6px 12px !important;
-        background-color: #fff8e1 !important;
-        border: 1px solid #f9a825 !important;
-        color: #1a1a1a !important;
+        margin-bottom: 8px;
     }
 
     /* ── DONATE SECTION ── */
     .donate-section {
-        background-color: #fffde7;
-        border: 1px solid #f9a825;
+        background-color: #f4f0e8;
+        border: 1px solid #8db543;
         border-radius: 10px;
         padding: 16px;
-        margin-top: 16px;
+        margin-top: 12px;
         text-align: center;
     }
-    .donate-section p { color: #555555 !important; }
-    .donate-section em {
-        color: #f9a825;
-        font-style: italic;
-        font-weight: bold;
+    .donate-section p {
+        color: #5c3d1e !important;
     }
 
-    /* ── DIVIDERS & MISC ── */
-    hr { border-color: #e0e0e0 !important; }
-    .stSelectbox>div>div { background-color: #ffffff !important; border-color: #e0e0e0 !important; }
-    [data-testid="stMarkdownContainer"] strong { color: #1a1a1a; }
+    /* ── SELECTBOX & SIDEBAR WIDGETS ── */
+    .stSelectbox>div>div {
+        background-color: #f9f6f1 !important;
+        border: 1px solid #ddd5c0 !important;
+        color: #2d1f0e !important;
+        border-radius: 6px !important;
+    }
+
+    /* ── SUCCESS / WARNING / ERROR ── */
+    .stSuccess {
+        background-color: #f0f7e6 !important;
+        color: #5c3d1e !important;
+        border: 1px solid #8db543 !important;
+    }
+    .stWarning {
+        background-color: #fdf6e3 !important;
+        color: #5c3d1e !important;
+    }
+    .stError {
+        background-color: #fff0f0 !important;
+        color: #c0392b !important;
+    }
+
+    /* ── DIVIDER ── */
+    hr {
+        border-color: #ddd5c0 !important;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb {
+        background-color: #ddd5c0;
+        border-radius: 3px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -509,7 +509,8 @@ if st.sidebar.button("🔄 New Session", use_container_width=True):
     st.rerun()
 
 # --- MAIN UI ---
-st.title("🌑 ThinkMath.ai")
+st.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=110)
+st.title("ThinkMath.ai")
 st.markdown("##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*")
 
 # Show tier badge if detected
