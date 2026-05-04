@@ -387,6 +387,77 @@ philosophical context that supersedes anything ambiguous above. The
 protocol governs YOUR engagement; the doctrine governs what is TRUE."""
 
 
+CRITIC_BRIEF = """You are an external proof critic for ThinkMath.ai.
+
+You receive:
+1. A mathematical PROBLEM statement.
+2. A proposed SIX-POINT COMMENTARY the engine has drafted (with sections
+   SEED, BRUTE PATH, ELEGANT PIVOT, PITFALLS, CONNECTIONS, TAKEAWAY).
+
+Your job is NOT to teach, NOT to generate a proof, and NOT to be polite.
+Your job is to find the flaws — silently, then report.
+
+Run these five checks:
+
+1. THEOREM LABELING. If a named theorem is invoked (Ptolemy, Vieta's,
+   AM-GM, Cauchy-Schwarz, Pigeonhole, Strong Induction, Sophie Germain,
+   LTE, Power of a Point, etc.), is it labelled correctly? Are the
+   problem's quantities playing the right roles in the theorem statement?
+   Common failure: "by Ptolemy AC·BD = ab + cd" when the labelling
+   actually gives ad + bc.
+
+2. CASE COMPLETENESS. Is the case analysis exhaustive? Is there a
+   hidden case (n=1, equality holds, edge configuration, all-equal
+   variables) the proof misses?
+
+3. CONSTRAINT RESPECT. Does the argument use ALL stated constraints —
+   strict inequalities (a > b > c > d means NO TWO MAY BE EQUAL),
+   integrality, primality, ordering, positivity? Common failure:
+   the rearranged equation is satisfied but the strict ordering is not.
+
+4. UNVERIFIED LEAPS. Are there assertions like "this quantity is an
+   integer", "this factor is > 1", "this exists", "WLOG", "by symmetry"
+   that need a sub-proof but get skipped?
+
+5. NUMERICAL SANITY. Pick ONE concrete instance that satisfies every
+   constraint AND the problem's defining condition. Plug it through the
+   ELEGANT PIVOT step-by-step. Does the central claim hold on that case?
+
+Output format — STRICT, exactly two header lines + an optional list:
+
+VERDICT: SOLID
+ONE-LINE-RATIONALE: <one short sentence>
+
+OR
+
+VERDICT: NEEDS_NOTE
+ONE-LINE-RATIONALE: <one short sentence>
+ISSUES:
+- <issue, ≤ 25 words>
+- <issue, ≤ 25 words>
+
+OR
+
+VERDICT: UNSAFE
+ONE-LINE-RATIONALE: <one short sentence naming the specific flaw>
+ISSUES:
+- <issue, ≤ 25 words>
+- <issue, ≤ 25 words>
+
+Verdict scale:
+- SOLID:      no substantive issues found.
+- NEEDS_NOTE: the proof spirit is correct but a step needs a caveat or
+              the reader should be warned about an unverified leap.
+- UNSAFE:     a step is mathematically wrong, a constraint is violated,
+              or a named theorem is misapplied. Engine should refuse
+              to ship this commentary unmodified.
+
+Bias toward NEEDS_NOTE for borderline cases. Reserve UNSAFE for clear,
+nameable errors. If unsure, choose NEEDS_NOTE.
+
+End your reply right after the ISSUES list. No further commentary."""
+
+
 # =============================================================================
 # CONSTANTS
 # =============================================================================
@@ -1090,6 +1161,165 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
 
 
 # =============================================================================
+# PROOF CRITIC — second-LLM pass on Phase 3 commentaries
+# =============================================================================
+
+CRITIC_OUTPUT_TOKENS = 700
+CRITIC_MAX_ATTEMPTS = 3
+CRITIC_VERDICT_RE = re.compile(r"VERDICT:\s*(SOLID|NEEDS_NOTE|UNSAFE)", re.I)
+CRITIC_RATIONALE_RE = re.compile(r"ONE-LINE-RATIONALE:\s*(.+?)(?:\n|$)", re.I)
+CRITIC_ISSUES_RE = re.compile(r"ISSUES:?\s*\n(.*)", re.S | re.I)
+
+
+def _parse_critic(text: str, model_label: str) -> dict:
+    """Parse the critic's structured response into a verdict dict."""
+    verdict_m = CRITIC_VERDICT_RE.search(text)
+    rationale_m = CRITIC_RATIONALE_RE.search(text)
+
+    verdict = verdict_m.group(1).upper() if verdict_m else "SOLID"
+    if verdict not in ("SOLID", "NEEDS_NOTE", "UNSAFE"):
+        verdict = "SOLID"
+
+    rationale = rationale_m.group(1).strip() if rationale_m else ""
+
+    issues: list[str] = []
+    issues_section = CRITIC_ISSUES_RE.search(text)
+    if issues_section:
+        for line in issues_section.group(1).splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            if line.startswith(("-", "*", "•", "—")):
+                issues.append(line.lstrip("-*•— ").strip())
+            elif line and len(issues) < 6 and not line.upper().startswith("VERDICT"):
+                issues.append(line)
+
+    return {
+        "status": verdict,
+        "rationale": rationale,
+        "issues": issues[:6],
+        "model": model_label,
+        "raw": text.strip(),
+    }
+
+
+def run_critic(
+    problem: str,
+    commentary: str,
+    all_models: list,
+    generator_provider: str | None = None,
+    status_writer=None,
+) -> dict:
+    """Independent second-LLM pass over a Phase-3 commentary.
+
+    Returns a dict with keys: status, rationale, issues, model, raw.
+    Status is one of SOLID / NEEDS_NOTE / UNSAFE / UNAVAILABLE / ERROR.
+    """
+    available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
+    if not available:
+        return {
+            "status": "UNAVAILABLE",
+            "rationale": "No critic model available right now.",
+            "issues": [],
+            "model": None,
+            "raw": "",
+        }
+
+    # Prefer (a) a different provider from the generator and (b) high score.
+    def _critic_priority(m):
+        diff_provider = 0 if (generator_provider and m["provider"] == generator_provider) else 1
+        return (-diff_provider, -m["score"])
+
+    candidates = sorted(available, key=_critic_priority)[:CRITIC_MAX_ATTEMPTS]
+
+    critic_input = (
+        "PROBLEM:\n"
+        f"{problem.strip()}\n\n"
+        "COMMENTARY (the engine's draft Six-Point):\n"
+        f"{commentary.strip()}\n\n"
+        "Apply your five checks. Return VERDICT + ONE-LINE-RATIONALE "
+        "(+ ISSUES if not SOLID). Nothing else."
+    )
+
+    if status_writer:
+        status_writer.write("→ Independent proof critic running…")
+
+    last_err = None
+    for m in candidates:
+        provider, model = m["provider"], m["model"]
+        try:
+            wrapper = get_wrapper(provider, model, CRITIC_BRIEF)
+            text = wrapper.send(critic_input, [], CRITIC_OUTPUT_TOKENS)
+            if text and text.strip():
+                if status_writer:
+                    status_writer.write(f"   ✓ critic: {provider} · `{model}`")
+                return _parse_critic(text, f"{provider} · {model}")
+        except Exception as e:
+            last_err = str(e)
+            if status_writer:
+                status_writer.write(f"   ✗ critic on {provider}/{model}: {last_err[:80]}")
+            # Don't trip the circuit breaker for critic failures — the generator
+            # ladder needs these models. Just move to the next candidate.
+            continue
+
+    return {
+        "status": "ERROR",
+        "rationale": f"All critic candidates failed. Last error: {last_err}",
+        "issues": [],
+        "model": None,
+        "raw": "",
+    }
+
+
+CRITIC_NEEDS_NOTE_BANNER = "🔍 **Independent critic note**"
+CRITIC_UNSAFE_BANNER = "⚠ **Critic flagged this commentary as unsafe**"
+
+
+def annotate_with_critic(commentary: str, critic: dict) -> str:
+    """Apply the critic's verdict to the commentary text the user will see."""
+    status = critic.get("status", "SOLID")
+
+    if status == "SOLID":
+        return commentary
+
+    if status in ("UNAVAILABLE", "ERROR"):
+        # Critic itself failed — ship commentary unchanged but flag silently.
+        return commentary + (
+            f"\n\n---\n*({critic.get('rationale', 'Critic offline; commentary unchecked.')})*"
+        )
+
+    if status == "NEEDS_NOTE":
+        block = (
+            f"\n\n---\n\n{CRITIC_NEEDS_NOTE_BANNER}: "
+            f"{critic.get('rationale', '')}"
+        )
+        if critic.get("issues"):
+            block += "\n\n*Specific concerns from the independent critic:*\n"
+            block += "\n".join(f"- {i}" for i in critic["issues"])
+        return commentary + block
+
+    if status == "UNSAFE":
+        # REPLACE the commentary with a refusal — do not ship a flawed proof.
+        refusal = (
+            f"{CRITIC_UNSAFE_BANNER}\n\n"
+            f"I drafted a Six-Point Commentary, but my independent proof critic "
+            f"flagged a substantive flaw I cannot fix without your help.\n\n"
+            f"**Critic rationale:** {critic.get('rationale', '(no rationale provided)')}\n"
+        )
+        if critic.get("issues"):
+            refusal += "\n**Specific concerns:**\n"
+            refusal += "\n".join(f"- {i}" for i in critic["issues"]) + "\n"
+        refusal += (
+            "\nLet's walk through the proof together rather than ship a flawed argument. "
+            "What's the first step you'd like to verify? "
+            "(For transparency, the original draft is available in admin mode.)"
+        )
+        return refusal
+
+    return commentary
+
+
+# =============================================================================
 # RESPONSE PARSING
 # =============================================================================
 
@@ -1697,13 +1927,39 @@ if st.session_state.messages:
 st.markdown("---")
 
 
-def render_mentor(content: str, model_label: str | None = None):
-    """Render a mentor card: native st.markdown body so KaTeX renders."""
+def render_mentor(content: str, model_label: str | None = None, critic: dict | None = None, original_draft: str | None = None):
+    """Render a mentor card: native st.markdown body so KaTeX renders.
+    In admin mode, expose the critic verdict and the pre-critic draft."""
     with st.chat_message("assistant"):
         st.markdown("<div class='card-role'>" + MENTOR_DISPLAY_NAME + "</div>", unsafe_allow_html=True)
         st.markdown(normalise_math(content))
         if model_label:
             st.markdown(f"<div class='card-footer'>Powered by {model_label}</div>", unsafe_allow_html=True)
+        # Admin-only critic transparency panel
+        if ADMIN_MODE and critic is not None:
+            status = critic.get("status", "?")
+            badge = {
+                "SOLID": "🟢 SOLID",
+                "NEEDS_NOTE": "🟡 NEEDS_NOTE",
+                "UNSAFE": "🔴 UNSAFE",
+                "UNAVAILABLE": "⚪ UNAVAILABLE",
+                "ERROR": "⚪ ERROR",
+            }.get(status, status)
+            label = f"Critic: {badge} · {critic.get('model', 'n/a')}"
+            with st.expander(label, expanded=False):
+                if critic.get("rationale"):
+                    st.markdown(f"**Rationale:** {critic['rationale']}")
+                if critic.get("issues"):
+                    st.markdown("**Issues flagged:**")
+                    for i in critic["issues"]:
+                        st.markdown(f"- {i}")
+                if original_draft and status == "UNSAFE":
+                    st.markdown("---")
+                    st.markdown("**Original (pre-critic) draft:**")
+                    st.markdown(normalise_math(original_draft))
+                if critic.get("raw"):
+                    st.caption("Raw critic output:")
+                    st.code(critic["raw"], language=None)
 
 
 def render_user(content: str):
@@ -1720,7 +1976,12 @@ else:
         if msg["role"] == "user":
             render_user(msg["content"])
         else:
-            render_mentor(msg["content"], msg.get("model"))
+            render_mentor(
+                msg["content"],
+                msg.get("model"),
+                critic=msg.get("critic"),
+                original_draft=msg.get("original_draft"),
+            )
 
 st.markdown("---")
 
@@ -1779,18 +2040,46 @@ if user_input:
             if not clean:
                 clean = "[Empty response. Please rephrase and try again.]"
 
+            # ────────── PROOF CRITIC PASS (Phase 3 only) ──────────
+            # When the engine ships a Six-Point Commentary, run it past an
+            # independent LLM critic before showing the user. SOLID → ship as-is;
+            # NEEDS_NOTE → ship with a caveat box; UNSAFE → refuse and ask the
+            # student to walk through the proof together.
+            critic_result = None
+            original_draft = None
+            if phase == 3 and "TAKEAWAY" in clean.upper():
+                problem_statement = next(
+                    (m["content"] for m in st.session_state.messages if m["role"] == "user"),
+                    "",
+                )
+                critic_result = run_critic(
+                    problem=problem_statement,
+                    commentary=clean,
+                    all_models=ALL_MODELS,
+                    generator_provider=provider,
+                    status_writer=status,
+                )
+                original_draft = clean
+                clean = annotate_with_critic(clean, critic_result)
+
             st.session_state.current_phase = phase
             st.session_state.detected_tier = tier
             st.session_state.active_model = f"{provider} · {model}"
-            st.session_state.messages.append({
+
+            mentor_msg = {
                 "role": "mentor",
                 "content": clean,
                 "model": st.session_state.active_model,
-            })
+            }
+            if critic_result is not None:
+                mentor_msg["critic"] = critic_result
+                mentor_msg["original_draft"] = original_draft
+            st.session_state.messages.append(mentor_msg)
 
             if "ready for stage 2" in clean.lower():
                 st.session_state.mvc_validated = True
 
+            # Save to Firebase only if the commentary was NOT refused as UNSAFE.
             if phase == 3 and "TAKEAWAY" in clean.upper():
                 problem = next(
                     (m["content"] for m in st.session_state.messages if m["role"] == "user"),
