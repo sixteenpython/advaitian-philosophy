@@ -1,8 +1,10 @@
-# ThinkMath.ai — End-of-Session Checkpoint
+# ThinkMath.ai + Book Project — End-of-Session Checkpoint
 
-**Date:** Monday, May 4, 2026
-**Session purpose:** Architectural calibration round before user testing
-**Outcome:** Ship-ready. User testing planned next few weeks.
+**Date:** Monday May 4 → Tuesday May 5, 2026 (extended past midnight)
+**Session purpose:** (A) Architectural calibration round for ThinkMath.ai before user testing; (B) Scoping the 25-day book project for Volume 1 of "Philosophy of Problem Solving"
+**Outcome:** App ship-ready (user testing planned). Book project plan locked, Day 1 starts May 5.
+
+> **READING ORDER:** Part A (Sections 1–15) covers the ThinkMath app shipping decision. Part B (Sections B.1–B.10, appended at end) covers the 25-day book project that begins May 5. Both are active context.
 
 ---
 
@@ -315,6 +317,8 @@ Do **not** start these before user-testing data is in:
 
 ## 14. Next Session Starting Point
 
+> **UPDATE (May 5, 00:30):** This section is partially superseded by the book project plan in PART B below. For book project context, jump to Section B.6 (Day 1 decisions) and Section B.10 ("Updated Next Session Starting Point"). The app-side guidance below remains valid: no new app features without user-testing data.
+
 When picking up in a new AI conversation:
 
 1. **Read this file first.** Don't re-discover context.
@@ -338,3 +342,268 @@ Full conversation transcript (for deep context if needed): [ThinkMath calibratio
 The product is in a state where the next round of improvements should be data-driven, not speculation-driven. Three confidence-defining instruments are now live (MVC gate, top-tier generator, critic), each architecturally complete. Further calibration is tuning, and tuning belongs to production data.
 
 Ship. Observe. Then iterate.
+
+---
+
+# PART B — BOOK PROJECT (Activated May 5, 00:30)
+
+## B.1 Strategic Pivot
+
+ThinkMath.ai ships and runs in production. Discipline holds: no new app features until user-testing data arrives.
+
+**The next 25 days of work focus has shifted to writing Volume 1 of "Philosophy of Problem Solving."** Same methodology that powers the app, now codified as a permanent text. The app and the book are two manifestations of one underlying doctrine; both feed each other.
+
+**Cursor license:** 1 month from May 4, 2026 → ~25 working days, target completion ~May 29.
+
+---
+
+## B.2 Volume 1 Scope
+
+Volume 1 = the **Five Pillars** (the framework book):
+
+1. **Pillar 1:** The Six-Point Framework (SEED · BRUTE PATH · ELEGANT PIVOT · PITFALLS · CONNECTIONS · TAKEAWAY)
+2. **Pillar 2:** The 20 Universal Archetypes (one chapter per archetype)
+3. **Pillar 3:** The Multidirectional Approach ("burn the candle from both ends")
+4. **Pillar 4:** CEP Design (Central Elegant Point — problem design from CEP backward)
+5. **Pillar 5:** Mathematical Gems (~50–100 named tools organized into 7 clusters)
+
+Volume 2 = the 1000 commentaries (deferred; future work).
+
+For Volume 1: the 8 reference commentaries from `commentaries/advaitian_commentaries_1_8.pdf` are planned as Appendix A.
+
+Realistic deliverable: **first-draft manuscript with all five pillars structured, written, internally consistent, properly cross-referenced.** Publication polish is a refinement pass after first draft is complete; that polish is Anand's pass alone.
+
+---
+
+## B.3 Repo Inventory (Discovered May 5)
+
+The repo is significantly more drafted than initially indexed. Volume 1 starts at ~30–40% drafted in raw form, not from zero.
+
+### Book-grade content (ready to lift, with light editing)
+
+| Asset | Size | Status |
+|---|---|---|
+| `knowledge_base/Chapter_1_Invariance.txt` | 19 KB | **Fully drafted Chapter 1 in book voice.** Has all sections: opening vignette (juggler), formal definition, deep structure (Group theory + Noether + Euler characteristic), diagnostic toolkit (3-questions method), worked example (polygon AP), 5 practice problems, connections web, 7 master takeaways, self-assessment checklist, bridge-to-Chapter-2. **The gold template for Chapters 2–20 of Pillar 2.** |
+| `commentaries/advaitian_commentaries_1_8.pdf` | 282 KB | 8 polished gold-standard commentaries → Appendix A. |
+| `my_references/extracted_text.txt` | 319 KB | Combined extraction of 4 source docx files. Contains full Stage 2 commentary text for problems 1, 2, and likely more. |
+
+### Doctrine drafts (need consolidation before chapter writing — see B.4)
+
+Six overlapping copies of the framework, all written in slightly different voices:
+
+| File | Size | Voice | Strengths |
+|---|---|---|---|
+| `knowledge_base/Advaitian_White_Paper.txt` | 28 KB | Academic white paper | TOC + 4-pillar Part structure |
+| `knowledge_base/Advaitian_Philosophy_Framework.txt` | 32 KB | Formal framework | Most complete pillar-by-pillar treatment |
+| `knowledge_base/Masterclass_Problem_Solving.txt` | 25 KB | Masterclass | Most pedagogical voice |
+| `knowledge_base/Seed_Elegance_Connections.txt` | 23 KB | Meta-framework | 3-min MVC workflow, 5-second heuristic, archetype lookup table |
+| `knowledge_base/ThinkMath_Blueprint_v3.md` | 45 KB | System-instruction | Tier-by-tier voice, **50+ structured gems in 7 clusters**, CEP library, pitfall hall of fame |
+| `knowledge_base/Advaitian_Master_Framework.txt` | 9 KB | Source-of-truth | Consolidated reference + 2 gold-standard examples |
+
+### Identity / brainstorming archives (voice reference, not source)
+
+~3.5 MB across 6 conversation transcripts at repo root: `claude-chat-advaitian-1/2/3`, `chatgpt-advaitian-1/2`, `gemini-chat-advaitian-1`, `chatgpt-evolution-prob-solving-with-kd-joshi`. Useful for voice calibration; not direct manuscript content.
+
+### Empty scaffolding (the destination for the next 25 days)
+
+Five pillar folders (`pillar1-framework/`, `pillar2-archetypes/`, `pillar3-multidirectional/`, `pillar4-cep-design/`, `pillar5-gems/`) plus `appendices/`, `templates/`, `theorems-certification/`, `transfer-applications/`, `scripts/`, `figures/` are all empty `.gitkeep` placeholders. Only `figures/imath_logo.png` exists.
+
+### Out of scope
+
+7 vriddhi conversation files + `claude-chat-astro-pred` are different projects.
+
+### Security check (verified May 5)
+
+`.gitignore` correctly excludes all secrets (`*_api_key.txt`, `credentials.py`, `local_keys.py`, hardcoded Gemini key file, Firebase admin SDK json). `git status --ignored` confirms with `!!` prefix. **No leakage risk for book commits.**
+
+---
+
+## B.4 The Doctrine Redundancy Issue (#1 Project Risk)
+
+Six overlapping copies of the framework drift in:
+
+- Archetype naming (e.g., "Substitution" vs "Substitution / Change of Variables")
+- Gem count (50? 100? 160?)
+- Pillar count (some say 4 + integration; the book uses 5)
+- Voice (white paper vs masterclass vs system instruction)
+
+If we don't pick one canonical source per concept up front, the 19 archetype chapters we write will contradict each other. **Doctrine consolidation is Day 1 work, before any chapter drafting.**
+
+---
+
+## B.5 Revised 25-Day Plan
+
+This revises yesterday's draft based on actual draft state discovered May 5.
+
+```
+DAYS 1–2  (May 5–6)    CONSOLIDATION + SCAFFOLDING
+                        - Resolve doctrine drift; pick canonical source per concept
+                        - Format decision (LaTeX vs Markdown); build pipeline setup
+                        - Chapter template extracted from Chapter_1_Invariance.txt
+                        - Notation, archetype numbering, gem numbering locked
+                        - Front-matter skeleton: Preface, TOC, Reader's Guide
+
+DAYS 3–13 (May 7–17)   PILLAR 2 — THE 20 ARCHETYPES (heaviest pillar)
+                        - Carry over Chapter 1 (Invariance), already drafted
+                        - Write Chapters 2–20 using same Chapter_1 template
+                        - ~2 days per chapter average
+                        - 11 days; the choke point of the project
+
+DAYS 14–15 (May 18–19) PILLAR 1 — SIX-POINT FRAMEWORK
+                        - Largely drafted in white paper + blueprint v3
+                        - Compress + re-voice + add 3–4 worked examples
+
+DAYS 16–18 (May 20–22) PILLAR 3 — MULTIDIRECTIONAL APPROACH
+                        - "Burn the candle from both ends"
+                        - Existing material + IMO 1988/2001 worked examples
+                        - Most novel; needs more original drafting
+
+DAYS 19–21 (May 23–25) PILLAR 4 — CEP DESIGN
+                        - 5-step protocol already documented
+                        - Worked example: IMO 2001 P6 cyclic-quadrilateral
+                        - Tighten CEP definition before drafting
+
+DAYS 22–24 (May 26–28) PILLAR 5 — MATHEMATICAL GEMS
+                        - Blueprint v3 has 50+ gems in 7 clusters (A–G)
+                        - Expand each into a structured "gem page"
+                        - V1 count recommended: 100 gems
+
+DAY 25     (May 29)    INTEGRATION + FRONT MATTER + APPENDICES
+                        - Preface, Introduction, Vision chapter
+                        - Glossary, Index of archetypes/gems, Bibliography
+                        - 8 commentaries inserted as Appendix A
+                        - Cross-reference + voice consistency final pass
+
+DAYS 26–30 (BUFFER)    Whatever pillar slipped + Pillar 1 polish pass
+```
+
+**Pillar 2 is the choke point.** If it slips, Pillar 5 compresses or the buffer absorbs.
+
+---
+
+## B.6 Three Pre-Work Decisions Needed (Day 1 Blockers)
+
+These shape everything. Recommendations included; await Anand's confirmation on May 5.
+
+### Decision 1: Doctrine consolidation strategy
+
+**Recommendation:**
+
+- Promote `Advaitian_Philosophy_Framework.txt` → canonical book-skeleton source (most complete pillar-by-pillar treatment, matches white paper structure)
+- Keep `ThinkMath_Blueprint_v3.md` → canonical operational appendix (only place with structured gem catalog + tier voice + pitfall hall of fame)
+- Demote the other four (`Advaitian_White_Paper.txt`, `Masterclass_Problem_Solving.txt`, `Seed_Elegance_Connections.txt`, `Advaitian_Master_Framework.txt`) to a new `_archive/doctrine-iterations/` folder
+- Keep `Chapter_1_Invariance.txt` as Pillar 2 Chapter 1 (just LaTeX-ify or markdown-format it)
+
+**App impact:** KB hot-reload remains functional because canonical files stay in `knowledge_base/`. KB budget pressure (currently skipping 5 of 8 files at 11K char limit) disappears with redundant copies removed. **The app will load the full canon for the first time.**
+
+### Decision 2: Format / build pipeline
+
+**Recommendation: Markdown source + Pandoc-build to LaTeX → PDF.**
+
+Reasons:
+- Markdown doesn't fight you for first drafts; preserves writing flow
+- KB hot-reload already works with `.md`; app and book share substrate
+- Pandoc → LaTeX → PDF gives publication-quality output when ready
+- GitHub renders markdown natively; drafts readable in browser without a build step
+
+Alternative: pure LaTeX in Overleaf. Heavier setup, more friction during drafting, unambiguously professional output. Recommend only if a strong LaTeX template is already prepared.
+
+### Decision 3: Volume 1 scope confirmation
+
+**Recommendation:**
+- Volume 1 = 5 pillars (framework book)
+- Volume 1 Appendix A = 8 commentaries (already polished)
+- Volume 2 = 1000 commentaries (out of scope for 25-day push)
+
+Confirm or adjust.
+
+---
+
+## B.7 Process Discipline (Different from App Build)
+
+| Dimension | App build | Book write |
+|---|---|---|
+| Cadence | Ship and iterate | Draft and refine |
+| Output mode | Functional or broken | Quality is continuous |
+| Auto-generation | Acceptable, then iterate | Never without section-outline approval |
+| Math correctness | LLM critic backstop | **Anand's verification, always** |
+| Iteration trigger | User signal in production | End-of-day Anand review |
+| Working unit | Commit + push | Section + Anand review + commit |
+
+**Key disciplines for the book:**
+
+1. AI drafts; Anand verifies math correctness. AI does not authorize mathematical claims.
+2. No auto-generating chapter content without you approving the section outline first.
+3. Every draft section ships with a "questions for you" annotation where AI is uncertain.
+4. Cross-pillar consistency enforced actively — if Pillar 2 establishes "Archetype 5 is Substitution," Pillar 5 cannot drift to a different name.
+5. End-of-day status: what got drafted, what's blocked, what needs your decision before AI can continue.
+6. Mathematical claims AI drafts get explicitly flagged for Anand verification.
+7. LaTeX/Markdown discipline: equations use canonical formatting that compiles consistently.
+
+---
+
+## B.8 What AI Brings vs What AI Cannot Do
+
+**What AI brings well:**
+- Fast LaTeX/Markdown drafting (theorem environments, equation alignment, cross-references, bibliography)
+- Structural editing (chapter consistency, voice calibration against Chapter_1)
+- Generating draft prose for sections you outline; you refine
+- Cross-domain connection-finding (the "Connections" sections in your commentaries are exactly what AI is good at drafting)
+- Catching internal inconsistencies across pillars
+- Producing first-pass examples and worked solutions
+- Organizing the bibliography and index
+- Tracking the running consistency log across 25 days
+
+**What AI cannot do:**
+- Have your original pedagogical insight. The methodology is yours; AI executes, AI does not generate.
+- Be the final mathematical authority. AI drafts a proof; you must verify it. (Yesterday's session showed even careful LLM-stacks ship subtly wrong math. The book's correctness floor must be human.)
+- Decide editorial priorities. Which 100 gems make the canon? Which examples are most pedagogically valuable? Anand decides; AI drafts to those decisions.
+- Replace the years of accumulated thinking that produced the framework.
+
+---
+
+## B.9 Aspirational Vision (Captured for Continuity)
+
+The book + app + live mentoring form a three-pillar "master craftsman" approach to a niche student population:
+
+> "If it stays small but serves 10,000 students well over five years. I just need the right students across the globe. Even if I produce 1000 JEE Advanced rankers or 100 IMO finalists out of these 10k students — that's it. I am done."
+
+This is the success metric. Not MAUs, not ARR, not market cap. **Outcomes for a small, carefully selected student cohort.**
+
+Roles in that vision:
+- **Book** — codify the doctrine permanently so it survives beyond Anand's direct teaching
+- **App** — scale the Socratic engagement across the cohort
+- **Live mentoring** — the irreplaceable human element for the elite tier
+
+---
+
+## B.10 Updated Next Session Starting Point (supersedes Section 14)
+
+When picking up tomorrow (May 5):
+
+1. **Read this file from the top.** Both Part A (app shipped) and Part B (book project) are active context.
+2. **Confirm the three Day 1 decisions** in Section B.6:
+   - Doctrine consolidation: approve recommendation or specify alternative
+   - Format: Markdown + Pandoc (recommended) or LaTeX/Overleaf
+   - Volume 1 scope: confirm 5 pillars + 8-commentary Appendix A
+3. **Once decisions are confirmed, Day 1 work begins:**
+   - Move 4 redundant doctrine files to `_archive/doctrine-iterations/`
+   - Set up build pipeline (Pandoc or Overleaf)
+   - Lift `Chapter_1_Invariance.txt` into `pillar2-archetypes/01-invariance.md` (or `.tex`) and use it to derive the chapter style guide
+   - Create chapter outline scaffolding in all five pillar folders
+   - Open Day 2 with Pillar 2 chapter outline locked
+4. **App side: hands off** unless an emergency fix is needed from user-testing data.
+
+If new instructions arrive that don't fit this plan, push back: ask whether they're urgent vs deferrable. The 25-day book commitment is the priority through May 29.
+
+---
+
+## Closing Note (Part B)
+
+The app shipped yesterday. The book starts tomorrow. Two months from now, both pillars of Anand's three-pillar mission (book + app + live mentoring) will be operational.
+
+The doctrine has been refined in this repo for ~2 years. The next 25 days are about codifying it permanently — turning a working methodology into a permanent text that outlives any single conversation, app version, or LLM model.
+
+Build the book. Then refine. Then ship Volume 2.
+
+🌑
