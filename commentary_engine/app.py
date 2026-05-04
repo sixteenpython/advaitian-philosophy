@@ -201,6 +201,28 @@ st.markdown("""
         background-color: #ddd5c0;
         border-radius: 3px;
     }
+
+    /* ── HIDE STREAMLIT SIDEBAR COLLAPSE TOOLTIP ── */
+    button[data-testid="collapsedControl"] {
+    display: none !important;
+    }
+    [data-testid="stSidebarCollapseButton"] {
+    display: none !important;
+    }
+    button[kind="headerNoPadding"] {
+    display: none !important;
+    }
+    /* Hide all Streamlit toolbar tooltips */
+    .st-emotion-cache-zq5wmm {
+    display: none !important;
+    }
+    /* Hide the keyboard_double_arrow tooltip specifically */
+    [data-testid="stSidebarNavCollapseIcon"] {
+    display: none !important;
+    }
+    .st-emotion-cache-1rtdyuf {
+    display: none !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
