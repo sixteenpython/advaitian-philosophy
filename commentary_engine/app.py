@@ -727,12 +727,6 @@ if user_input:
         status.write(f"Intent detected: {'Mathematical Structure' if is_math else 'Conversational/Greeting'}")
         status.write(f"Routing to {tier_name} model tier...")
         
-        # Debug: Show key availability
-        if not groq_k:
-            status.write(f"🔍 Groq key not found in: {os.getcwd()}, {os.path.dirname(__file__)}")
-        if not samba_k:
-            status.write(f"🔍 SambaNova key not found in: {os.getcwd()}, {os.path.dirname(__file__)}")
-        
         retry_count = 0
         while retry_count < len(active_tier):
             provider, model_name = active_tier[retry_count]
