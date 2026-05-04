@@ -1,30 +1,27 @@
 """
-ThinkMath.ai — Socratic Mentor (Optimized Edition)
+ThinkMath.ai — Socratic Mentor (Optimised Edition)
 
 Architecture
 ------------
 1. Dynamic model discovery: every chat-capable model under your Gemini, Groq, and
    SambaNova keys is enumerated at startup via each provider's models.list() endpoint.
 2. Lean prompts: a ~1K-token CORE_BRIEF for math problems, a ~200-token CONCIERGE
-   prompt for greetings. The full knowledge base is retrieved on-demand only.
+   prompt for greetings.
 3. Quota-aware circuit breaker: parses retry_delay, distinguishes daily-quota
-   exhaustion from per-minute throttling from TPM-too-small, and skips dead models
-   for the appropriate duration (until midnight PT for RPD, etc.).
+   exhaustion from per-minute throttling from TPM-too-small.
 4. Smart routing: greetings → smallest model first; math → largest model first.
-   Failover walks the live, sorted ladder; circuit-broken models are skipped.
+5. UI: bright academic theme, iMaTh branding, native KaTeX math rendering.
 """
 
 import os
 import re
-import json
-import runpy
 import importlib.util
 from datetime import datetime, timezone, timedelta
 from hashlib import sha1
 
 import streamlit as st
 import google.generativeai as genai
-import google.api_core.exceptions
+import google.api_core.exceptions  # noqa: F401  (kept for error type-checks)
 import firebase_admin
 from firebase_admin import credentials, firestore
 from groq import Groq
@@ -32,23 +29,51 @@ from openai import OpenAI
 
 
 # =============================================================================
+# BRANDING
+# =============================================================================
+
+LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
+MENTOR_DISPLAY_NAME = "ThinkMath's Digital Clone"
+
+
+# =============================================================================
 # CORE PROMPTS — kept lean to fit every provider's free tier
 # =============================================================================
 
-CONCIERGE_BRIEF = """You are the ThinkMath.ai Socratic Mentor — the Digital Clone of Anand.
+CONCIERGE_BRIEF = """You are ThinkMath — the Socratic Mentor of the Advaitian Foundation
+(ThinkMath.ai).
+
 The student is greeting you or making small talk. Reply warmly, in 2-3 sentences.
 Invite them to share their math problem so you can find its Seed together.
 Do not lecture. Do not list archetypes. Do not give answers.
+
+Identity rules:
+- Your name is "ThinkMath" or "ThinkMath.ai".
+- NEVER refer to yourself or anyone else as "Anand". The founder's identity is private.
+
+Math formatting rules (CRITICAL):
+- Use $...$ for inline math and $$...$$ for block math.
+- NEVER use \\(...\\) or \\[...\\] delimiters — they will not render.
 
 End every reply with this hidden metadata line, on its own line, exactly:
 PHASE:1 TIER:3"""
 
 
-CORE_BRIEF = """You are the ThinkMath.ai Socratic Mentor — the Digital Clone of Anand,
-founder of the Advaitian Foundation. You are a Structural Mirror, never a calculator.
+CORE_BRIEF = """You are ThinkMath — the Socratic Mentor of the Advaitian Foundation
+(ThinkMath.ai). You are a Structural Mirror, never a calculator.
+
+# IDENTITY (strict)
+- Your name is "ThinkMath" or "ThinkMath.ai".
+- NEVER refer to yourself or the founder as "Anand". The founder's identity is private.
+- If asked who built you, say "I am ThinkMath, the mentor of the Advaitian Foundation."
+
+# MATH FORMATTING (CRITICAL — failure = unreadable output)
+- Inline math: $x^2 + y^2 = z^2$
+- Block math:  $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$
+- NEVER use \\(...\\) or \\[...\\] — they will render as raw text and confuse the student.
 
 # VOICE
-Warm, precise, uncompromising. Three constants regardless of student tier.
+Warm, precise, uncompromising.
 - Never give the answer outright. Never validate brute formula-plugging as "good".
 - Name the trap, never shame the person.
 - Make the student feel they discovered the truth — because they did.
@@ -115,7 +140,7 @@ META-REASONING
 19. PIVOTING / ELIMINATION — "Simplify by subtraction, not addition."
 20. ANALOGY / TRANSFER — "If you've solved it once, you've solved it everywhere."
 
-# 5-SECOND HEURISTIC (use to pick a candidate archetype fast)
+# 5-SECOND HEURISTIC
 - "Does X exist?"          → Existence/Uniqueness (11)
 - "Find max/min"           → Extremal (12) or Inequalities (10)
 - Suspiciously clean numbers → Reverse Engineering (16)
@@ -123,7 +148,8 @@ META-REASONING
 - Something stays the same → Invariance (1)
 
 # OUTPUT RULES
-- Plain markdown only. No HTML. No emojis. Tight to the phase.
+- Plain markdown. No HTML. No emojis. Tight to the phase.
+- Use $...$ and $$...$$ for ALL math, never \\( \\) or \\[ \\].
 - End EVERY reply with exactly this hidden line, on its own line:
 PHASE:[1/2/3] TIER:[0/1/2/3/4]
 Do not explain the metadata line to the student."""
@@ -133,7 +159,6 @@ Do not explain the metadata line to the student."""
 # CONSTANTS
 # =============================================================================
 
-# Phase-aware output budgets (avoid spending TPM on the response side)
 MAX_OUTPUT_TOKENS = {
     "concierge": 256,
     1: 700,
@@ -141,7 +166,6 @@ MAX_OUTPUT_TOKENS = {
     3: 2500,
 }
 
-# Greetings short-circuited with a canned response (zero API spend)
 GREETING_PATTERNS = {
     "hi", "hello", "hey", "yo", "namaste", "namaskar", "namaskaram", "pranam",
     "vanakkam", "good morning", "good afternoon", "good evening", "hola", "salaam",
@@ -149,48 +173,34 @@ GREETING_PATTERNS = {
 }
 
 CANNED_GREETING = (
-    "Namaste. I am the ThinkMath.ai Socratic Mentor — Anand's Digital Clone.\n\n"
-    "Share the problem you're working on, and we will find its **Seed** together.\n\n"
-    "I will never hand you the answer. I will give you something better — the "
+    "Namaste. I am the ThinkMath.ai Socratic Mentor.\n\n"
+    "Share your problem and we will find its **Seed** together.\n\n"
+    "I will never give you the answer. I will give you something better — the "
     "structural instinct to find it yourself, and to recognise it the next time it "
     "appears in disguise.\n\n"
     "*What problem are you working on today?*"
 )
 
-# Hardcoded fallback model lists (May 2026 vintage). Used only if live discovery
-# fails for a provider. Kept tight to known-good IDs.
 KNOWN_GEMINI_MODELS = [
-    "gemini-2.5-flash",
-    "gemini-2.5-flash-lite",
-    "gemini-2.5-pro",
-    "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
+    "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro",
+    "gemini-2.0-flash", "gemini-2.0-flash-lite",
+    "gemini-1.5-flash", "gemini-1.5-flash-8b",
 ]
 KNOWN_GROQ_MODELS = [
-    "llama-3.3-70b-versatile",
-    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile", "llama-3.1-8b-instant",
     "meta-llama/llama-4-scout-17b-16e-instruct",
     "meta-llama/llama-4-maverick-17b-128e-instruct",
-    "deepseek-r1-distill-llama-70b",
-    "qwen-qwq-32b",
-    "gemma2-9b-it",
-    "mistral-saba-24b",
+    "deepseek-r1-distill-llama-70b", "qwen-qwq-32b",
+    "gemma2-9b-it", "mistral-saba-24b",
 ]
 KNOWN_SAMBANOVA_MODELS = [
-    "Meta-Llama-3.3-70B-Instruct",
-    "Meta-Llama-3.1-70B-Instruct",
-    "Meta-Llama-3.1-8B-Instruct",
-    "DeepSeek-V3-0324",
-    "DeepSeek-R1",
+    "Meta-Llama-3.3-70B-Instruct", "Meta-Llama-3.1-70B-Instruct",
+    "Meta-Llama-3.1-8B-Instruct", "DeepSeek-V3-0324", "DeepSeek-R1",
     "Llama-4-Maverick-17B-128E-Instruct",
     "Llama-3.3-Swallow-70B-Instruct-v0.4",
-    "Qwen3-32B",
-    "Qwen2.5-Coder-32B-Instruct",
+    "Qwen3-32B", "Qwen2.5-Coder-32B-Instruct",
 ]
 
-# Filter substrings — never route chat through these even if discovered
 EXCLUDE_SUBSTRINGS = (
     "embedding", "embed", "whisper", "tts", "imagen", "image", "vision",
     "guard", "aqa", "code-gecko",
@@ -198,11 +208,32 @@ EXCLUDE_SUBSTRINGS = (
 
 
 # =============================================================================
-# CREDENTIALS — robust, multi-source, no string-splitting
+# LATEX NORMALISER — convert any \( \) / \[ \] to $ $ / $$ $$
+# =============================================================================
+
+# \[ ... \]  →  $$ ... $$
+_BLOCK_LATEX_RE = re.compile(r"\\\[(.*?)\\\]", re.DOTALL)
+# \( ... \)  →  $ ... $
+_INLINE_LATEX_RE = re.compile(r"\\\((.*?)\\\)", re.DOTALL)
+
+
+def normalise_math(text: str) -> str:
+    """Convert TeX-style \\(...\\) / \\[...\\] to Streamlit/KaTeX $...$ / $$...$$."""
+    if not text:
+        return text
+    text = _BLOCK_LATEX_RE.sub(lambda m: f"$${m.group(1).strip()}$$", text)
+    text = _INLINE_LATEX_RE.sub(lambda m: f"${m.group(1).strip()}$", text)
+    # Also defensively replace any leftover "Anand" → "ThinkMath" if a fallback
+    # model ignores the system prompt.
+    text = re.sub(r"\bAnand['']?s?\b", "ThinkMath", text)
+    return text
+
+
+# =============================================================================
+# CREDENTIALS
 # =============================================================================
 
 def _try_load_keys_module(path: str) -> dict:
-    """Safely import a Python file as a module and pull *_API_KEY constants."""
     try:
         if not os.path.exists(path):
             return {}
@@ -224,14 +255,9 @@ def _clean(val):
 
 @st.cache_resource
 def get_credentials():
-    """
-    Resolve credentials from (in order): Streamlit secrets → local key modules →
-    plaintext fallback files → environment variables. Cached for the app lifetime.
-    """
     api_k = groq_k = samba_k = None
     fb_cred = None
 
-    # 1. Streamlit secrets (cloud / .streamlit/secrets.toml)
     try:
         if hasattr(st, "secrets") and st.secrets:
             api_k = api_k or st.secrets.get("GEMINI_API_KEY")
@@ -242,7 +268,6 @@ def get_credentials():
     except Exception:
         pass
 
-    # 2. Local key modules — search common locations
     here = os.path.dirname(os.path.abspath(__file__))
     candidates = [
         os.path.join(here, "credentials.py"),
@@ -256,7 +281,6 @@ def get_credentials():
         groq_k = groq_k or keys.get("GROQ_API_KEY")
         samba_k = samba_k or keys.get("SAMBANOVA_API_KEY")
 
-    # 3. Plaintext fallback files (legacy)
     search_paths = [here, os.path.dirname(here), os.getcwd()]
     plain_files = {
         "GEMINI_API_KEY": ["AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt", "gemini_api_key.txt"],
@@ -280,12 +304,10 @@ def get_credentials():
                     except Exception:
                         pass
 
-    # 4. Environment variables (last resort)
     api_k = api_k or os.environ.get("GEMINI_API_KEY")
     groq_k = groq_k or os.environ.get("GROQ_API_KEY")
     samba_k = samba_k or os.environ.get("SAMBANOVA_API_KEY")
 
-    # Firebase JSON discovery
     if not fb_cred:
         for p in search_paths:
             fp = os.path.join(p, "advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json")
@@ -305,15 +327,8 @@ GEMINI_KEY, FIREBASE_CRED, GROQ_KEY, SAMBA_KEY = get_credentials()
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def discover_models(gemini_key, groq_key, samba_key):
-    """
-    Query each provider's live catalog for chat-capable models. Falls back to
-    KNOWN_* lists if discovery errors. Cached for 1 hour.
-
-    Returns: list of dicts: [{"provider", "model", "score", "context"}]
-    """
     models = []
 
-    # --- Gemini ---
     gemini_names = []
     if gemini_key:
         try:
@@ -334,13 +349,10 @@ def discover_models(gemini_key, groq_key, samba_key):
 
     for name in gemini_names:
         models.append({
-            "provider": "Gemini",
-            "model": name,
-            "score": _score_model(name),
-            "context": _gemini_context(name),
+            "provider": "Gemini", "model": name,
+            "score": _score_model(name), "context": _gemini_context(name),
         })
 
-    # --- Groq ---
     groq_names = []
     if groq_key:
         try:
@@ -360,13 +372,10 @@ def discover_models(gemini_key, groq_key, samba_key):
 
     for name in groq_names:
         models.append({
-            "provider": "Groq",
-            "model": name,
-            "score": _score_model(name),
-            "context": 8192,
+            "provider": "Groq", "model": name,
+            "score": _score_model(name), "context": 8192,
         })
 
-    # --- SambaNova ---
     samba_names = []
     if samba_key:
         try:
@@ -384,24 +393,16 @@ def discover_models(gemini_key, groq_key, samba_key):
 
     for name in samba_names:
         models.append({
-            "provider": "SambaNova",
-            "model": name,
-            "score": _score_model(name),
-            "context": 8192,
+            "provider": "SambaNova", "model": name,
+            "score": _score_model(name), "context": 8192,
         })
 
     return models
 
 
 def _score_model(name: str) -> int:
-    """
-    Heuristic capability score 0-10. Higher = stronger reasoning.
-    Used to sort the failover ladder.
-    """
     n = name.lower()
     score = 5
-
-    # Size / family boosts (reasoning end)
     if "pro" in n and "gemini" in n: score += 4
     elif "405b" in n or "400b" in n: score += 5
     elif "120b" in n: score += 4
@@ -412,16 +413,11 @@ def _score_model(name: str) -> int:
     elif "12b" in n or "9b" in n: score += 0
     elif "8b" in n or "7b" in n: score -= 1
     elif "lite" in n or "nano" in n or "mini" in n or "flash-8b" in n: score -= 2
-
-    # Family / reasoning specialisations
     if "thinking" in n or "reasoning" in n: score += 2
     if "deepseek" in n: score += 2
     if "qwq" in n or "qwen3" in n: score += 1
     if "instant" in n: score -= 1
-
-    # Penalise experimental builds slightly (less reliable on free tier)
     if "exp" in n or "preview" in n or "beta" in n: score -= 1
-
     return max(0, min(10, score))
 
 
@@ -434,7 +430,7 @@ def _gemini_context(name: str) -> int:
 
 
 # =============================================================================
-# QUOTA STATE — circuit breaker
+# QUOTA STATE
 # =============================================================================
 
 def _now_ts() -> float:
@@ -442,9 +438,8 @@ def _now_ts() -> float:
 
 
 def _seconds_until_pt_midnight() -> int:
-    """Gemini free-tier RPD resets at midnight Pacific Time."""
     now_utc = datetime.now(timezone.utc)
-    pt_offset = timedelta(hours=-8)  # PST; close enough for daylight-savings drift
+    pt_offset = timedelta(hours=-8)
     now_pt = now_utc + pt_offset
     next_midnight_pt = (now_pt + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
     return int((next_midnight_pt - now_pt).total_seconds()) + 60
@@ -470,24 +465,16 @@ def block_model(provider: str, model: str, seconds: int, reason: str):
 
 
 def parse_retry_seconds(error_str: str) -> int:
-    """Pull a retry-delay hint out of provider error messages."""
     m = re.search(r"retry_delay\s*\{\s*seconds:\s*(\d+)", error_str)
-    if m:
-        return int(m.group(1)) + 1
+    if m: return int(m.group(1)) + 1
     m = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.I)
-    if m:
-        return int(float(m.group(1))) + 1
+    if m: return int(float(m.group(1))) + 1
     m = re.search(r"try again in (\d+(?:\.\d+)?)\s*(?:s|sec|second)", error_str, re.I)
-    if m:
-        return int(float(m.group(1))) + 1
+    if m: return int(float(m.group(1))) + 1
     return 60
 
 
 def classify_error(error_str: str) -> str:
-    """
-    Returns one of: 'daily_quota', 'minute_quota', 'tpm_too_small',
-    'auth', 'not_found', 'transient', 'fatal'
-    """
     s = error_str.lower()
     if "limit: 0" in s or "perdayper" in s.replace(" ", "") or "rpd" in s or "per day" in s:
         return "daily_quota"
@@ -505,7 +492,7 @@ def classify_error(error_str: str) -> str:
 
 
 # =============================================================================
-# PROVIDER WRAPPERS — unified interface
+# PROVIDER WRAPPERS
 # =============================================================================
 
 class BaseWrapper:
@@ -573,10 +560,7 @@ class SambaWrapper(BaseWrapper):
 
     def __init__(self, model_name, system_instruction):
         super().__init__(model_name, system_instruction)
-        self._client = OpenAI(
-            api_key=SAMBA_KEY,
-            base_url="https://api.sambanova.ai/v1",
-        )
+        self._client = OpenAI(api_key=SAMBA_KEY, base_url="https://api.sambanova.ai/v1")
 
     def send(self, user_message, history, max_output_tokens):
         msgs = [{"role": "system", "content": self.system_instruction}]
@@ -593,15 +577,10 @@ class SambaWrapper(BaseWrapper):
         return completion.choices[0].message.content or ""
 
 
-WRAPPER_CLASS = {
-    "Gemini": GeminiWrapper,
-    "Groq": GroqWrapper,
-    "SambaNova": SambaWrapper,
-}
+WRAPPER_CLASS = {"Gemini": GeminiWrapper, "Groq": GroqWrapper, "SambaNova": SambaWrapper}
 
 
 def get_wrapper(provider: str, model: str, system_prompt: str) -> BaseWrapper:
-    """Cache wrappers in session_state to avoid re-uploading the system prompt."""
     cache = st.session_state.wrapper_cache
     key = f"{provider}::{model}::{sha1(system_prompt.encode()).hexdigest()[:8]}"
     if key not in cache:
@@ -611,7 +590,7 @@ def get_wrapper(provider: str, model: str, system_prompt: str) -> BaseWrapper:
 
 
 # =============================================================================
-# INTENT DETECTION & LADDER BUILDING
+# INTENT & LADDER
 # =============================================================================
 
 MATH_HINTS = re.compile(
@@ -624,11 +603,9 @@ MATH_HINTS = re.compile(
 
 
 def detect_intent(text: str) -> str:
-    """Returns 'greeting', 'math', or 'general' (treated as math for safety)."""
     cleaned = text.strip().lower()
     if cleaned in GREETING_PATTERNS:
         return "greeting"
-    # Single-word non-math messages get treated as greeting
     if len(cleaned.split()) <= 2 and not MATH_HINTS.search(text):
         return "greeting"
     if MATH_HINTS.search(text) or len(text) > 60:
@@ -637,31 +614,17 @@ def detect_intent(text: str) -> str:
 
 
 def build_ladder(intent: str, all_models: list) -> list:
-    """
-    Build the failover ladder for this turn.
-    - greeting: smallest/cheapest first (ascending score)
-    - math: strongest first (descending score)
-    Skip circuit-broken models. Interleave providers to avoid hammering one.
-    """
     available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
     if not available:
         return []
-
     if intent == "greeting":
-        # Cap fast tier to score <= 5; fall back to anything if empty
         fast = [m for m in available if m["score"] <= 5]
-        ladder = sorted(fast or available, key=lambda m: (m["score"], m["model"]))
-    else:
-        # Reasoning: top-down by score, but interleave providers so we don't burn
-        # one provider's per-minute quota in 3 consecutive calls.
-        ranked = sorted(available, key=lambda m: -m["score"])
-        ladder = _interleave_by_provider(ranked)
-
-    return ladder
+        return sorted(fast or available, key=lambda m: (m["score"], m["model"]))
+    ranked = sorted(available, key=lambda m: -m["score"])
+    return _interleave_by_provider(ranked)
 
 
 def _interleave_by_provider(models: list) -> list:
-    """Round-robin through providers preserving relative score order."""
     by_provider = {}
     for m in models:
         by_provider.setdefault(m["provider"], []).append(m)
@@ -678,16 +641,11 @@ def _interleave_by_provider(models: list) -> list:
 # =============================================================================
 
 def chat(user_input: str, history: list, all_models: list, status_writer=None):
-    """
-    Walks the failover ladder. Returns (response_text, provider, model) or raises.
-    """
     intent = detect_intent(user_input)
 
-    # Short-circuit greetings entirely (zero API spend)
     if intent == "greeting" and not history:
         return CANNED_GREETING + "\n\nPHASE:1 TIER:3", "Local", "canned"
 
-    # Pick prompt + token budget
     if intent == "greeting":
         system_prompt = CONCIERGE_BRIEF
         max_tok = MAX_OUTPUT_TOKENS["concierge"]
@@ -710,42 +668,34 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
         )
 
     last_error = None
-    for i, m in enumerate(ladder):
+    for m in ladder:
         provider, model = m["provider"], m["model"]
         if status_writer:
             status_writer.write(f"→ Trying **{provider}** · `{model}` (score {m['score']})")
-
         try:
-            # Sliding window: last 3 turns (6 messages)
             short_history = history[-6:]
             wrapper = get_wrapper(provider, model, system_prompt)
             text = wrapper.send(user_input, short_history, max_tok)
             if not text or not text.strip():
                 raise RuntimeError("empty response")
             return text, provider, model
-
         except Exception as e:
             err = str(e)
             kind = classify_error(err)
             last_error = e
-
             if status_writer:
                 status_writer.write(f"   ✗ {kind}: {err[:120]}")
-
             if kind == "daily_quota":
                 block_model(provider, model, _seconds_until_pt_midnight(), "daily quota exhausted")
             elif kind == "minute_quota":
                 block_model(provider, model, parse_retry_seconds(err), "rate-limited per minute")
             elif kind == "tpm_too_small":
-                # Prompt cannot fit this model's TPM — block for a long while
                 block_model(provider, model, 6 * 3600, "TPM cap < prompt size")
             elif kind == "not_found":
                 block_model(provider, model, 24 * 3600, "model id no longer valid")
             elif kind == "auth":
-                # Block all of this provider for the session — bad key
                 block_model(provider, model, 3600, "auth failure")
             elif kind == "transient":
-                # Quick retry on next provider, no long block
                 block_model(provider, model, 30, "transient error")
             else:
                 block_model(provider, model, 60, f"fatal: {err[:60]}")
@@ -762,7 +712,6 @@ PHASE_TIER_RE = re.compile(r"^\s*PHASE:\s*(\d+)\s+TIER:\s*(\d+)\s*$", re.M)
 
 
 def parse_metadata(response_text: str):
-    """Extract (clean_text, phase, tier) from the trailing PHASE:x TIER:y line."""
     phase, tier = 1, 3
     match = PHASE_TIER_RE.search(response_text or "")
     if match:
@@ -803,12 +752,10 @@ def init_firebase():
 def save_session_to_firebase(messages, phase, tier):
     try:
         db = init_firebase()
-        if not db:
-            return
+        if not db: return
         db.collection("sessions").document().set({
             "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
-            "final_phase": phase,
-            "detected_tier": tier,
+            "final_phase": phase, "detected_tier": tier,
             "timestamp": firestore.SERVER_TIMESTAMP,
             "message_count": len(messages),
         })
@@ -819,14 +766,10 @@ def save_session_to_firebase(messages, phase, tier):
 def save_commentary_to_firebase(problem, commentary, tier):
     try:
         db = init_firebase()
-        if not db:
-            return False
+        if not db: return False
         db.collection("commentaries").document().set({
-            "problem": problem,
-            "commentary": commentary,
-            "tier": tier,
-            "timestamp": firestore.SERVER_TIMESTAMP,
-            "status": "generated",
+            "problem": problem, "commentary": commentary, "tier": tier,
+            "timestamp": firestore.SERVER_TIMESTAMP, "status": "generated",
         })
         return True
     except Exception:
@@ -834,57 +777,189 @@ def save_commentary_to_firebase(problem, commentary, tier):
 
 
 # =============================================================================
-# UI — Streamlit, dark minimalist theme (preserved from previous session)
+# UI — Streamlit, BRIGHT ACADEMIC theme + iMaTh logo
 # =============================================================================
 
-st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="ThinkMath.ai",
+    page_icon=LOGO_URL,
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 st.markdown("""
     <style>
+    /* ── BASE ── */
     html, body, [class*="css"] {
-        font-family: 'Courier New', Courier, monospace !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        font-size: 15px;
+        line-height: 1.75;
+        color: #2d1f0e;
     }
-    .stApp { background-color: #121212; color: #e0e0e0; }
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea,
+    .stApp { background-color: #ffffff; }
+
+    /* ── SIDEBAR ── */
+    section[data-testid="stSidebar"] {
+        background-color: #f9f6f1 !important;
+        border-right: 1px solid #ddd5c0;
+    }
+    section[data-testid="stSidebar"] * {
+        color: #2d1f0e !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+    }
+
+    /* ── HEADINGS ── */
+    h1 {
+        color: #5c3d1e !important;
+        font-weight: 800 !important;
+        font-size: 1.8rem !important;
+        letter-spacing: -0.5px;
+    }
+    h2, h3, h4, h5, h6 {
+        color: #5c3d1e !important;
+        font-weight: 700 !important;
+    }
+
+    /* ── TAGLINE ── */
+    .stMarkdown p em {
+        color: #7a6040;
+        font-style: italic;
+    }
+
+    /* ── CHAT MESSAGES (st.chat_message) ── */
+    /* Hide default avatars to get the clean card look */
+    [data-testid="stChatMessageAvatarUser"],
+    [data-testid="stChatMessageAvatarAssistant"],
+    [data-testid="stChatMessageAvatarCustom"] {
+        display: none !important;
+    }
+    /* Card body */
+    [data-testid="stChatMessage"] {
+        background-color: #faf7f2 !important;
+        border-left: 4px solid #5c3d1e !important;
+        border-radius: 8px !important;
+        padding: 14px 18px !important;
+        margin: 10px 0 !important;
+        box-shadow: 0 1px 4px rgba(92,61,30,0.08) !important;
+    }
+    /* User card variant — tint + accent green */
+    [data-testid="stChatMessage"]:has([data-testid="stChatMessageContent-user"]) {
+        background-color: #f4f0e8 !important;
+        border-left: 4px solid #8db543 !important;
+    }
+    /* Header strip inside cards */
+    .card-role {
+        color: #5c3d1e;
+        font-size: 0.78em;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .card-footer {
+        font-size: 0.7em;
+        color: #a08866;
+        margin-top: 8px;
+        border-top: 1px solid #ece4d2;
+        padding-top: 4px;
+    }
+
+    /* ── INPUT ── */
+    .stTextInput>div>div>input,
+    .stTextArea>div>div>textarea,
     [data-testid="stChatInput"] textarea {
-        background-color: #1e1e1e !important;
-        color: #e0e0e0 !important;
-        border: 1px solid #333 !important;
-        font-family: 'Courier New', Courier, monospace !important;
+        background-color: #ffffff !important;
+        color: #2d1f0e !important;
+        border: 1px solid #ddd5c0 !important;
+        border-radius: 8px !important;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
     }
+    [data-testid="stChatInput"] textarea:focus {
+        border: 2px solid #8db543 !important;
+        outline: none !important;
+    }
+
+    /* ── BUTTONS ── */
     .stButton>button {
-        background-color: #2b2b2b; color: #ffffff;
-        border: 1px solid #444; transition: all 0.3s;
+        background-color: #ffffff;
+        color: #5c3d1e;
+        border: 1px solid #ddd5c0;
+        border-radius: 6px;
+        font-family: 'Segoe UI', Arial, sans-serif !important;
+        transition: all 0.2s ease;
     }
-    .stButton>button:hover { background-color: #3b3b3b; border-color: #666; }
-    h1, h2, h3, h4, h5, h6 { color: #ffffff !important; }
-    .stMarkdown p { color: #cccccc; }
-    .user-message {
-        background-color: #1a1a2e; border-left: 3px solid #6c63ff;
-        padding: 12px 16px; border-radius: 0 8px 8px 0;
-        margin: 8px 0; color: #e0e0e0;
+    .stButton>button:hover {
+        background-color: #f4f0e8;
+        border-color: #8db543;
+        color: #5c3d1e;
     }
-    .mentor-message {
-        background-color: #0d1117; border-left: 3px solid #00b4d8;
-        padding: 12px 16px; border-radius: 0 8px 8px 0;
-        margin: 8px 0; color: #e0e0e0;
+    .stButton>button[kind="primary"] {
+        background-color: #8db543 !important;
+        color: #ffffff !important;
+        border: none !important;
+        font-weight: bold !important;
     }
-    .phase-active { color: #00b4d8; font-weight: bold; }
-    .phase-inactive { color: #555; }
-    .phase-complete { color: #4caf50; }
-    .donate-section {
-        background-color: #1a1a1a; border: 1px solid #333;
-        border-radius: 8px; padding: 16px; margin-top: 16px; text-align: center;
+    .stButton>button[kind="primary"]:hover {
+        background-color: #7a9e3a !important;
     }
+
+    /* ── PHASE INDICATOR ── */
+    .phase-active   { color: #8db543 !important; font-weight: bold; }
+    .phase-complete { color: #5c3d1e !important; }
+    .phase-inactive { color: #bbb0a0 !important; }
+
+    /* ── STATUS PILL ── */
+    .status-pill {
+        background-color: #f0f7e6;
+        border: 1px solid #8db543;
+        color: #5c3d1e;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 0.85em;
+        margin: 4px 0;
+        display: block;
+    }
+    .status-pill.warn {
+        background-color: #fdf6e3;
+        border-color: #d6a93b;
+        color: #6c4f17;
+    }
+    .status-pill.dim {
+        background-color: #f4f0e8;
+        border-color: #ddd5c0;
+        color: #7a6040;
+    }
+
+    /* ── TIER BADGE ── */
     .tier-badge {
-        background-color: #2b2b2b; border: 1px solid #6c63ff;
-        border-radius: 12px; padding: 4px 10px; font-size: 0.75em;
-        color: #6c63ff; display: inline-block; margin-bottom: 8px;
+        background-color: #f4f0e8;
+        border: 1px solid #8db543;
+        color: #5c3d1e;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.8em;
+        display: inline-block;
+        margin-bottom: 8px;
     }
-    .model-badge {
-        font-size: 0.7em; color: #888; margin-top: 8px;
-        border-top: 1px solid #2a2a2a; padding-top: 4px;
+
+    /* ── DONATE ── */
+    .donate-section {
+        background-color: #f4f0e8;
+        border: 1px solid #8db543;
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 12px;
+        text-align: center;
     }
+    .donate-section p { color: #5c3d1e !important; }
+
+    /* ── DIVIDERS / SCROLLBARS ── */
+    hr { border-color: #ddd5c0 !important; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background-color: #ddd5c0; border-radius: 3px; }
+
+    /* ── HIDE STREAMLIT CHROME ── */
     button[data-testid="collapsedControl"],
     [data-testid="stSidebarCollapseButton"],
     button[kind="headerNoPadding"],
@@ -902,7 +977,6 @@ TIER_LABELS = {
 }
 
 
-# --- session state init ---
 def _init_state():
     defaults = {
         "messages": [],
@@ -919,20 +993,45 @@ def _init_state():
         if k not in st.session_state:
             st.session_state[k] = v
 
+
 _init_state()
 
 
-# --- discover models once per hour ---
+# Discover models (cached 1h)
 ALL_MODELS = discover_models(GEMINI_KEY, GROQ_KEY, SAMBA_KEY)
 
 
-# --- sidebar ---
-st.sidebar.markdown("### ThinkMath.ai")
-st.sidebar.markdown("*Socratic Mentor — Live Edition*")
-st.sidebar.markdown("---")
+# ---------------------------------------------------------------------------
+# SIDEBAR
+# ---------------------------------------------------------------------------
 
-# Provider health
-with st.sidebar.expander("Engine Status", expanded=False):
+st.sidebar.image(LOGO_URL, width=90)
+st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
+
+# Connection pills
+if GEMINI_KEY:
+    st.sidebar.markdown("<div class='status-pill'>● Gemini Connected</div>", unsafe_allow_html=True)
+else:
+    st.sidebar.markdown("<div class='status-pill warn'>○ Gemini Missing</div>", unsafe_allow_html=True)
+
+if FIREBASE_CRED:
+    st.sidebar.markdown("<div class='status-pill'>● Firebase Connected</div>", unsafe_allow_html=True)
+else:
+    st.sidebar.markdown("<div class='status-pill dim'>○ Firebase Offline</div>", unsafe_allow_html=True)
+
+if GROQ_KEY:
+    st.sidebar.markdown("<div class='status-pill'>● Groq Connected</div>", unsafe_allow_html=True)
+if SAMBA_KEY:
+    st.sidebar.markdown("<div class='status-pill'>● SambaNova Connected</div>", unsafe_allow_html=True)
+
+# Engine status
+st.sidebar.markdown("#### Engine Status")
+active = st.session_state.active_model or "Initializing…"
+pill_class = "status-pill" if st.session_state.active_model else "status-pill dim"
+st.sidebar.markdown(f"<div class='{pill_class}'>Model: {active}</div>", unsafe_allow_html=True)
+
+# Detailed health (collapsed)
+with st.sidebar.expander("Provider Catalog", expanded=False):
     by_provider = {}
     for m in ALL_MODELS:
         by_provider.setdefault(m["provider"], 0)
@@ -945,7 +1044,6 @@ with st.sidebar.expander("Engine Status", expanded=False):
         live = count - blocked
         status = "✓" if live > 0 else "✗"
         st.markdown(f"{status} **{p}** — {live}/{count} live")
-
     if st.button("Reset circuit breakers", use_container_width=True):
         st.session_state.quota_state = {}
         st.rerun()
@@ -953,9 +1051,9 @@ with st.sidebar.expander("Engine Status", expanded=False):
 # Phase indicator
 st.sidebar.markdown("#### Session Progress")
 phases_meta = {
-    1: "Phase 1 · Finding the Seed",
-    2: "Phase 2 · Identifying Directions",
-    3: "Phase 3 · Convergence",
+    1: "Phase 1: Finding the Seed",
+    2: "Phase 2: Identifying Directions",
+    3: "Phase 3: Convergence",
 }
 for n, label in phases_meta.items():
     cur = st.session_state.current_phase
@@ -969,12 +1067,12 @@ for n, label in phases_meta.items():
 st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div class='donate-section'>
-  <p style='color:#e0e0e0; font-size:0.85em; line-height:1.6;'>
+  <p style='font-size:0.85em; line-height:1.6;'>
     <em>"You've burned the candle from both ends today.<br>
     Help us put a candle in someone else's hands."</em>
   </p>
-  <p style='color:#888; font-size:0.75em; margin-top:8px;'>
-    Every donation supports free structural math education.
+  <p style='font-size:0.75em; margin-top:8px; color:#7a6040;'>
+    Every donation supports free structural math education for students who can't afford coaching.
   </p>
 </div>
 """, unsafe_allow_html=True)
@@ -988,17 +1086,21 @@ if st.sidebar.button("New Session", use_container_width=True):
             st.session_state.current_phase,
             st.session_state.detected_tier,
         )
-    for k in ("messages",):
-        st.session_state[k] = []
+    st.session_state.messages = []
     st.session_state.current_phase = 1
     st.session_state.detected_tier = 3
     st.session_state.session_saved = False
     st.session_state.hint_level = 0
     st.session_state.mvc_validated = False
+    st.session_state.active_model = None
     st.rerun()
 
 
-# --- main area ---
+# ---------------------------------------------------------------------------
+# MAIN
+# ---------------------------------------------------------------------------
+
+st.image(LOGO_URL, width=110)
 st.title("ThinkMath.ai")
 st.markdown("##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*")
 
@@ -1011,36 +1113,35 @@ if st.session_state.messages:
 st.markdown("---")
 
 
-# --- chat display ---
-def render_messages():
-    if not st.session_state.messages:
-        st.markdown(f"""
-        <div class='mentor-message'>
-        <strong>Anand's Digital Clone</strong><br><br>
-        {CANNED_GREETING.replace(chr(10), '<br>')}
-        </div>
-        """, unsafe_allow_html=True)
-        return
+def render_mentor(content: str, model_label: str | None = None):
+    """Render a mentor card: native st.markdown body so KaTeX renders."""
+    with st.chat_message("assistant"):
+        st.markdown("<div class='card-role'>" + MENTOR_DISPLAY_NAME + "</div>", unsafe_allow_html=True)
+        st.markdown(normalise_math(content))
+        if model_label:
+            st.markdown(f"<div class='card-footer'>Powered by {model_label}</div>", unsafe_allow_html=True)
+
+
+def render_user(content: str):
+    with st.chat_message("user"):
+        st.markdown("<div class='card-role'>You</div>", unsafe_allow_html=True)
+        st.markdown(normalise_math(content))
+
+
+# Intro card (when no messages yet)
+if not st.session_state.messages:
+    render_mentor(CANNED_GREETING)
+else:
     for msg in st.session_state.messages:
         if msg["role"] == "user":
-            st.markdown(f"""
-            <div class='user-message'><strong>You</strong><br>{msg['content']}</div>
-            """, unsafe_allow_html=True)
+            render_user(msg["content"])
         else:
-            badge = ""
-            if msg.get("model"):
-                badge = f"<div class='model-badge'>Powered by {msg['model']}</div>"
-            st.markdown(f"""
-            <div class='mentor-message'>
-            <strong>Anand's Digital Clone</strong><br>{msg['content']}{badge}
-            </div>
-            """, unsafe_allow_html=True)
+            render_mentor(msg["content"], msg.get("model"))
 
-render_messages()
 st.markdown("---")
 
 
-# --- input + stuck button ---
+# Input + stuck button
 col_input, col_stuck = st.columns([5, 1])
 with col_input:
     user_input = st.chat_input("Share your math problem or response here…")
@@ -1059,13 +1160,13 @@ if stuck_clicked and st.session_state.messages:
     st.session_state.hint_level = (lvl + 1) % (len(hints) + 1)
 
 
-# --- Stage 2 button (now uses unified chat()) ---
+# Stage 2 button
 if st.session_state.mvc_validated and st.session_state.current_phase < 3:
-    if st.button("Generate Stage 2 Commentary", use_container_width=True):
+    if st.button("Generate Stage 2 Commentary", type="primary", use_container_width=True):
         user_input = "Please give me the full Stage 2 Six-Point Commentary now."
 
 
-# --- process turn ---
+# Process turn
 if user_input:
     if not (GEMINI_KEY or GROQ_KEY or SAMBA_KEY):
         st.error("No API keys configured. Add at least one of GEMINI_API_KEY / GROQ_API_KEY / SAMBANOVA_API_KEY.")
@@ -1089,6 +1190,7 @@ if user_input:
                 status_writer=status,
             )
             clean, phase, tier = parse_metadata(raw)
+            clean = normalise_math(clean)
             if not clean:
                 clean = "[Empty response. Please rephrase and try again.]"
 
@@ -1120,7 +1222,7 @@ if user_input:
             st.error(str(e))
 
 
-# --- export / commit (Phase 3 only) ---
+# Export / commit (Phase 3 only)
 if st.session_state.messages and st.session_state.current_phase == 3:
     st.markdown("---")
     col_save, col_export = st.columns(2)
