@@ -254,10 +254,17 @@ def get_gemini_model(system_instruction):
         "max_output_tokens": 8192,
         "response_mime_type": "text/plain",
     }
+    safety_settings = [
+        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
+        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+    ]
     return genai.GenerativeModel(
         model_name=selected_model,
         generation_config=generation_config,
-        system_instruction=system_instruction
+        system_instruction=system_instruction,
+        safety_settings=safety_settings
     )
 
 # --- FIREBASE ---
@@ -346,6 +353,8 @@ if 'session_saved' not in st.session_state:
     st.session_state.session_saved = False
 if 'hint_level' not in st.session_state:
     st.session_state.hint_level = 0
+if 'mvc_validated' not in st.session_state:
+    st.session_state.mvc_validated = False
 
 # --- RENDER PHASE INDICATOR ---
 render_phase_indicator(st.session_state.current_phase)
@@ -428,6 +437,30 @@ with chat_container:
 
 st.markdown("---")
 
+# --- STAGE 2 BUTTON ---
+if st.session_state.mvc_validated and st.session_state.current_phase < 3:
+    if st.button("🏆 Generate Stage 2 Commentary", type="primary", use_container_width=True):
+        stage2_prompt = "Please give me the full Stage 2 Six-Point Commentary now."
+        st.session_state.messages.append({"role": "user", "content": stage2_prompt})
+        with st.spinner("Generating Stage 2 Commentary..."):
+            try:
+                if st.session_state.chat_session is None:
+                    model = get_gemini_model(SYSTEM_PROMPT)
+                    st.session_state.chat_session = model.start_chat(history=[])
+                s2_response = st.session_state.chat_session.send_message(stage2_prompt)
+                if not s2_response.candidates or not s2_response.candidates[0].content.parts:
+                    s2_raw = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
+                else:
+                    s2_raw = s2_response.text
+                s2_clean, s2_phase, s2_tier = parse_metadata(s2_raw)
+                st.session_state.current_phase = s2_phase
+                st.session_state.detected_tier = s2_tier
+                st.session_state.messages.append({"role": "mentor", "content": s2_clean})
+            except Exception as e:
+                st.error(f"API Error: {e}")
+        st.session_state.mvc_validated = False
+        st.rerun()
+
 # --- INPUT AREA ---
 col_input, col_stuck = st.columns([5, 1])
 
@@ -471,7 +504,10 @@ if user_input:
 
             # Send message
             response = st.session_state.chat_session.send_message(user_input)
-            raw_response = response.text
+            if not response.candidates or not response.candidates[0].content.parts:
+                raw_response = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
+            else:
+                raw_response = response.text
 
             # Parse metadata and clean response
             clean_response, phase, tier = parse_metadata(raw_response)
@@ -482,6 +518,10 @@ if user_input:
 
             # Add mentor response
             st.session_state.messages.append({"role": "mentor", "content": clean_response})
+
+            # Detect MVC validation signal
+            if "ready for stage 2" in clean_response.lower():
+                st.session_state.mvc_validated = True
 
             # Auto-save to Firebase when Phase 3 completes (commentary generated)
             if phase == 3 and "TAKEAWAY" in clean_response.upper():
