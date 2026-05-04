@@ -461,7 +461,7 @@ st.sidebar.markdown("""
 """, unsafe_allow_html=True)
 
 # Replace with your actual PayPal.me link
-PAYPAL_LINK = "https://paypal.me/AdvaitianFoundation"
+PAYPAL_LINK = "https://paypal.me/vasumathiiK"
 st.sidebar.link_button("❤️ Support the Mission", PAYPAL_LINK, use_container_width=True)
 
 # --- NEW SESSION BUTTON ---
