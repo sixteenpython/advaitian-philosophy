@@ -11,16 +11,21 @@ import google.api_core.exceptions
 
 # --- MODEL ORCHESTRATION CONFIG ---
 FAST_TIER = [
-    ("Gemini", "gemini-1.5-flash"),
-    ("Groq", "llama3-8b-8192"),
-    ("Gemini", "gemini-1.5-flash-8b")
+    ("Gemini", "gemini-2.0-flash"),
+    ("Groq", "llama-3.1-8b-instant"),
+    ("SambaNova", "gemma-3-12b-it")
 ]
 
 REASONING_TIER = [
-    ("Gemini", "gemini-2.0-flash"),
-    ("SambaNova", "Meta-Llama-3.1-405B-Instruct"),
+    # Top Tier: High Intelligence / Reasoning
+    ("Gemini", "gemini-2.0-flash-thinking-exp-01-21"),
+    ("SambaNova", "DeepSeek-V3.2"),
+    ("Groq", "llama-3.3-70b-versatile"),
+    ("SambaNova", "Meta-Llama-3.3-70B-Instruct"),
     ("Groq", "llama-3.1-70b-versatile"),
-    ("Gemini", "gemini-1.5-flash")
+    # New Generation Fallbacks
+    ("Groq", "llama-4-scout-8b"), 
+    ("SambaNova", "Llama-4-Maverick-17B-128E-Instruct")
 ]
 
 def detect_math_intent(text):
@@ -246,17 +251,29 @@ def get_credentials():
     groq_k = None
     samba_k = None
 
-    # 1. Try Streamlit Secrets
+    # 1. Standard Live Handshake (Using Streamlit Secrets)
     try:
         if hasattr(st, "secrets") and st.secrets:
-            api_k = st.secrets.get("GEMINI_API_KEY")
-            groq_k = st.secrets.get("GROQ_API_KEY")
-            samba_k = st.secrets.get("SAMBANOVA_API_KEY")
+            if not api_k: api_k = st.secrets.get("GEMINI_API_KEY")
+            if not groq_k: groq_k = st.secrets.get("GROQ_API_KEY")
+            if not samba_k: samba_k = st.secrets.get("SAMBANOVA_API_KEY")
             if "firebase" in st.secrets:
                 fb_cred = dict(st.secrets["firebase"])
     except: pass
 
-    # 2. Try Local File Fallbacks 
+    # 2. Local File Handshake (Self-Healing)
+    local_files = ["local_keys.py", "commentary_engine/local_keys.py", "credentials.py"]
+    for lf in local_files:
+        try:
+            with open(lf, "r") as f:
+                content = f.read()
+                if "GROQ_API_KEY" in content and not groq_k:
+                    groq_k = content.split('GROQ_API_KEY = "')[1].split('"')[0]
+                if "SAMBANOVA_API_KEY" in content and not samba_k:
+                    samba_k = content.split('SAMBANOVA_API_KEY = "')[1].split('"')[0]
+                if "GEMINI_API_KEY" in content and not api_k:
+                    api_k = content.split('GEMINI_API_KEY = "')[1].split('"')[0]
+        except: pass
     def clean_key(val):
         return val.strip().replace('"', '').replace("'", "") if val else None
 
