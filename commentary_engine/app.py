@@ -389,9 +389,10 @@ class GeminiWrapper(ModelWrapper):
         return response
 
 class GroqWrapper(ModelWrapper):
-    def __init__(self, model_name, sys_instr):
+    def __init__(self, model_name, sys_instr, key=None):
         super().__init__("Groq", model_name, sys_instr)
-        self.client = Groq(api_key=groq_api_key)
+        _, _, groq_k, _ = get_credentials()
+        self.client = Groq(api_key=key or groq_k or groq_api_key)
 
     def send_message(self, text):
         self.history.append({"role": "user", "content": text})
@@ -415,10 +416,11 @@ class GroqWrapper(ModelWrapper):
         return MockResponse(response_text)
 
 class SambaNovaWrapper(ModelWrapper):
-    def __init__(self, model_name, sys_instr):
+    def __init__(self, model_name, sys_instr, key=None):
         super().__init__("SambaNova", model_name, sys_instr)
+        _, _, _, samba_k = get_credentials()
         self.client = OpenAI(
-            api_key=samba_api_key,
+            api_key=key or samba_k or samba_api_key,
             base_url="https://api.sambanova.ai/v1"
         )
 
@@ -710,6 +712,9 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     with st.status("Thinking structurally...", expanded=True) as status:
+        # Re-fetch credentials dynamically to allow instant healing if files were added
+        _, _, groq_k, samba_k = get_credentials()
+        
         # Intent-Aware Routing
         is_math = detect_math_intent(user_input)
         active_tier = REASONING_TIER if is_math else FAST_TIER
@@ -732,17 +737,17 @@ if user_input:
                         continue
                     session = GeminiWrapper(f"models/{model_name}" if "/" not in model_name else model_name, SYSTEM_PROMPT)
                 elif provider == "Groq":
-                    if not groq_api_key:
+                    if not groq_k:
                         status.write(f"⚠️ {provider} API Key missing. Skipping...")
                         retry_count += 1
                         continue
-                    session = GroqWrapper(model_name, SYSTEM_PROMPT)
+                    session = GroqWrapper(model_name, SYSTEM_PROMPT, key=groq_k)
                 elif provider == "SambaNova":
-                    if not samba_api_key:
+                    if not samba_k:
                         status.write(f"⚠️ {provider} API Key missing. Skipping...")
                         retry_count += 1
                         continue
-                    session = SambaNovaWrapper(model_name, SYSTEM_PROMPT)
+                    session = SambaNovaWrapper(model_name, SYSTEM_PROMPT, key=samba_k)
                 
                 st.session_state.active_model = f"{provider}: {model_name}"
                 
