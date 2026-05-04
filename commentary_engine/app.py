@@ -10,18 +10,31 @@ from datetime import datetime
 import google.api_core.exceptions
 
 # --- MODEL ORCHESTRATION CONFIG ---
-GEMINI_MODELS = [
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-1.5-flash-8b",
+FAST_TIER = [
+    ("Gemini", "gemini-1.5-flash"),
+    ("Groq", "llama3-8b-8192"),
+    ("Gemini", "gemini-1.5-flash-8b")
 ]
 
-# The global priority spanning providers
-MODEL_PRIORITY_LIST = (
-    [("Gemini", m) for m in GEMINI_MODELS] +
-    [("Groq", "llama-3.1-70b-versatile")] +
-    [("SambaNova", "llama-3.1-70b-instruct")]
-)
+REASONING_TIER = [
+    ("Gemini", "gemini-2.0-flash"),
+    ("SambaNova", "Meta-Llama-3.1-405B-Instruct"),
+    ("Groq", "llama-3.1-70b-versatile"),
+    ("Gemini", "gemini-1.5-flash")
+]
+
+def detect_math_intent(text):
+    """Heuristic to detect if input is a math problem vs greeting."""
+    math_indicators = ["+", "-", "*", "/", "=", "x", "n", "p", "q", "sum", "odd", "even", "integer", "prime", "prove", "if", "then", "archetype", "seed"]
+    # Check for numbers or common math symbols
+    if any(char.isdigit() for char in text):
+        return True
+    words = text.lower().split()
+    if any(indicator in words for indicator in math_indicators):
+        return True
+    if len(text) > 60: # Long messages are usually problems
+        return True
+    return False
 
 # --- DESIGN & CONFIG ---
 st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
@@ -676,9 +689,17 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     with st.status("Thinking structurally...", expanded=True) as status:
+        # Intent-Aware Routing
+        is_math = detect_math_intent(user_input)
+        active_tier = REASONING_TIER if is_math else FAST_TIER
+        tier_name = "REASONING" if is_math else "FAST"
+        
+        status.write(f"Intent detected: {'Mathematical Structure' if is_math else 'Conversational/Greeting'}")
+        status.write(f"Routing to {tier_name} model tier...")
+        
         retry_count = 0
-        while retry_count < len(MODEL_PRIORITY_LIST):
-            provider, model_name = MODEL_PRIORITY_LIST[retry_count]
+        while retry_count < len(active_tier):
+            provider, model_name = active_tier[retry_count]
             status.write(f"Connecting to {provider} ({model_name})...")
             
             try:
@@ -713,10 +734,13 @@ if user_input:
                 if not clean_response:
                     clean_response = "[Empty response from engine. Please check your prompt.]"
 
+                # Add Model Indicator to response for verification
+                display_response = f"{clean_response}\n\n<div style='font-size:0.7em; color:#bbb0a0; margin-top:8px; border-top:1px solid #f0e6d6; padding-top:4px;'>Powered by {provider} {model_name}</div>"
+
                 # Update session state with successful response
                 st.session_state.current_phase = phase
                 st.session_state.detected_tier = tier
-                st.session_state.messages.append({"role": "mentor", "content": clean_response})
+                st.session_state.messages.append({"role": "mentor", "content": display_response})
                 st.session_state.chat_session = session # Persist successful session
                 
                 # Detect MVC validation signal
@@ -738,11 +762,12 @@ if user_input:
                 # Retry on quota (429) or rate limits
                 if "429" in str(e) or "quota" in str(e).lower() or isinstance(e, google.api_core.exceptions.ResourceExhausted):
                     retry_count += 1
-                    status.warning(f"Pivoting to next provider level...")
+                    status.warning(f"Quota exceeded on {provider}. Pivoting to next provider level...")
                     continue
                 else:
                     st.error(f"Fatal Engine Error: {e}")
                     break
+
 
 
 
