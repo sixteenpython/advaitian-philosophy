@@ -235,38 +235,36 @@ def get_credentials():
 inferred_api_key, inferred_fb_cred = get_credentials()
 
 # --- SIDEBAR ---
-st.sidebar.title("⚙️ ThinkMath.ai")
+st.sidebar.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=90)
+st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
 
 if inferred_api_key:
-    st.sidebar.success("✅ Gemini API Key Loaded")
+    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Gemini Connected</div>", unsafe_allow_html=True)
     api_key = inferred_api_key
 else:
     api_key = st.sidebar.text_input("Gemini API Key", type="password")
 
 if inferred_fb_cred:
-    st.sidebar.success("✅ Firebase Connected")
+    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Firebase Connected</div>", unsafe_allow_html=True)
     firebase_cred = inferred_fb_cred
 else:
     firebase_cred_path = st.sidebar.text_input("Firebase JSON Path")
     firebase_cred = firebase_cred_path
 
 st.sidebar.markdown("---")
-st.sidebar.title("🤖 Engine Status")
-if st.session_state.get("active_model"):
-    st.sidebar.info(f"Engine: {st.session_state.active_model}")
-else:
-    st.sidebar.warning("Engine: Initializing...")
+st.sidebar.markdown("#### Engine Status")
+st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Model: {st.session_state.get('active_model', 'Initializing...')}</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 
 # --- PHASE INDICATOR ---
 def render_phase_indicator(current_phase):
     phases = {
-        1: "🔍 Phase 1: Finding the Seed",
-        2: "🧭 Phase 2: Identifying Directions",
-        3: "💡 Phase 3: Convergence"
+        1: "Phase 1: Finding the Seed",
+        2: "Phase 2: Identifying Directions",
+        3: "Phase 3: Convergence"
     }
-    st.sidebar.markdown("### 📊 Session Progress")
+    st.sidebar.markdown("#### Session Progress")
     for num, label in phases.items():
         if num < current_phase:
             st.sidebar.markdown(f"<span class='phase-complete'>✓ {label}</span>", unsafe_allow_html=True)
@@ -478,8 +476,8 @@ st.sidebar.markdown("---")
 st.sidebar.markdown("""
 <div class='donate-section'>
     <p style='color: #e0e0e0; font-size: 0.85em; line-height: 1.6;'>
-        <em>"You've burned the candle from both ends today.<br>
-        Help us put a candle in someone else's hands."</em>
+        <em>\"You've burned the candle from both ends today.<br>
+        Help us put a candle in someone else's hands.\"</em>
     </p>
     <p style='color: #888; font-size: 0.75em; margin-top: 8px;'>
         Every donation supports free structural math education for students who can't afford coaching.
@@ -489,11 +487,11 @@ st.sidebar.markdown("""
 
 # Replace with your actual PayPal.me link
 PAYPAL_LINK = "https://paypal.me/vasumathiiK"
-st.sidebar.link_button("❤️ Support the Mission", PAYPAL_LINK, use_container_width=True)
+st.sidebar.link_button("Support the Mission", PAYPAL_LINK, use_container_width=True)
 
 # --- NEW SESSION BUTTON ---
 st.sidebar.markdown("---")
-if st.sidebar.button("🔄 New Session", use_container_width=True):
+if st.sidebar.button("New Session", use_container_width=True):
     if st.session_state.messages and not st.session_state.session_saved:
         save_session_to_firebase(
             st.session_state.messages,
@@ -511,7 +509,7 @@ if st.sidebar.button("🔄 New Session", use_container_width=True):
 # --- MAIN UI ---
 st.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=110)
 st.title("ThinkMath.ai")
-st.markdown("##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*")
+st.markdown("##### Your Advaitian Socratic Mentor — Find the Seed. Burn the candle from both ends.")
 
 # Show tier badge if detected
 if st.session_state.messages:
@@ -554,7 +552,7 @@ st.markdown("---")
 
 # --- STAGE 2 BUTTON ---
 if st.session_state.mvc_validated and st.session_state.current_phase < 3:
-    if st.button("🏆 Generate Stage 2 Commentary", type="primary", use_container_width=True):
+    if st.button("Generate Stage 2 Commentary", type="primary", use_container_width=True):
         stage2_prompt = "Please give me the full Stage 2 Six-Point Commentary now."
         st.session_state.messages.append({"role": "user", "content": stage2_prompt})
         with st.spinner("Generating Stage 2 Commentary..."):
@@ -675,20 +673,20 @@ if st.session_state.messages and st.session_state.current_phase == 3:
     col_save, col_export = st.columns(2)
 
     with col_save:
-        if st.button("📖 Commit to Advaitian Bible", use_container_width=True):
+        if st.button("Commit to Advaitian Bible", use_container_width=True):
             problem = st.session_state.messages[0]["content"] if st.session_state.messages else ""
             last_mentor = next(
                 (m["content"] for m in reversed(st.session_state.messages) if m["role"] == "mentor"),
                 ""
             )
             if save_commentary_to_firebase(problem, last_mentor, st.session_state.detected_tier):
-                st.success("✅ Commentary committed to the Advaitian Bible (Firestore)!")
+                st.success("Commentary committed to the Advaitian Bible (Firestore)!")
                 st.balloons()
             else:
                 st.error("Failed to commit. Check Firebase credentials.")
 
     with col_export:
-        if st.button("📥 Export Session", use_container_width=True):
+        if st.button("Export Session", use_container_width=True):
             session_text = f"ThinkMath.ai Session Export\n"
             session_text += f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
             session_text += f"Tier: {TIER_LABELS.get(st.session_state.detected_tier, 'Unknown')}\n"
