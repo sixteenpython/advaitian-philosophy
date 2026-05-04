@@ -9,99 +9,186 @@ from datetime import datetime
 # --- DESIGN & CONFIG ---
 st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
 
-# Inject Custom CSS for dark minimalist theme and monospaced fonts
+# Inject Custom CSS — Khan Academy / Vedantu-inspired warm education theme
 st.markdown("""
     <style>
-    /* Base theme overrides */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    /* ── BASE ── */
     html, body, [class*="css"] {
-        font-family: 'Courier New', Courier, monospace !important;
+        font-family: 'Inter', sans-serif !important;
+        font-size: 15px !important;
+        line-height: 1.7 !important;
     }
     .stApp {
-        background-color: #121212;
-        color: #e0e0e0;
+        background-color: #0f0f23;
+        color: #f0f0f0;
     }
-    .stTextInput>div>div>input, .stTextArea>div>div>textarea {
-        background-color: #1e1e1e !important;
-        color: #e0e0e0 !important;
-        border: 1px solid #333 !important;
+    code, pre, .math, .katex {
         font-family: 'Courier New', Courier, monospace !important;
     }
-    .stButton>button {
-        background-color: #2b2b2b;
-        color: #ffffff;
-        border: 1px solid #444;
-        transition: all 0.3s;
-    }
-    .stButton>button:hover {
-        background-color: #3b3b3b;
-        border-color: #666;
-    }
+
+    /* ── HEADINGS ── */
     h1, h2, h3, h4, h5, h6 {
         color: #ffffff !important;
+        letter-spacing: 0.3px !important;
     }
-    .stMarkdown p {
-        color: #cccccc;
-    }
+    h1 { font-size: 2.2rem !important; font-weight: 700 !important; }
+    .stMarkdown p { color: #a0a0b0; }
 
-    /* Chat message styling */
-    .user-message {
-        background-color: #1a1a2e;
-        border-left: 3px solid #6c63ff;
-        padding: 12px 16px;
-        border-radius: 0 8px 8px 0;
-        margin: 8px 0;
-        color: #e0e0e0;
+    /* ── SIDEBAR ── */
+    [data-testid="stSidebar"] {
+        background-color: #12122a !important;
+        border-right: 1px solid #2a2a4a;
     }
-    .mentor-message {
-        background-color: #0d1117;
-        border-left: 3px solid #00b4d8;
-        padding: 12px 16px;
-        border-radius: 0 8px 8px 0;
-        margin: 8px 0;
-        color: #e0e0e0;
-    }
-    .phase-indicator {
-        background-color: #1e1e1e;
-        border: 1px solid #333;
-        border-radius: 8px;
-        padding: 12px;
-        margin: 8px 0;
-    }
+    [data-testid="stSidebar"] * { color: #f0f0f0; }
+
+    /* ── PHASE INDICATORS ── */
     .phase-active {
-        color: #00b4d8;
-        font-weight: bold;
+        color: #00c9a7;
+        font-weight: 600;
+        text-shadow: 0 0 8px rgba(0, 201, 167, 0.5);
     }
     .phase-inactive {
-        color: #555;
+        color: #3a3a5a;
     }
     .phase-complete {
-        color: #4caf50;
+        color: #6c63ff;
     }
-    .donate-section {
-        background-color: #1a1a1a;
-        border: 1px solid #333;
+
+    /* ── INPUT BOX ── */
+    .stTextInput>div>div>input,
+    .stTextArea>div>div>textarea,
+    [data-testid="stChatInput"] textarea {
+        background-color: #1a1a35 !important;
+        color: #f0f0f0 !important;
+        border: 1px solid #2a2a4a !important;
+        border-radius: 8px !important;
+        font-family: 'Inter', sans-serif !important;
+        transition: all 0.2s ease !important;
+    }
+    .stTextInput>div>div>input:focus,
+    .stTextArea>div>div>textarea:focus,
+    [data-testid="stChatInput"] textarea:focus {
+        border: 1px solid #6c63ff !important;
+        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+    }
+
+    /* ── BUTTONS — DEFAULT (secondary) ── */
+    .stButton>button {
+        background-color: #1a1a35 !important;
+        color: #f0f0f0 !important;
+        border: 1px solid #2a2a4a !important;
+        border-radius: 8px !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 500 !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton>button:hover {
+        border-color: #6c63ff !important;
+        box-shadow: 0 2px 8px rgba(108, 99, 255, 0.2) !important;
+    }
+
+    /* ── PRIMARY BUTTON (Generate Stage 2) ── */
+    .stButton>button[kind="primary"],
+    button[data-testid="baseButton-primary"] {
+        background: linear-gradient(135deg, #6c63ff, #00c9a7) !important;
+        color: #ffffff !important;
+        border: none !important;
+        border-radius: 8px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.3px !important;
+        box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3) !important;
+        transition: all 0.2s ease !important;
+    }
+    .stButton>button[kind="primary"]:hover,
+    button[data-testid="baseButton-primary"]:hover {
+        box-shadow: 0 6px 20px rgba(108, 99, 255, 0.5) !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* ── STUCK BUTTON ── */
+    .stuck-button>button {
+        background-color: #2a1f00 !important;
+        border: 1px solid #ffd166 !important;
+        color: #ffd166 !important;
+        font-size: 0.85em !important;
+        padding: 4px 12px !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+    }
+    .stuck-button>button:hover {
+        background-color: #3a2a00 !important;
+        box-shadow: 0 0 8px rgba(255, 209, 102, 0.3) !important;
+    }
+
+    /* ── SUPPORT BUTTON ── */
+    [data-testid="stLinkButton"] a,
+    .stLinkButton a {
+        background-color: #1a0a0a !important;
+        border: 1px solid #ff6b6b !important;
+        color: #ff6b6b !important;
+        border-radius: 8px !important;
+        transition: all 0.2s ease !important;
+    }
+    [data-testid="stLinkButton"] a:hover {
+        box-shadow: 0 0 8px rgba(255, 107, 107, 0.3) !important;
+    }
+
+    /* ── CHAT MESSAGES ── */
+    .user-message {
+        background-color: #1e1e3f;
+        border-left: 4px solid #6c63ff;
+        padding: 16px 20px;
         border-radius: 8px;
+        margin: 10px 0;
+        color: #f0f0f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+    }
+    .mentor-message {
+        background-color: #0d2137;
+        border-left: 4px solid #00c9a7;
+        padding: 16px 20px;
+        border-radius: 8px;
+        margin: 10px 0;
+        color: #f0f0f0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+    }
+
+    /* ── TIER BADGE ── */
+    .tier-badge {
+        background-color: #1a1a35;
+        border: 1px solid #00c9a7;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 0.75em;
+        color: #00c9a7;
+        display: inline-block;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+        font-weight: 500;
+    }
+
+    /* ── DONATE SECTION ── */
+    .donate-section {
+        background-color: #0d0d1f;
+        border: 1px solid #2a2a4a;
+        border-radius: 12px;
         padding: 16px;
         margin-top: 16px;
         text-align: center;
     }
-    .tier-badge {
-        background-color: #2b2b2b;
-        border: 1px solid #6c63ff;
-        border-radius: 12px;
-        padding: 4px 10px;
-        font-size: 0.75em;
-        color: #6c63ff;
-        display: inline-block;
-        margin-bottom: 8px;
+    .donate-section em {
+        color: #ffd166;
+        font-style: italic;
     }
-    .stuck-button>button {
-        background-color: #1a1a2e !important;
-        border: 1px solid #6c63ff !important;
-        color: #6c63ff !important;
-        font-size: 0.85em !important;
-        padding: 4px 12px !important;
-    }
+
+    /* ── DIVIDERS & MISC ── */
+    hr { border-color: #2a2a4a !important; }
+    .stSelectbox>div>div { background-color: #1a1a35 !important; border-color: #2a2a4a !important; }
+    [data-testid="stMarkdownContainer"] strong { color: #f0f0f0; }
     </style>
     """, unsafe_allow_html=True)
 
