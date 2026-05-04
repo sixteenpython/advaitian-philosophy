@@ -19,184 +19,188 @@ GEMINI_MODEL_PRIORITY = [
 # --- DESIGN & CONFIG ---
 st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
 
-# Inject Custom CSS — "Warm Blackboard" premium academic theme
+# Inject Custom CSS — Bright Academic Theme (Yellow/White)
 st.markdown("""
     <style>
     /* ── BASE ── */
     html, body, [class*="css"] {
-        font-family: 'Georgia', serif !important;
+        font-family: 'Inter', sans-serif !important;
         font-size: 15px !important;
-        line-height: 1.8 !important;
+        line-height: 1.7 !important;
+        color: #1a1a1a !important;
     }
     .stApp {
-        background-color: #1c1710;
-        color: #f0ead6;
+        background-color: #ffffff;
+        color: #1a1a1a;
     }
     code, pre, .math, .katex {
         font-family: 'Courier New', Courier, monospace !important;
     }
 
     /* ── SCROLLBAR ── */
-    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #3a3020; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: #e0e0e0; border-radius: 10px; }
 
     /* ── HEADINGS ── */
     h1, h2, h3, h4, h5, h6 {
-        color: #f5a623 !important;
-        font-family: 'Georgia', serif !important;
-        letter-spacing: 0.2px !important;
+        color: #1a1a1a !important;
+        font-family: 'Inter', sans-serif !important;
+        font-weight: 700 !important;
     }
-    h1 { font-size: 2.2rem !important; }
-    .stMarkdown p { color: #f0ead6; }
+    h1 { font-size: 2rem !important; font-weight: 800 !important; }
+    .stMarkdown p { color: #1a1a1a; }
 
     /* ── SIDEBAR ── */
     [data-testid="stSidebar"] {
-        background-color: #151210 !important;
-        border-right: 1px solid #3a3020;
+        background-color: #fafafa !important;
+        border-right: 1px solid #e0e0e0;
     }
-    [data-testid="stSidebar"] * { color: #e8d5a3; }
+    [data-testid="stSidebar"] * { color: #1a1a1a !important; }
 
     /* ── PHASE INDICATORS ── */
     .phase-active {
-        color: #f5a623;
-        font-weight: 600;
-        text-shadow: 0 0 5px rgba(245, 166, 35, 0.4);
+        color: #f9a825 !important;
+        font-weight: bold !important;
     }
     .phase-inactive {
-        color: #4a4030;
+        color: #aaaaaa !important;
     }
     .phase-complete {
-        color: #7bc67e;
+        color: #2e7d32 !important;
     }
 
     /* ── INPUT BOX ── */
     .stTextInput>div>div>input,
     .stTextArea>div>div>textarea,
     [data-testid="stChatInput"] textarea {
-        background-color: #242018 !important;
-        color: #f0ead6 !important;
-        border: 1px solid #3a3020 !important;
-        border-radius: 6px !important;
-        font-family: 'Georgia', serif !important;
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 8px !important;
+        font-family: 'Inter', sans-serif !important;
         transition: all 0.2s ease !important;
     }
     .stTextInput>div>div>input:focus,
     .stTextArea>div>div>textarea:focus,
     [data-testid="stChatInput"] textarea:focus {
-        border: 1px solid #f5a623 !important;
-        box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.1) !important;
+        border: 2px solid #f9a825 !important;
+        box-shadow: none !important;
     }
 
     /* ── BUTTONS — DEFAULT (secondary) ── */
     .stButton>button {
-        background-color: #242018 !important;
-        color: #e8d5a3 !important;
-        border: 1px solid #3a3020 !important;
+        background-color: #ffffff !important;
+        color: #1a1a1a !important;
+        border: 1px solid #e0e0e0 !important;
         border-radius: 6px !important;
-        font-family: 'Georgia', serif !important;
+        font-family: 'Inter', sans-serif !important;
         transition: all 0.2s ease !important;
     }
     .stButton>button:hover {
-        border-color: #f5a623 !important;
-        color: #f5a623 !important;
+        background-color: #fff8e1 !important;
+        border-color: #f9a825 !important;
+        color: #1a1a1a !important;
     }
 
     /* ── PRIMARY BUTTON (Generate Stage 2) ── */
     .stButton>button[kind="primary"],
     button[data-testid="baseButton-primary"] {
-        background-color: #f5a623 !important;
-        color: #1c1710 !important;
+        background-color: #f9a825 !important;
+        color: #1a1a1a !important;
         border: none !important;
         border-radius: 6px !important;
         font-weight: bold !important;
-        box-shadow: 0 2px 8px rgba(245, 166, 35, 0.3) !important;
         transition: all 0.2s ease !important;
     }
     .stButton>button[kind="primary"]:hover,
     button[data-testid="baseButton-primary"]:hover {
-        background-color: #fbbd5a !important;
+        background-color: #ffb300 !important;
         transform: translateY(-1px) !important;
     }
 
     /* ── STUCK BUTTON ── */
     .stuck-button>button {
-        background-color: #2a1f00 !important;
-        border: 1px solid #f5a623 !important;
-        color: #f5a623 !important;
+        background-color: #fff8e1 !important;
+        border: 1px solid #f9a825 !important;
+        color: #f9a825 !important;
         font-size: 0.85em !important;
         padding: 4px 12px !important;
-        border-radius: 6px !important;
-        transition: all 0.2s ease !important;
-    }
-    .stuck-button>button:hover {
-        background-color: #3a2a00 !important;
+        border-radius: 8px !important;
     }
 
     /* ── SUPPORT BUTTON ── */
     [data-testid="stLinkButton"] a,
     .stLinkButton a {
-        background-color: #2a1010 !important;
-        border: 1px solid #e07070 !important;
-        color: #e07070 !important;
-        border-radius: 6px !important;
-        transition: all 0.2s ease !important;
+        background-color: #fff3f3 !important;
+        border: 1px solid #e53935 !important;
+        color: #e53935 !important;
+        border-radius: 8px !important;
     }
 
     /* ── CHAT MESSAGES ── */
     .user-message {
-        background-color: #2a2218;
-        border-left: 4px solid #f5a623;
+        background-color: #fff8e1;
+        border-left: 4px solid #f9a825;
         padding: 16px 20px;
-        border-radius: 6px;
+        border-radius: 8px;
         margin: 12px 0;
-        color: #f0ead6;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        color: #1a1a1a;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         transition: all 0.2s ease;
     }
     .mentor-message {
-        background-color: #1e1c14;
-        border-left: 4px solid #e8d5a3;
+        background-color: #f5f5f5;
+        border-left: 4px solid #1a1a1a;
         padding: 16px 20px;
-        border-radius: 6px;
+        border-radius: 8px;
         margin: 12px 0;
-        color: #f0ead6;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        color: #1a1a1a;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         transition: all 0.2s ease;
     }
 
     /* ── TIER BADGE ── */
     .tier-badge {
-        background-color: #242018;
-        border: 1px solid #f5a623;
+        background-color: #fff8e1;
+        border: 1px solid #f9a825;
         border-radius: 20px;
         padding: 4px 12px;
         font-size: 0.75em;
-        color: #f5a623;
+        color: #f9a825;
         display: inline-block;
         margin-bottom: 10px;
-        font-family: 'Georgia', serif;
+    }
+
+    /* ── ENGINE STATUS BADGE ── */
+    .stAlert {
+        border-radius: 6px !important;
+        padding: 6px 12px !important;
+        background-color: #fff8e1 !important;
+        border: 1px solid #f9a825 !important;
+        color: #1a1a1a !important;
     }
 
     /* ── DONATE SECTION ── */
     .donate-section {
-        background-color: #1a1508;
-        border: 1px solid #3a3020;
+        background-color: #fffde7;
+        border: 1px solid #f9a825;
         border-radius: 10px;
         padding: 16px;
         margin-top: 16px;
         text-align: center;
     }
+    .donate-section p { color: #555555 !important; }
     .donate-section em {
-        color: #f5a623;
+        color: #f9a825;
         font-style: italic;
-        font-family: 'Georgia', serif;
+        font-weight: bold;
     }
 
     /* ── DIVIDERS & MISC ── */
-    hr { border-color: #3a3020 !important; }
-    .stSelectbox>div>div { background-color: #242018 !important; border-color: #3a3020 !important; }
-    [data-testid="stMarkdownContainer"] strong { color: #e8d5a3; }
+    hr { border-color: #e0e0e0 !important; }
+    .stSelectbox>div>div { background-color: #ffffff !important; border-color: #e0e0e0 !important; }
+    [data-testid="stMarkdownContainer"] strong { color: #1a1a1a; }
     </style>
     """, unsafe_allow_html=True)
 
