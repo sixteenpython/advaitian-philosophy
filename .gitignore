@@ -3,6 +3,11 @@ _overleaf-downloads/
 AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt
 advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json
 *_api_key.txt
+# Local key modules — NEVER commit these
+credentials.py
+local_keys.py
+commentary_engine/credentials.py
+commentary_engine/local_keys.py
 
 # Python
 __pycache__/
