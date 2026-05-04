@@ -2,18 +2,26 @@ import streamlit as st
 import google.generativeai as genai
 import firebase_admin
 from firebase_admin import credentials, firestore
+from groq import Groq
+from openai import OpenAI
 import json
 import os
 from datetime import datetime
 import google.api_core.exceptions
 
 # --- MODEL ORCHESTRATION CONFIG ---
-GEMINI_MODEL_PRIORITY = [
+GEMINI_MODELS = [
     "gemini-2.0-flash",
-    "gemini-2.0-flash-lite",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b",
 ]
+
+# The global priority spanning providers
+MODEL_PRIORITY_LIST = (
+    [("Gemini", m) for m in GEMINI_MODELS] +
+    [("Groq", "llama-3.1-70b-versatile")] +
+    [("SambaNova", "llama-3.1-70b-instruct")]
+)
 
 # --- DESIGN & CONFIG ---
 st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
@@ -300,27 +308,79 @@ You are a structural mirror. You NEVER give the answer. You guide by Socratic qu
 {core_kb}
 """
 
-# --- GEMINI MODEL ORCHESTRATOR ---
-def get_model_instance(model_name, system_instruction):
-    """Initialize a specific Gemini model instance."""
-    genai.configure(api_key=api_key)
-    generation_config = {
-        "temperature": 0.3,
-        "top_p": 0.95,
-        "top_k": 40,
-        "max_output_tokens": 8192,
-        "response_mime_type": "text/plain",
-    }
-    safety_settings = [
-        {"category": f"HARM_CATEGORY_{c}", "threshold": "BLOCK_NONE"} 
-        for c in ["HARASSMENT", "HATE_SPEECH", "SEXUALLY_EXPLICIT", "DANGEROUS_CONTENT"]
-    ]
-    return genai.GenerativeModel(
-        model_name=model_name,
-        generation_config=generation_config,
-        system_instruction=system_instruction,
-        safety_settings=safety_settings
-    )
+# --- PROVIDER WRAPPERS ---
+class ModelWrapper:
+    def __init__(self, provider, model_name, system_instruction):
+        self.provider = provider
+        self.model_name = model_name
+        self.system_instruction = system_instruction
+        self.history = []
+
+    def send_message(self, text):
+        # To be implemented by subclasses
+        pass
+
+class GeminiWrapper(ModelWrapper):
+    def __init__(self, model_name, system_instruction):
+        super().__init__("Gemini", model_name, system_instruction)
+        genai.configure(api_key=api_key)
+        self.model = genai.GenerativeModel(
+            model_name=model_name,
+            system_instruction=system_instruction,
+            generation_config={"temperature": 0.3, "top_p": 0.95, "max_output_tokens": 8192}
+        )
+        self.chat = self.model.start_chat(history=[])
+
+    def send_message(self, text):
+        return self.chat.send_message(text)
+
+class GroqWrapper(ModelWrapper):
+    def __init__(self, model_name, sys_instr):
+        super().__init__("Groq", model_name, sys_instr)
+        self.client = Groq(api_key=groq_api_key)
+
+    def send_message(self, text):
+        self.history.append({"role": "user", "content": text})
+        messages = [{"role": "system", "content": self.system_instruction}] + self.history
+        completion = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=messages,
+            temperature=0.3,
+            max_tokens=4096
+        )
+        response_text = completion.choices[0].message.content
+        self.history.append({"role": "assistant", "content": response_text})
+        # Mocking Gemini's response object structure
+        class MockResponse:
+            def __init__(self, text):
+                self.text = text
+                self.candidates = [True]
+        return MockResponse(response_text)
+
+class SambaNovaWrapper(ModelWrapper):
+    def __init__(self, model_name, sys_instr):
+        super().__init__("SambaNova", model_name, sys_instr)
+        self.client = OpenAI(
+            api_key=samba_api_key,
+            base_url="https://api.sambanova.ai/v1"
+        )
+
+    def send_message(self, text):
+        self.history.append({"role": "user", "content": text})
+        messages = [{"role": "system", "content": self.system_instruction}] + self.history
+        completion = self.client.chat.completions.create(
+            model=self.model_name,
+            messages=messages,
+            temperature=0.3,
+            max_tokens=4096
+        )
+        response_text = completion.choices[0].message.content
+        self.history.append({"role": "assistant", "content": response_text})
+        class MockResponse:
+            def __init__(self, text):
+                self.text = text
+                self.candidates = [True]
+        return MockResponse(response_text)
 
 
 
@@ -329,18 +389,23 @@ st.sidebar.image("https://raw.githubusercontent.com/sixteenpython/advaitian-phil
 st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
 
 # --- SIDEBAR CREDENTIALS ---
-if inferred_api_key:
-    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Gemini Connected</div>", unsafe_allow_html=True)
-    api_key = inferred_api_key
-else:
-    api_key = st.sidebar.text_input("Gemini API Key", type="password")
+col1, col2 = st.sidebar.columns(2)
+with col1:
+    if inferred_api_key:
+        st.markdown("<div class='connected-badge'>● Gemini ✓</div>", unsafe_allow_html=True)
+        api_key = inferred_api_key
+    else:
+        api_key = st.text_input("Gemini Key", type="password")
 
-if inferred_fb_cred:
-    st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Firebase Connected</div>", unsafe_allow_html=True)
-    firebase_cred = inferred_fb_cred
-else:
-    firebase_cred_path = st.sidebar.text_input("Firebase JSON Path")
-    firebase_cred = firebase_cred_path
+with col2:
+    if inferred_fb_cred:
+        st.markdown("<div class='connected-badge'>● Firebase ✓</div>", unsafe_allow_html=True)
+        firebase_cred = inferred_fb_cred
+    else:
+        firebase_cred = st.text_input("Firebase JSON", type="password")
+
+groq_api_key = st.sidebar.text_input("Groq API Key", type="password", help="Fallback provider on Gemini 429")
+samba_api_key = st.sidebar.text_input("SambaNova API Key", type="password", help="Secondary fallback")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("#### Engine Status")
@@ -612,26 +677,35 @@ if user_input:
 
     with st.status("Thinking structurally...", expanded=True) as status:
         retry_count = 0
-        while retry_count < len(GEMINI_MODEL_PRIORITY):
-            current_model_name = GEMINI_MODEL_PRIORITY[retry_count]
-            status.write(f"Connecting to {current_model_name}...")
+        while retry_count < len(MODEL_PRIORITY_LIST):
+            provider, model_name = MODEL_PRIORITY_LIST[retry_count]
+            status.write(f"Connecting to {provider} ({model_name})...")
             
             try:
-                # Initialize model and session
-                model = get_model_instance(current_model_name, SYSTEM_PROMPT)
-                st.session_state.active_model = current_model_name
+                # Initialize appropriate wrapper
+                if provider == "Gemini":
+                    if not api_key: 
+                        retry_count += 1
+                        continue
+                    session = GeminiWrapper(model_name, SYSTEM_PROMPT)
+                elif provider == "Groq":
+                    if not groq_api_key:
+                        retry_count += 1
+                        continue
+                    session = GroqWrapper(model_name, SYSTEM_PROMPT)
+                elif provider == "SambaNova":
+                    if not samba_api_key:
+                        retry_count += 1
+                        continue
+                    session = SambaNovaWrapper(model_name, SYSTEM_PROMPT)
                 
-                # We always start a fresh chat session for a new model attempt to avoid context bleed
-                chat = model.start_chat(history=[])
+                st.session_state.active_model = f"{provider}: {model_name}"
                 
-                status.write(f"Generating structural response via {current_model_name}...")
-                response = chat.send_message(user_input)
+                status.write(f"Generating structural response via {provider}...")
+                response = session.send_message(user_input)
                 status.write("Response received. Parsing...")
                 
-                if not response.candidates or not response.candidates[0].content.parts:
-                    raw_response = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
-                else:
-                    raw_response = response.text
+                raw_response = response.text
 
                 # Parse metadata and clean response
                 clean_response, phase, tier = parse_metadata(raw_response)
@@ -643,7 +717,7 @@ if user_input:
                 st.session_state.current_phase = phase
                 st.session_state.detected_tier = tier
                 st.session_state.messages.append({"role": "mentor", "content": clean_response})
-                st.session_state.chat_session = chat # Persist successful session
+                st.session_state.chat_session = session # Persist successful session
                 
                 # Detect MVC validation signal
                 if "ready for stage 2" in clean_response.lower():
@@ -660,14 +734,16 @@ if user_input:
                 break # Success!
 
             except Exception as e:
-                status.error(f"Failure on {current_model_name}: {e}")
-                # Only retry on quota or rate limits
+                status.error(f"Failure on {provider} ({model_name}): {e}")
+                # Retry on quota (429) or rate limits
                 if "429" in str(e) or "quota" in str(e).lower() or isinstance(e, google.api_core.exceptions.ResourceExhausted):
                     retry_count += 1
+                    status.warning(f"Pivoting to next provider level...")
                     continue
                 else:
                     st.error(f"Fatal Engine Error: {e}")
                     break
+
 
 
 # --- EXPORT SESSION ---
