@@ -19,186 +19,184 @@ GEMINI_MODEL_PRIORITY = [
 # --- DESIGN & CONFIG ---
 st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
 
-# Inject Custom CSS — Khan Academy / Vedantu-inspired warm education theme
+# Inject Custom CSS — "Warm Blackboard" premium academic theme
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
     /* ── BASE ── */
     html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif !important;
+        font-family: 'Georgia', serif !important;
         font-size: 15px !important;
-        line-height: 1.7 !important;
+        line-height: 1.8 !important;
     }
     .stApp {
-        background-color: #0f0f23;
-        color: #f0f0f0;
+        background-color: #1c1710;
+        color: #f0ead6;
     }
     code, pre, .math, .katex {
         font-family: 'Courier New', Courier, monospace !important;
     }
 
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #3a3020; border-radius: 10px; }
+
     /* ── HEADINGS ── */
     h1, h2, h3, h4, h5, h6 {
-        color: #ffffff !important;
-        letter-spacing: 0.3px !important;
+        color: #f5a623 !important;
+        font-family: 'Georgia', serif !important;
+        letter-spacing: 0.2px !important;
     }
-    h1 { font-size: 2.2rem !important; font-weight: 700 !important; }
-    .stMarkdown p { color: #a0a0b0; }
+    h1 { font-size: 2.2rem !important; }
+    .stMarkdown p { color: #f0ead6; }
 
     /* ── SIDEBAR ── */
     [data-testid="stSidebar"] {
-        background-color: #12122a !important;
-        border-right: 1px solid #2a2a4a;
+        background-color: #151210 !important;
+        border-right: 1px solid #3a3020;
     }
-    [data-testid="stSidebar"] * { color: #f0f0f0; }
+    [data-testid="stSidebar"] * { color: #e8d5a3; }
 
     /* ── PHASE INDICATORS ── */
     .phase-active {
-        color: #00c9a7;
+        color: #f5a623;
         font-weight: 600;
-        text-shadow: 0 0 8px rgba(0, 201, 167, 0.5);
+        text-shadow: 0 0 5px rgba(245, 166, 35, 0.4);
     }
     .phase-inactive {
-        color: #3a3a5a;
+        color: #4a4030;
     }
     .phase-complete {
-        color: #6c63ff;
+        color: #7bc67e;
     }
 
     /* ── INPUT BOX ── */
     .stTextInput>div>div>input,
     .stTextArea>div>div>textarea,
     [data-testid="stChatInput"] textarea {
-        background-color: #1a1a35 !important;
-        color: #f0f0f0 !important;
-        border: 1px solid #2a2a4a !important;
-        border-radius: 8px !important;
-        font-family: 'Inter', sans-serif !important;
+        background-color: #242018 !important;
+        color: #f0ead6 !important;
+        border: 1px solid #3a3020 !important;
+        border-radius: 6px !important;
+        font-family: 'Georgia', serif !important;
         transition: all 0.2s ease !important;
     }
     .stTextInput>div>div>input:focus,
     .stTextArea>div>div>textarea:focus,
     [data-testid="stChatInput"] textarea:focus {
-        border: 1px solid #6c63ff !important;
-        box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+        border: 1px solid #f5a623 !important;
+        box-shadow: 0 0 0 2px rgba(245, 166, 35, 0.1) !important;
     }
 
     /* ── BUTTONS — DEFAULT (secondary) ── */
     .stButton>button {
-        background-color: #1a1a35 !important;
-        color: #f0f0f0 !important;
-        border: 1px solid #2a2a4a !important;
-        border-radius: 8px !important;
-        font-family: 'Inter', sans-serif !important;
-        font-weight: 500 !important;
+        background-color: #242018 !important;
+        color: #e8d5a3 !important;
+        border: 1px solid #3a3020 !important;
+        border-radius: 6px !important;
+        font-family: 'Georgia', serif !important;
         transition: all 0.2s ease !important;
     }
     .stButton>button:hover {
-        border-color: #6c63ff !important;
-        box-shadow: 0 2px 8px rgba(108, 99, 255, 0.2) !important;
+        border-color: #f5a623 !important;
+        color: #f5a623 !important;
     }
 
     /* ── PRIMARY BUTTON (Generate Stage 2) ── */
     .stButton>button[kind="primary"],
     button[data-testid="baseButton-primary"] {
-        background: linear-gradient(135deg, #6c63ff, #00c9a7) !important;
-        color: #ffffff !important;
+        background-color: #f5a623 !important;
+        color: #1c1710 !important;
         border: none !important;
-        border-radius: 8px !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.3px !important;
-        box-shadow: 0 4px 15px rgba(108, 99, 255, 0.3) !important;
+        border-radius: 6px !important;
+        font-weight: bold !important;
+        box-shadow: 0 2px 8px rgba(245, 166, 35, 0.3) !important;
         transition: all 0.2s ease !important;
     }
     .stButton>button[kind="primary"]:hover,
     button[data-testid="baseButton-primary"]:hover {
-        box-shadow: 0 6px 20px rgba(108, 99, 255, 0.5) !important;
+        background-color: #fbbd5a !important;
         transform: translateY(-1px) !important;
     }
 
     /* ── STUCK BUTTON ── */
     .stuck-button>button {
         background-color: #2a1f00 !important;
-        border: 1px solid #ffd166 !important;
-        color: #ffd166 !important;
+        border: 1px solid #f5a623 !important;
+        color: #f5a623 !important;
         font-size: 0.85em !important;
         padding: 4px 12px !important;
-        border-radius: 8px !important;
+        border-radius: 6px !important;
         transition: all 0.2s ease !important;
     }
     .stuck-button>button:hover {
         background-color: #3a2a00 !important;
-        box-shadow: 0 0 8px rgba(255, 209, 102, 0.3) !important;
     }
 
     /* ── SUPPORT BUTTON ── */
     [data-testid="stLinkButton"] a,
     .stLinkButton a {
-        background-color: #1a0a0a !important;
-        border: 1px solid #ff6b6b !important;
-        color: #ff6b6b !important;
-        border-radius: 8px !important;
+        background-color: #2a1010 !important;
+        border: 1px solid #e07070 !important;
+        color: #e07070 !important;
+        border-radius: 6px !important;
         transition: all 0.2s ease !important;
-    }
-    [data-testid="stLinkButton"] a:hover {
-        box-shadow: 0 0 8px rgba(255, 107, 107, 0.3) !important;
     }
 
     /* ── CHAT MESSAGES ── */
     .user-message {
-        background-color: #1e1e3f;
-        border-left: 4px solid #6c63ff;
+        background-color: #2a2218;
+        border-left: 4px solid #f5a623;
         padding: 16px 20px;
-        border-radius: 8px;
-        margin: 10px 0;
-        color: #f0f0f0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 6px;
+        margin: 12px 0;
+        color: #f0ead6;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         transition: all 0.2s ease;
     }
     .mentor-message {
-        background-color: #0d2137;
-        border-left: 4px solid #00c9a7;
+        background-color: #1e1c14;
+        border-left: 4px solid #e8d5a3;
         padding: 16px 20px;
-        border-radius: 8px;
-        margin: 10px 0;
-        color: #f0f0f0;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        border-radius: 6px;
+        margin: 12px 0;
+        color: #f0ead6;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
         transition: all 0.2s ease;
     }
 
     /* ── TIER BADGE ── */
     .tier-badge {
-        background-color: #1a1a35;
-        border: 1px solid #00c9a7;
+        background-color: #242018;
+        border: 1px solid #f5a623;
         border-radius: 20px;
         padding: 4px 12px;
         font-size: 0.75em;
-        color: #00c9a7;
+        color: #f5a623;
         display: inline-block;
         margin-bottom: 10px;
-        letter-spacing: 0.5px;
-        font-weight: 500;
+        font-family: 'Georgia', serif;
     }
 
     /* ── DONATE SECTION ── */
     .donate-section {
-        background-color: #0d0d1f;
-        border: 1px solid #2a2a4a;
-        border-radius: 12px;
+        background-color: #1a1508;
+        border: 1px solid #3a3020;
+        border-radius: 10px;
         padding: 16px;
         margin-top: 16px;
         text-align: center;
     }
     .donate-section em {
-        color: #ffd166;
+        color: #f5a623;
         font-style: italic;
+        font-family: 'Georgia', serif;
     }
 
     /* ── DIVIDERS & MISC ── */
-    hr { border-color: #2a2a4a !important; }
-    .stSelectbox>div>div { background-color: #1a1a35 !important; border-color: #2a2a4a !important; }
-    [data-testid="stMarkdownContainer"] strong { color: #f0f0f0; }
+    hr { border-color: #3a3020 !important; }
+    .stSelectbox>div>div { background-color: #242018 !important; border-color: #3a3020 !important; }
+    [data-testid="stMarkdownContainer"] strong { color: #e8d5a3; }
     </style>
     """, unsafe_allow_html=True)
 
