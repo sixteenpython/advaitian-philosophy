@@ -15,6 +15,8 @@ Architecture
 
 import os
 import re
+import time
+import hashlib
 import importlib.util
 from datetime import datetime, timezone, timedelta
 from hashlib import sha1
@@ -375,7 +377,14 @@ MODE F TIER CALIBRATION — "what level am I at?": ask 2–3 abstraction-graded
 - Inline math $...$ for variables in prose; block math $$...$$ only when standalone.
 - End EVERY reply with this hidden line, on its own line, exactly:
 PHASE:[1/2/3] TIER:[0/1/2/3/4]
-Do not explain the metadata to the student."""
+Do not explain the metadata to the student.
+
+# LIVE DOCTRINE NOTE
+Below this protocol you may see a section titled "LIVE DOCTRINE FROM
+knowledge_base/". Those passages are auto-loaded from the Advaitian
+Foundation's source files on each turn. Treat them as authoritative
+philosophical context that supersedes anything ambiguous above. The
+protocol governs YOUR engagement; the doctrine governs what is TRUE."""
 
 
 # =============================================================================
@@ -428,6 +437,147 @@ EXCLUDE_SUBSTRINGS = (
     "embedding", "embed", "whisper", "tts", "imagen", "image", "vision",
     "guard", "aqa", "code-gecko",
 )
+
+
+# =============================================================================
+# LIVE KNOWLEDGE BASE — auto-loaded from knowledge_base/ on every request,
+# hot-reloaded when any file changes. The user maintains the doctrine; the
+# engine auto-rebalances. No code change required when knowledge_base/ is
+# updated and committed.
+# =============================================================================
+
+KB_DIR_NAME = "knowledge_base"
+# Total budget chosen so that:
+#   CORE_BRIEF (~4.4K tokens) + KB doctrine (~2.7K tokens) + history + user input
+#   ≈ 7K-8K input tokens — fits Groq 70B/120B (32K-128K ctx) and all SambaNova /
+#   Gemini models comfortably. Groq 8B (8K ctx) drops out of the ladder for
+#   long turns; the circuit breaker handles that automatically.
+KB_BUDGET_CHARS = 11000     # ~2750 tokens total across all files
+KB_PER_FILE_CAP = 10500     # ~2625 tokens per file (enough for the full Master Framework)
+KB_FILE_EXTS = (".md", ".txt")
+
+# Files starting with these prefixes are considered "engine-internal" and skipped.
+KB_SKIP_PREFIXES = ("_", ".")
+
+# Module-level cache (persists across Streamlit reruns within a process).
+_KB_CACHE: dict = {"signature": None, "data": None, "loaded_at": 0.0}
+
+
+def _find_kb_dir() -> str | None:
+    """Locate knowledge_base/ — search common deployment layouts."""
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.normpath(os.path.join(here, "..", KB_DIR_NAME)),  # commentary_engine/../knowledge_base
+        os.path.normpath(os.path.join(here, KB_DIR_NAME)),        # commentary_engine/knowledge_base
+        os.path.normpath(os.path.join(here, "..", "..", KB_DIR_NAME)),
+        os.path.normpath(os.path.join(os.getcwd(), KB_DIR_NAME)),
+    ]
+    for c in candidates:
+        if os.path.isdir(c):
+            return c
+    return None
+
+
+def _kb_signature(kb_dir: str) -> tuple:
+    """A cheap fingerprint of (filename, mtime, size) tuples — used to detect change."""
+    sig = []
+    try:
+        for name in sorted(os.listdir(kb_dir)):
+            if not name.endswith(KB_FILE_EXTS) or name.startswith(KB_SKIP_PREFIXES):
+                continue
+            path = os.path.join(kb_dir, name)
+            try:
+                stat = os.stat(path)
+                sig.append((name, stat.st_mtime, stat.st_size))
+            except OSError:
+                pass
+    except OSError:
+        return ()
+    return tuple(sig)
+
+
+def _load_kb_doctrine(kb_dir: str) -> dict:
+    """Read and concatenate KB files into a single doctrine string within budget."""
+    pieces: list[str] = []
+    files_loaded: list[tuple[str, int, bool]] = []  # (name, chars, truncated?)
+    files_skipped: list[str] = []
+    used = 0
+
+    candidates = sorted(
+        f for f in os.listdir(kb_dir)
+        if f.endswith(KB_FILE_EXTS) and not f.startswith(KB_SKIP_PREFIXES)
+    )
+
+    for name in candidates:
+        path = os.path.join(kb_dir, name)
+        try:
+            with open(path, encoding="utf-8") as f:
+                text = f.read().strip()
+        except Exception:
+            continue
+        if not text:
+            continue
+
+        truncated = False
+        if len(text) > KB_PER_FILE_CAP:
+            text = text[:KB_PER_FILE_CAP].rstrip() + "\n[…file truncated to fit prompt budget]"
+            truncated = True
+
+        header = f"\n--- knowledge_base/{name} ---\n"
+        block = header + text + "\n"
+
+        if used + len(block) > KB_BUDGET_CHARS:
+            files_skipped.append(name)
+            continue
+
+        pieces.append(block)
+        files_loaded.append((name, len(text), truncated))
+        used += len(block)
+
+    body = "".join(pieces)
+    fingerprint = hashlib.sha256(body.encode("utf-8")).hexdigest()[:10] if body else ""
+
+    return {
+        "body": body,
+        "fingerprint": fingerprint,
+        "files_loaded": files_loaded,
+        "files_skipped": files_skipped,
+        "total_chars": used,
+        "kb_dir": kb_dir,
+    }
+
+
+def get_live_kb() -> dict | None:
+    """Return current KB state. Hot-reloads when any file's mtime/size changes."""
+    kb_dir = _find_kb_dir()
+    if not kb_dir:
+        return None
+    sig = _kb_signature(kb_dir)
+    if not sig:
+        return None
+    if _KB_CACHE["signature"] != sig:
+        _KB_CACHE["data"] = _load_kb_doctrine(kb_dir)
+        _KB_CACHE["signature"] = sig
+        _KB_CACHE["loaded_at"] = time.time()
+    return _KB_CACHE["data"]
+
+
+KB_DOCTRINE_HEADER = (
+    "\n\n# ───────── LIVE DOCTRINE FROM knowledge_base/ ─────────\n"
+    "The sections below are loaded directly from the knowledge_base/ folder "
+    "maintained by the Advaitian Foundation. They reflect the latest committed "
+    "version of the philosophical source-of-truth.\n"
+    "If anything below clarifies, sharpens, or contradicts the protocol above, "
+    "TREAT THE DOCTRINE AS AUTHORITATIVE. The protocol above describes HOW you "
+    "engage; the doctrine below describes WHAT you teach."
+)
+
+
+def assemble_system_prompt(kb_state: dict | None) -> str:
+    """Compose the final system prompt: skeleton CORE_BRIEF + live doctrine."""
+    if not kb_state or not kb_state["body"]:
+        return CORE_BRIEF
+    return CORE_BRIEF + KB_DOCTRINE_HEADER + kb_state["body"]
 
 
 # =============================================================================
@@ -874,7 +1024,9 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
         system_prompt = CONCIERGE_BRIEF
         max_tok = MAX_OUTPUT_TOKENS["concierge"]
     else:
-        system_prompt = CORE_BRIEF
+        # Hot-reload knowledge_base/ on every math turn — any commit/push
+        # to that folder is reflected in the doctrine without restart.
+        system_prompt = assemble_system_prompt(get_live_kb())
         phase = st.session_state.get("current_phase", 1)
         # Stage-2 / Six-Point requests need Phase-3 budget regardless of current_phase.
         ui_low = user_input.lower()
@@ -1300,6 +1452,39 @@ with st.sidebar.expander("Provider Catalog", expanded=False):
     if st.button("Reset circuit breakers", use_container_width=True):
         st.session_state.quota_state = {}
         st.rerun()
+
+# Live doctrine (knowledge_base/)
+with st.sidebar.expander("Live Doctrine (knowledge_base/)", expanded=False):
+    _kb = get_live_kb()
+    if _kb is None:
+        st.caption("⚠ No `knowledge_base/` folder found.")
+    elif not _kb["files_loaded"]:
+        st.caption(f"Folder found at `{_kb.get('kb_dir', '?')}` but no `.md`/`.txt` files loaded.")
+    else:
+        approx_tok = _kb["total_chars"] // 4
+        st.markdown(
+            f"**Fingerprint:** `{_kb['fingerprint']}`  \n"
+            f"**Loaded:** {_kb['total_chars']:,} chars (~{approx_tok:,} tokens)"
+        )
+        loaded_at = datetime.fromtimestamp(
+            _KB_CACHE.get("loaded_at", time.time())
+        ).strftime("%H:%M:%S")
+        st.caption(f"Last reload: {loaded_at} · auto-reloads on file change")
+        st.markdown("**Files in doctrine:**")
+        for name, chars, trunc in _kb["files_loaded"]:
+            mark = " *(truncated)*" if trunc else ""
+            st.markdown(f"- `{name}` — {chars:,} chars{mark}")
+        if _kb["files_skipped"]:
+            st.caption("Skipped (budget exceeded):")
+            for name in _kb["files_skipped"]:
+                st.caption(f"  · `{name}`")
+        st.caption(
+            f"Per-file cap: {KB_PER_FILE_CAP:,} chars · "
+            f"Total budget: {KB_BUDGET_CHARS:,} chars"
+        )
+        if st.button("Force reload now", use_container_width=True):
+            _KB_CACHE["signature"] = None
+            st.rerun()
 
 # Phase indicator
 st.sidebar.markdown("#### Session Progress")
