@@ -9,7 +9,6 @@ import google.api_core.exceptions
 
 # --- MODEL ORCHESTRATION CONFIG ---
 GEMINI_MODEL_PRIORITY = [
-    "gemini-2.5-flash",
     "gemini-2.0-flash",
     "gemini-2.0-flash-lite",
     "gemini-1.5-flash",
@@ -204,25 +203,18 @@ st.markdown("""
 
     /* ── HIDE STREAMLIT SIDEBAR COLLAPSE TOOLTIP ── */
     button[data-testid="collapsedControl"] {
-    display: none !important;
+        display: none !important;
     }
     [data-testid="stSidebarCollapseButton"] {
-    display: none !important;
+        display: none !important;
     }
     button[kind="headerNoPadding"] {
-    display: none !important;
+        display: none !important;
     }
-    /* Hide all Streamlit toolbar tooltips */
-    .st-emotion-cache-zq5wmm {
-    display: none !important;
-    }
-    /* Hide the keyboard_double_arrow tooltip specifically */
     [data-testid="stSidebarNavCollapseIcon"] {
-    display: none !important;
+        display: none !important;
     }
-    .st-emotion-cache-1rtdyuf {
-    display: none !important;
-    }
+
     </style>
     """, unsafe_allow_html=True)
 
@@ -388,15 +380,14 @@ def get_gemini_model_with_fallback(system_instruction):
                 system_instruction=system_instruction,
                 safety_settings=safety_settings
             )
-            # Test initialization if possible, or just return
+            # Log success to session state
             st.session_state.active_model = model_name
             return model
-        except (google.api_core.exceptions.ResourceExhausted, Exception) as e:
-            if "429" in str(e) or "quota" in str(e).lower():
-                continue # Try next model
-            raise e
+        except Exception as e:
+            # Continue to next model on initialization errors
+            continue
     
-    st.error("All models in the priority list have exhausted their quota. Please try again later.")
+    st.error("Engine failure: No models available in the priority list. Please check your API key or quota.")
     st.stop()
 
 # --- FIREBASE ---
