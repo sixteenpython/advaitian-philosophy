@@ -1667,7 +1667,7 @@ with hdr_donate:
         )
         st.link_button(
             "Support the Mission",
-            "https://paypal.me/AdvaitianFoundation",
+            "https://paypal.me/vasumathiiK",
             use_container_width=True,
         )
 
