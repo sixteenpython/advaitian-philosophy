@@ -691,13 +691,14 @@ if user_input:
                 break # Success!
 
             except Exception as e:
+                status.error(f"Failure on {current_model}: {e}")
                 if "429" in str(e) or "quota" in str(e).lower() or isinstance(e, google.api_core.exceptions.ResourceExhausted):
                     st.session_state.chat_session = None
                     st.session_state.active_model = None
                     retry_count += 1
                     continue
                 else:
-                    st.error(f"API Error: {e}")
+                    st.error(f"Fatal API Error: {e}")
                     break
 
 # --- EXPORT SESSION ---
