@@ -1169,8 +1169,46 @@ st.set_page_config(
     page_title="ThinkMath.ai",
     page_icon=LOGO_URL,
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="auto",
 )
+
+# =============================================================================
+# ADMIN GATE — sidebar is visible only to the team via ?admin=<PIN>
+# Configure the PIN via Streamlit Secrets:  ADMIN_PIN = "your-secret"
+# Default fallback is "vriddhi-2026" (change before any public deploy).
+# =============================================================================
+
+ADMIN_PIN_DEFAULT = "vriddhi-2026"
+try:
+    ADMIN_PIN = (
+        st.secrets.get("ADMIN_PIN", ADMIN_PIN_DEFAULT)
+        if hasattr(st, "secrets") else ADMIN_PIN_DEFAULT
+    )
+except Exception:
+    ADMIN_PIN = ADMIN_PIN_DEFAULT
+
+try:
+    _qp_admin = st.query_params.get("admin")
+except Exception:
+    _qp_admin = None
+
+ADMIN_MODE = bool(_qp_admin) and _qp_admin == ADMIN_PIN
+
+# When NOT in admin mode, hide the sidebar AND its toggle entirely.
+if not ADMIN_MODE:
+    st.markdown(
+        """
+        <style>
+            section[data-testid="stSidebar"]              { display: none !important; }
+            button[data-testid="collapsedControl"]        { display: none !important; }
+            [data-testid="stSidebarCollapseButton"]       { display: none !important; }
+            [data-testid="stSidebarCollapsedControl"]     { display: none !important; }
+            /* Reclaim the horizontal space the sidebar would have used */
+            [data-testid="stAppViewContainer"] > .main    { margin-left: 0 !important; }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 st.markdown("""
     <style>
@@ -1279,9 +1317,65 @@ st.markdown("""
         border-radius: 8px !important;
         font-family: 'Segoe UI', Arial, sans-serif !important;
     }
+    /* Make the chat input a true paragraph-sized box (4-6 lines tall) */
+    [data-testid="stChatInput"] textarea {
+        min-height: 110px !important;
+        max-height: 320px !important;
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+        padding: 12px 14px !important;
+    }
     [data-testid="stChatInput"] textarea:focus {
         border: 2px solid #8db543 !important;
         outline: none !important;
+    }
+
+    /* ── HEADER CARDS (top-of-page band) ── */
+    /* st.container(border=True) renders this wrapper — we restyle it to match
+       the cream academic theme. */
+    [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #faf7f2 !important;
+        border: 1px solid #ddd5c0 !important;
+        border-radius: 10px !important;
+        padding: 10px 14px !important;
+    }
+    /* Tint the third header card (donate) green */
+    div[data-testid="column"]:nth-child(3) [data-testid="stVerticalBlockBorderWrapper"] {
+        background-color: #f4f0e8 !important;
+        border-color: #8db543 !important;
+    }
+    .header-title {
+        color: #5c3d1e;
+        font-size: 0.75em;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    .header-progress-row {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 6px;
+        font-size: 0.92em;
+        line-height: 1.6;
+    }
+    .header-donate-quote {
+        font-size: 0.78em;
+        color: #5c3d1e;
+        line-height: 1.4;
+        margin: 0 0 6px 0;
+        font-style: italic;
+    }
+    .admin-pill {
+        background: #5c3d1e;
+        color: #faf7f2 !important;
+        padding: 3px 10px;
+        border-radius: 6px;
+        font-size: 0.7em;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        display: inline-block;
     }
 
     /* ── BUTTONS ── */
@@ -1407,144 +1501,181 @@ ALL_MODELS = discover_models(GEMINI_KEY, GROQ_KEY, SAMBA_KEY)
 
 
 # ---------------------------------------------------------------------------
-# SIDEBAR
+# SIDEBAR — admin only (gated by ?admin=<PIN>)
+# Public users see only the header bar below; the sidebar is fully hidden.
 # ---------------------------------------------------------------------------
 
-st.sidebar.image(LOGO_URL, width=90)
-st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
+if ADMIN_MODE:
+    st.sidebar.image(LOGO_URL, width=90)
+    st.sidebar.markdown(
+        "<div class='admin-pill'>● ADMIN MODE</div>"
+        "<hr style='border:none; border-top:1px solid #ddd5c0; margin:10px 0;'>",
+        unsafe_allow_html=True,
+    )
 
-# Connection pills
-if GEMINI_KEY:
-    st.sidebar.markdown("<div class='status-pill'>● Gemini Connected</div>", unsafe_allow_html=True)
-else:
-    st.sidebar.markdown("<div class='status-pill warn'>○ Gemini Missing</div>", unsafe_allow_html=True)
-
-if FIREBASE_CRED:
-    st.sidebar.markdown("<div class='status-pill'>● Firebase Connected</div>", unsafe_allow_html=True)
-else:
-    st.sidebar.markdown("<div class='status-pill dim'>○ Firebase Offline</div>", unsafe_allow_html=True)
-
-if GROQ_KEY:
-    st.sidebar.markdown("<div class='status-pill'>● Groq Connected</div>", unsafe_allow_html=True)
-if SAMBA_KEY:
-    st.sidebar.markdown("<div class='status-pill'>● SambaNova Connected</div>", unsafe_allow_html=True)
-
-# Engine status
-st.sidebar.markdown("#### Engine Status")
-active = st.session_state.active_model or "Initializing…"
-pill_class = "status-pill" if st.session_state.active_model else "status-pill dim"
-st.sidebar.markdown(f"<div class='{pill_class}'>Model: {active}</div>", unsafe_allow_html=True)
-
-# Detailed health (collapsed)
-with st.sidebar.expander("Provider Catalog", expanded=False):
-    by_provider = {}
-    for m in ALL_MODELS:
-        by_provider.setdefault(m["provider"], 0)
-        by_provider[m["provider"]] += 1
-    for p, count in by_provider.items():
-        blocked = sum(
-            1 for m in ALL_MODELS
-            if m["provider"] == p and is_blocked(m["provider"], m["model"])
-        )
-        live = count - blocked
-        status = "✓" if live > 0 else "✗"
-        st.markdown(f"{status} **{p}** — {live}/{count} live")
-    if st.button("Reset circuit breakers", use_container_width=True):
-        st.session_state.quota_state = {}
-        st.rerun()
-
-# Live doctrine (knowledge_base/)
-with st.sidebar.expander("Live Doctrine (knowledge_base/)", expanded=False):
-    _kb = get_live_kb()
-    if _kb is None:
-        st.caption("⚠ No `knowledge_base/` folder found.")
-    elif not _kb["files_loaded"]:
-        st.caption(f"Folder found at `{_kb.get('kb_dir', '?')}` but no `.md`/`.txt` files loaded.")
+    # Connection pills
+    if GEMINI_KEY:
+        st.sidebar.markdown("<div class='status-pill'>● Gemini Connected</div>", unsafe_allow_html=True)
     else:
-        approx_tok = _kb["total_chars"] // 4
-        st.markdown(
-            f"**Fingerprint:** `{_kb['fingerprint']}`  \n"
-            f"**Loaded:** {_kb['total_chars']:,} chars (~{approx_tok:,} tokens)"
-        )
-        loaded_at = datetime.fromtimestamp(
-            _KB_CACHE.get("loaded_at", time.time())
-        ).strftime("%H:%M:%S")
-        st.caption(f"Last reload: {loaded_at} · auto-reloads on file change")
-        st.markdown("**Files in doctrine:**")
-        for name, chars, trunc in _kb["files_loaded"]:
-            mark = " *(truncated)*" if trunc else ""
-            st.markdown(f"- `{name}` — {chars:,} chars{mark}")
-        if _kb["files_skipped"]:
-            st.caption("Skipped (budget exceeded):")
-            for name in _kb["files_skipped"]:
-                st.caption(f"  · `{name}`")
-        st.caption(
-            f"Per-file cap: {KB_PER_FILE_CAP:,} chars · "
-            f"Total budget: {KB_BUDGET_CHARS:,} chars"
-        )
-        if st.button("Force reload now", use_container_width=True):
-            _KB_CACHE["signature"] = None
+        st.sidebar.markdown("<div class='status-pill warn'>○ Gemini Missing</div>", unsafe_allow_html=True)
+
+    if FIREBASE_CRED:
+        st.sidebar.markdown("<div class='status-pill'>● Firebase Connected</div>", unsafe_allow_html=True)
+    else:
+        st.sidebar.markdown("<div class='status-pill dim'>○ Firebase Offline</div>", unsafe_allow_html=True)
+
+    if GROQ_KEY:
+        st.sidebar.markdown("<div class='status-pill'>● Groq Connected</div>", unsafe_allow_html=True)
+    if SAMBA_KEY:
+        st.sidebar.markdown("<div class='status-pill'>● SambaNova Connected</div>", unsafe_allow_html=True)
+
+    # Engine status
+    st.sidebar.markdown("#### Engine Status")
+    active = st.session_state.active_model or "Initializing…"
+    pill_class = "status-pill" if st.session_state.active_model else "status-pill dim"
+    st.sidebar.markdown(f"<div class='{pill_class}'>Model: {active}</div>", unsafe_allow_html=True)
+
+    # Detailed health (collapsed)
+    with st.sidebar.expander("Provider Catalog", expanded=False):
+        by_provider = {}
+        for m in ALL_MODELS:
+            by_provider.setdefault(m["provider"], 0)
+            by_provider[m["provider"]] += 1
+        for p, count in by_provider.items():
+            blocked = sum(
+                1 for m in ALL_MODELS
+                if m["provider"] == p and is_blocked(m["provider"], m["model"])
+            )
+            live = count - blocked
+            status = "✓" if live > 0 else "✗"
+            st.markdown(f"{status} **{p}** — {live}/{count} live")
+        if st.button("Reset circuit breakers", use_container_width=True):
+            st.session_state.quota_state = {}
             st.rerun()
 
-# Phase indicator
-st.sidebar.markdown("#### Session Progress")
-phases_meta = {
-    1: "Phase 1: Finding the Seed",
-    2: "Phase 2: Identifying Directions",
-    3: "Phase 3: Convergence",
-}
-for n, label in phases_meta.items():
-    cur = st.session_state.current_phase
-    if n < cur:
-        st.sidebar.markdown(f"<span class='phase-complete'>✓ {label}</span>", unsafe_allow_html=True)
-    elif n == cur:
-        st.sidebar.markdown(f"<span class='phase-active'>▶ {label}</span>", unsafe_allow_html=True)
-    else:
-        st.sidebar.markdown(f"<span class='phase-inactive'>○ {label}</span>", unsafe_allow_html=True)
+    # Live doctrine (knowledge_base/)
+    with st.sidebar.expander("Live Doctrine (knowledge_base/)", expanded=False):
+        _kb = get_live_kb()
+        if _kb is None:
+            st.caption("⚠ No `knowledge_base/` folder found.")
+        elif not _kb["files_loaded"]:
+            st.caption(f"Folder found at `{_kb.get('kb_dir', '?')}` but no `.md`/`.txt` files loaded.")
+        else:
+            approx_tok = _kb["total_chars"] // 4
+            st.markdown(
+                f"**Fingerprint:** `{_kb['fingerprint']}`  \n"
+                f"**Loaded:** {_kb['total_chars']:,} chars (~{approx_tok:,} tokens)"
+            )
+            loaded_at = datetime.fromtimestamp(
+                _KB_CACHE.get("loaded_at", time.time())
+            ).strftime("%H:%M:%S")
+            st.caption(f"Last reload: {loaded_at} · auto-reloads on file change")
+            st.markdown("**Files in doctrine:**")
+            for name, chars, trunc in _kb["files_loaded"]:
+                mark = " *(truncated)*" if trunc else ""
+                st.markdown(f"- `{name}` — {chars:,} chars{mark}")
+            if _kb["files_skipped"]:
+                st.caption("Skipped (budget exceeded):")
+                for name in _kb["files_skipped"]:
+                    st.caption(f"  · `{name}`")
+            st.caption(
+                f"Per-file cap: {KB_PER_FILE_CAP:,} chars · "
+                f"Total budget: {KB_BUDGET_CHARS:,} chars"
+            )
+            if st.button("Force reload now", use_container_width=True):
+                _KB_CACHE["signature"] = None
+                st.rerun()
 
-st.sidebar.markdown("---")
-st.sidebar.markdown("""
-<div class='donate-section'>
-  <p style='font-size:0.85em; line-height:1.6;'>
-    <em>"You've burned the candle from both ends today.<br>
-    Help us put a candle in someone else's hands."</em>
-  </p>
-  <p style='font-size:0.75em; margin-top:8px; color:#7a6040;'>
-    Every donation supports free structural math education for students who can't afford coaching.
-  </p>
-</div>
-""", unsafe_allow_html=True)
-st.sidebar.link_button("Support the Mission", "https://paypal.me/AdvaitianFoundation", use_container_width=True)
+    st.sidebar.markdown("---")
+    st.sidebar.caption(
+        "Public users see only the chat. Share the URL with `?admin=<PIN>` to unlock this panel."
+    )
 
-st.sidebar.markdown("---")
-if st.sidebar.button("New Session", use_container_width=True):
-    if st.session_state.messages and not st.session_state.session_saved:
-        save_session_to_firebase(
-            st.session_state.messages,
-            st.session_state.current_phase,
-            st.session_state.detected_tier,
+
+# ---------------------------------------------------------------------------
+# MAIN — public surface (everyone sees this)
+# ---------------------------------------------------------------------------
+
+# Logo + title
+title_col_logo, title_col_text = st.columns([1, 9])
+with title_col_logo:
+    st.image(LOGO_URL, width=70)
+with title_col_text:
+    st.markdown("## ThinkMath.ai")
+    st.markdown(
+        "##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*"
+    )
+
+# ─── HEADER BAR (3 cards: New Session · Session Progress · Support) ───
+hdr_new, hdr_progress, hdr_donate = st.columns([1.1, 1.6, 1.6])
+
+with hdr_new:
+    with st.container(border=True):
+        st.markdown(
+            "<div class='header-title'>Session</div>",
+            unsafe_allow_html=True,
         )
-    st.session_state.messages = []
-    st.session_state.current_phase = 1
-    st.session_state.detected_tier = 3
-    st.session_state.session_saved = False
-    st.session_state.hint_level = 0
-    st.session_state.mvc_validated = False
-    st.session_state.active_model = None
-    st.rerun()
+        if st.button("🆕 New Session", use_container_width=True, key="hdr_new_session"):
+            if st.session_state.messages and not st.session_state.session_saved:
+                save_session_to_firebase(
+                    st.session_state.messages,
+                    st.session_state.current_phase,
+                    st.session_state.detected_tier,
+                )
+            st.session_state.messages = []
+            st.session_state.current_phase = 1
+            st.session_state.detected_tier = 3
+            st.session_state.session_saved = False
+            st.session_state.hint_level = 0
+            st.session_state.mvc_validated = False
+            st.session_state.active_model = None
+            st.rerun()
 
+with hdr_progress:
+    with st.container(border=True):
+        st.markdown(
+            "<div class='header-title'>Session Progress</div>",
+            unsafe_allow_html=True,
+        )
+        cur = st.session_state.current_phase
+        phases_meta = {
+            1: "Phase 1: Seed",
+            2: "Phase 2: Directions",
+            3: "Phase 3: Convergence",
+        }
+        rows = []
+        for n, label in phases_meta.items():
+            if n < cur:
+                rows.append(f"<span class='phase-complete'>✓ {label}</span>")
+            elif n == cur:
+                rows.append(f"<span class='phase-active'>▶ {label}</span>")
+            else:
+                rows.append(f"<span class='phase-inactive'>○ {label}</span>")
+        st.markdown(
+            f"<div class='header-progress-row'>{''.join(rows)}</div>",
+            unsafe_allow_html=True,
+        )
 
-# ---------------------------------------------------------------------------
-# MAIN
-# ---------------------------------------------------------------------------
-
-st.image(LOGO_URL, width=110)
-st.title("ThinkMath.ai")
-st.markdown("##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*")
+with hdr_donate:
+    with st.container(border=True):
+        st.markdown(
+            "<p class='header-donate-quote'>"
+            "&ldquo;You&rsquo;ve burned the candle from both ends today. "
+            "Help us put a candle in someone else&rsquo;s hands.&rdquo;"
+            "</p>",
+            unsafe_allow_html=True,
+        )
+        st.link_button(
+            "Support the Mission",
+            "https://paypal.me/AdvaitianFoundation",
+            use_container_width=True,
+        )
 
 if st.session_state.messages:
     st.markdown(
-        f"<span class='tier-badge'>{TIER_LABELS.get(st.session_state.detected_tier, 'Tier 3 — Elite')}</span>",
+        f"<span class='tier-badge'>"
+        f"{TIER_LABELS.get(st.session_state.detected_tier, 'Tier 3 — Elite')}"
+        f"</span>",
         unsafe_allow_html=True,
     )
 
