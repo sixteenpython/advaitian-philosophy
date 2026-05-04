@@ -5,6 +5,16 @@ from firebase_admin import credentials, firestore
 import json
 import os
 from datetime import datetime
+import google.api_core.exceptions
+
+# --- MODEL ORCHESTRATION CONFIG ---
+GEMINI_MODEL_PRIORITY = [
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+]
 
 # --- DESIGN & CONFIG ---
 st.set_page_config(page_title="ThinkMath.ai", layout="wide", initial_sidebar_state="expanded")
@@ -239,12 +249,11 @@ else:
     firebase_cred = firebase_cred_path
 
 st.sidebar.markdown("---")
-st.sidebar.title("🤖 Model")
-selected_model = st.sidebar.selectbox(
-    "Choose Gemini Model:",
-    ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash-lite"],
-    index=0
-)
+st.sidebar.title("🤖 Engine Status")
+if st.session_state.get("active_model"):
+    st.sidebar.info(f"Engine: {st.session_state.active_model}")
+else:
+    st.sidebar.warning("Engine: Initializing...")
 
 st.sidebar.markdown("---")
 
@@ -331,8 +340,9 @@ This allows the UI to track session progress. Do not explain this line to the st
 {knowledge_base}
 """
 
-# --- GEMINI MODEL ---
-def get_gemini_model(system_instruction):
+# --- GEMINI MODEL ORCHESTRATOR ---
+def get_gemini_model_with_fallback(system_instruction):
+    """Try models in priority order until one works."""
     genai.configure(api_key=api_key)
     generation_config = {
         "temperature": 0.3,
@@ -347,12 +357,25 @@ def get_gemini_model(system_instruction):
         {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
         {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
     ]
-    return genai.GenerativeModel(
-        model_name=selected_model,
-        generation_config=generation_config,
-        system_instruction=system_instruction,
-        safety_settings=safety_settings
-    )
+
+    for model_name in GEMINI_MODEL_PRIORITY:
+        try:
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                generation_config=generation_config,
+                system_instruction=system_instruction,
+                safety_settings=safety_settings
+            )
+            # Test initialization if possible, or just return
+            st.session_state.active_model = model_name
+            return model
+        except (google.api_core.exceptions.ResourceExhausted, Exception) as e:
+            if "429" in str(e) or "quota" in str(e).lower():
+                continue # Try next model
+            raise e
+    
+    st.error("All models in the priority list have exhausted their quota. Please try again later.")
+    st.stop()
 
 # --- FIREBASE ---
 def init_firebase():
@@ -442,6 +465,8 @@ if 'hint_level' not in st.session_state:
     st.session_state.hint_level = 0
 if 'mvc_validated' not in st.session_state:
     st.session_state.mvc_validated = False
+if 'active_model' not in st.session_state:
+    st.session_state.active_model = None
 
 # --- RENDER PHASE INDICATOR ---
 render_phase_indicator(st.session_state.current_phase)
@@ -530,21 +555,31 @@ if st.session_state.mvc_validated and st.session_state.current_phase < 3:
         stage2_prompt = "Please give me the full Stage 2 Six-Point Commentary now."
         st.session_state.messages.append({"role": "user", "content": stage2_prompt})
         with st.spinner("Generating Stage 2 Commentary..."):
-            try:
-                if st.session_state.chat_session is None:
-                    model = get_gemini_model(SYSTEM_PROMPT)
-                    st.session_state.chat_session = model.start_chat(history=[])
-                s2_response = st.session_state.chat_session.send_message(stage2_prompt)
-                if not s2_response.candidates or not s2_response.candidates[0].content.parts:
-                    s2_raw = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
-                else:
-                    s2_raw = s2_response.text
-                s2_clean, s2_phase, s2_tier = parse_metadata(s2_raw)
-                st.session_state.current_phase = s2_phase
-                st.session_state.detected_tier = s2_tier
-                st.session_state.messages.append({"role": "mentor", "content": s2_clean})
-            except Exception as e:
-                st.error(f"API Error: {e}")
+            retry_count = 0
+            while retry_count < len(GEMINI_MODEL_PRIORITY):
+                try:
+                    if st.session_state.chat_session is None:
+                        model = get_gemini_model_with_fallback(SYSTEM_PROMPT)
+                        st.session_state.chat_session = model.start_chat(history=[])
+                    s2_response = st.session_state.chat_session.send_message(stage2_prompt)
+                    if not s2_response.candidates or not s2_response.candidates[0].content.parts:
+                        s2_raw = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
+                    else:
+                        s2_raw = s2_response.text
+                    s2_clean, s2_phase, s2_tier = parse_metadata(s2_raw)
+                    st.session_state.current_phase = s2_phase
+                    st.session_state.detected_tier = s2_tier
+                    st.session_state.messages.append({"role": "mentor", "content": s2_clean})
+                    break # Success!
+                except Exception as e:
+                    if "429" in str(e) or "quota" in str(e).lower() or isinstance(e, google.api_core.exceptions.ResourceExhausted):
+                        st.session_state.chat_session = None
+                        st.session_state.active_model = None
+                        retry_count += 1
+                        continue
+                    else:
+                        st.error(f"API Error: {e}")
+                        break
         st.session_state.mvc_validated = False
         st.rerun()
 
@@ -583,46 +618,53 @@ if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
 
     with st.spinner("Thinking structurally..."):
-        try:
-            # Initialize or continue chat session
-            if st.session_state.chat_session is None:
-                model = get_gemini_model(SYSTEM_PROMPT)
-                st.session_state.chat_session = model.start_chat(history=[])
+        retry_count = 0
+        while retry_count < len(GEMINI_MODEL_PRIORITY):
+            try:
+                # Initialize or continue chat session
+                if st.session_state.chat_session is None:
+                    model = get_gemini_model_with_fallback(SYSTEM_PROMPT)
+                    st.session_state.chat_session = model.start_chat(history=[])
 
-            # Send message
-            response = st.session_state.chat_session.send_message(user_input)
-            if not response.candidates or not response.candidates[0].content.parts:
-                raw_response = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
-            else:
-                raw_response = response.text
+                # Send message
+                response = st.session_state.chat_session.send_message(user_input)
+                if not response.candidates or not response.candidates[0].content.parts:
+                    raw_response = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
+                else:
+                    raw_response = response.text
 
-            # Parse metadata and clean response
-            clean_response, phase, tier = parse_metadata(raw_response)
+                # Parse metadata and clean response
+                clean_response, phase, tier = parse_metadata(raw_response)
 
-            # Update session state
-            st.session_state.current_phase = phase
-            st.session_state.detected_tier = tier
+                # Update session state
+                st.session_state.current_phase = phase
+                st.session_state.detected_tier = tier
 
-            # Add mentor response
-            st.session_state.messages.append({"role": "mentor", "content": clean_response})
+                # Add mentor response
+                st.session_state.messages.append({"role": "mentor", "content": clean_response})
 
-            # Detect MVC validation signal
-            if "ready for stage 2" in clean_response.lower():
-                st.session_state.mvc_validated = True
+                # Detect MVC validation signal
+                if "ready for stage 2" in clean_response.lower():
+                    st.session_state.mvc_validated = True
 
-            # Auto-save to Firebase when Phase 3 completes (commentary generated)
-            if phase == 3 and "TAKEAWAY" in clean_response.upper():
-                problem = st.session_state.messages[0]["content"] if st.session_state.messages else ""
-                save_commentary_to_firebase(problem, clean_response, tier)
-                st.session_state.session_saved = True
+                # Auto-save to Firebase when Phase 3 completes (commentary generated)
+                if phase == 3 and "TAKEAWAY" in clean_response.upper():
+                    problem = st.session_state.messages[0]["content"] if st.session_state.messages else ""
+                    save_commentary_to_firebase(problem, clean_response, tier)
+                    st.session_state.session_saved = True
 
-            st.rerun()
+                st.rerun()
+                break # Success!
 
-        except Exception as e:
-            if "429" in str(e) or "quota" in str(e).lower():
-                st.error(f"⚠️ Quota exceeded on {selected_model}. Switch model in sidebar and retry.")
-            else:
-                st.error(f"API Error: {e}")
+            except Exception as e:
+                if "429" in str(e) or "quota" in str(e).lower() or isinstance(e, google.api_core.exceptions.ResourceExhausted):
+                    st.session_state.chat_session = None
+                    st.session_state.active_model = None
+                    retry_count += 1
+                    continue
+                else:
+                    st.error(f"API Error: {e}")
+                    break
 
 # --- EXPORT SESSION ---
 if st.session_state.messages and st.session_state.current_phase == 3:
