@@ -256,31 +256,48 @@ def get_credentials():
                 fb_cred = dict(st.secrets["firebase"])
     except: pass
 
-    # 2. Try Local File Fallbacks (for Gemini/Firebase)
+    # 2. Try Local File Fallbacks 
     def clean_key(val):
         return val.strip().replace('"', '').replace("'", "") if val else None
 
-    if not api_k:
-        try:
-            with open(os.path.join(os.path.dirname(__file__), "..", "AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt"), "r") as f:
-                api_k = clean_key(f.read())
-        except: pass
-
-    if not groq_k:
-        try:
-            with open(os.path.join(os.path.dirname(__file__), "..", "groq_api_key.txt"), "r") as f:
-                groq_k = clean_key(f.read())
-        except: pass
-
-    if not samba_k:
-        try:
-            with open(os.path.join(os.path.dirname(__file__), "..", "samba_api_key.txt"), "r") as f:
-                samba_k = clean_key(f.read())
-        except: pass
+    # Search paths: root and current dir
+    paths = [
+        os.path.dirname(__file__),
+        os.path.join(os.path.dirname(__file__), "..")
+    ]
+    
+    for p in paths:
+        if not api_k:
+            try:
+                with open(os.path.join(p, "AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt"), "r") as f:
+                    api_k = clean_key(f.read())
+            except: pass
+        if not groq_k:
+            try:
+                # Try both common names
+                for n in ["groq_api_key.txt", "groq_key.txt"]:
+                    if os.path.exists(os.path.join(p, n)):
+                        with open(os.path.join(p, n), "r") as f:
+                            groq_k = clean_key(f.read())
+                            break
+            except: pass
+        if not samba_k:
+            try:
+                for n in ["samba_api_key.txt", "samba_key.txt"]:
+                    if os.path.exists(os.path.join(p, n)):
+                        with open(os.path.join(p, n), "r") as f:
+                            samba_k = clean_key(f.read())
+                            break
+            except: pass
 
     fb_path = os.path.join(os.path.dirname(__file__), "..", "advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json")
     if not fb_cred and os.path.exists(fb_path):
         fb_cred = fb_path
+    if not fb_cred:
+        p2 = os.path.join(os.path.dirname(__file__), "advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json")
+        if os.path.exists(p2): fb_cred = p2
+
+    return clean_key(api_k), fb_cred, clean_key(groq_k), clean_key(samba_k)
 
     # Standardize values
     return clean_key(api_k), fb_cred, clean_key(groq_k), clean_key(samba_k)
