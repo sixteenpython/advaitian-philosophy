@@ -2,9 +2,11 @@ _overleaf-downloads/
 # Secrets
 AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt
 advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json
+*_api_key.txt
 
 # Python
 __pycache__/
 *.pyc
 .venv/
 .streamlit/
+*.json

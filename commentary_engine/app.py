@@ -360,10 +360,16 @@ class GeminiWrapper(ModelWrapper):
             system_instruction=system_instruction,
             generation_config={"temperature": 0.3, "top_p": 0.95, "max_output_tokens": 8192}
         )
-        self.chat = self.model.start_chat(history=[])
 
     def send_message(self, text):
-        return self.chat.send_message(text)
+        # Manual history management for Triple-Wall resilience
+        self.history.append({"role": "user", "parts": [text]})
+        # Keep only last 3 turns
+        recent_history = self.history[-6:] if len(self.history) > 6 else self.history
+        self.chat = self.model.start_chat(history=recent_history[:-1])
+        response = self.chat.send_message(text)
+        self.history.append({"role": "model", "parts": [response.text]})
+        return response
 
 class GroqWrapper(ModelWrapper):
     def __init__(self, model_name, sys_instr):
@@ -372,7 +378,10 @@ class GroqWrapper(ModelWrapper):
 
     def send_message(self, text):
         self.history.append({"role": "user", "content": text})
-        messages = [{"role": "system", "content": self.system_instruction}] + self.history
+        # Sliding Window: Keep last 3 turns
+        recent_history = self.history[-6:] if len(self.history) > 6 else self.history
+        messages = [{"role": "system", "content": self.system_instruction}] + recent_history
+        
         completion = self.client.chat.completions.create(
             model=self.model_name,
             messages=messages,
@@ -381,7 +390,7 @@ class GroqWrapper(ModelWrapper):
         )
         response_text = completion.choices[0].message.content
         self.history.append({"role": "assistant", "content": response_text})
-        # Mocking Gemini's response object structure
+        
         class MockResponse:
             def __init__(self, text):
                 self.text = text
@@ -398,7 +407,9 @@ class SambaNovaWrapper(ModelWrapper):
 
     def send_message(self, text):
         self.history.append({"role": "user", "content": text})
-        messages = [{"role": "system", "content": self.system_instruction}] + self.history
+        recent_history = self.history[-6:] if len(self.history) > 6 else self.history
+        messages = [{"role": "system", "content": self.system_instruction}] + recent_history
+        
         completion = self.client.chat.completions.create(
             model=self.model_name,
             messages=messages,
@@ -407,6 +418,7 @@ class SambaNovaWrapper(ModelWrapper):
         )
         response_text = completion.choices[0].message.content
         self.history.append({"role": "assistant", "content": response_text})
+        
         class MockResponse:
             def __init__(self, text):
                 self.text = text
