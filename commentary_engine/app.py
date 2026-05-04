@@ -262,63 +262,47 @@ TIER_LABELS = {
 def load_knowledge_base():
     kb_dir = os.path.join(os.path.dirname(__file__), "..", "knowledge_base")
     if not os.path.exists(kb_dir):
-        return "Warning: knowledge_base directory not found."
+        return "Warning: folder not found.", ""
 
-    aggregated_kb = ""
-    # Load Blueprint v3 first — it takes priority
-    blueprint_path = os.path.join(kb_dir, "ThinkMath_Blueprint_v3.md")
-    if os.path.exists(blueprint_path):
-        with open(blueprint_path, "r", encoding="utf-8") as f:
-            aggregated_kb += f"\n--- PRIMARY DIRECTIVE: ThinkMath_Blueprint_v3.md ---\n"
-            aggregated_kb += f.read()
-            aggregated_kb += "\n--- END PRIMARY DIRECTIVE ---\n\n"
+    core_kb = ""
+    ref_kb = ""
+    
+    # Load Blueprint v3 and Master Framework first — these are CORE (Sent in System Prompt)
+    core_files = ["ThinkMath_Blueprint_v3.md", "Advaitian_Master_Framework.txt"]
+    for cf in core_files:
+        path = os.path.join(kb_dir, cf)
+        if os.path.exists(path):
+            with open(path, "r", encoding="utf-8") as f:
+                core_kb += f"\n--- CORE DIRECTIVE: {cf} ---\n{f.read()}\n"
 
-    # Then load all other knowledge base files
+    # Load all other reference files (Stored in session but not sent in every System Prompt)
     for filename in sorted(os.listdir(kb_dir)):
-        if filename.endswith((".txt", ".md")) and filename != "ThinkMath_Blueprint_v3.md":
-            file_path = os.path.join(kb_dir, filename)
+        if filename.endswith((".txt", ".md")) and filename not in core_files:
+            path = os.path.join(kb_dir, filename)
             try:
-                with open(file_path, "r", encoding="utf-8") as file:
-                    aggregated_kb += f"\n--- REFERENCE: {filename} ---\n"
-                    aggregated_kb += file.read()
-                    aggregated_kb += "\n"
-            except Exception as e:
-                aggregated_kb += f"\nError loading {filename}: {e}\n"
+                with open(path, "r", encoding="utf-8") as file:
+                    ref_kb += f"\n--- REFERENCE: {filename} ---\n{file.read()}\n"
+            except: pass
 
-    return aggregated_kb if aggregated_kb else "Knowledge base is empty."
+    return core_kb, ref_kb
 
-knowledge_base = load_knowledge_base()
+core_kb, reference_kb = load_knowledge_base()
 
 # --- SYSTEM PROMPT ---
-# Blueprint v3 is already fully loaded in knowledge_base as PRIMARY DIRECTIVE.
-# This wrapper ensures the Socratic chat mode is activated.
+# We keep this as lean as possible to save quota. History and Blueprint are the priority.
 SYSTEM_PROMPT = f"""
-You are the ThinkMath.ai Socratic Mentor — the Digital Clone of ThinkMath, Founder of the Advaitian Foundation.
+You are the ThinkMath.ai Socratic Mentor — the Digital Clone of ThinkMath.
 
-Your complete operating instructions, philosophy, 20 archetypes, 160 gems, tier detection protocol,
-socratic engagement protocol, escape hatch system, and six-point commentary framework are all
-contained in the PRIMARY DIRECTIVE section of your knowledge base below.
+CRITICAL: Your entire operating logic is defined in the CORE DIRECTIVES below. 
+You are a structural mirror. You NEVER give the answer. You guide by Socratic questioning.
 
-CRITICAL: Read and fully internalize the PRIMARY DIRECTIVE (ThinkMath_Blueprint_v3.md) before
-responding to any student message. Every response must reflect that document.
-
-You are operating in SOCRATIC CHAT MODE. The student submits problems via chat.
-You guide them through Phases 1, 2, and 3 as described in your blueprint.
-You NEVER give the answer directly. You are a Structural Mirror.
-
-After each response, append a hidden metadata line in this exact format (on its own line at the end):
-PHASE:[1/2/3] TIER:[0/1/2/3/4]
-
-This allows the UI to track session progress. Do not explain this line to the student.
-
---- KNOWLEDGE BASE (PRIMARY DIRECTIVE + REFERENCES) ---
-{knowledge_base}
+--- CORE DIRECTIVES ---
+{core_kb}
 """
 
 # --- GEMINI MODEL ORCHESTRATOR ---
-def get_gemini_model_with_fallback(system_instruction):
-    """Try models in priority order until one works."""
-    # Note: 'api_key' must be defined in sidebar or passed in
+def get_model_instance(model_name, system_instruction):
+    """Initialize a specific Gemini model instance."""
     genai.configure(api_key=api_key)
     generation_config = {
         "temperature": 0.3,
@@ -328,29 +312,16 @@ def get_gemini_model_with_fallback(system_instruction):
         "response_mime_type": "text/plain",
     }
     safety_settings = [
-        {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_NONE"},
-        {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"},
+        {"category": f"HARM_CATEGORY_{c}", "threshold": "BLOCK_NONE"} 
+        for c in ["HARASSMENT", "HATE_SPEECH", "SEXUALLY_EXPLICIT", "DANGEROUS_CONTENT"]
     ]
+    return genai.GenerativeModel(
+        model_name=model_name,
+        generation_config=generation_config,
+        system_instruction=system_instruction,
+        safety_settings=safety_settings
+    )
 
-    for model_name in GEMINI_MODEL_PRIORITY:
-        try:
-            model = genai.GenerativeModel(
-                model_name=model_name,
-                generation_config=generation_config,
-                system_instruction=system_instruction,
-                safety_settings=safety_settings
-            )
-            # Log success to session state
-            st.session_state.active_model = model_name
-            return model
-        except Exception as e:
-            # Continue to next model on initialization errors
-            continue
-    
-    st.error("Engine failure: No models available in the priority list. Please check your API key or quota.")
-    st.stop()
 
 
 # --- SIDEBAR ---
@@ -642,17 +613,19 @@ if user_input:
     with st.status("Thinking structurally...", expanded=True) as status:
         retry_count = 0
         while retry_count < len(GEMINI_MODEL_PRIORITY):
-            current_model = GEMINI_MODEL_PRIORITY[retry_count]
-            status.write(f"Connecting to {current_model}...")
+            current_model_name = GEMINI_MODEL_PRIORITY[retry_count]
+            status.write(f"Connecting to {current_model_name}...")
+            
             try:
-                # Initialize or continue chat session
-                if st.session_state.chat_session is None:
-                    model = get_gemini_model_with_fallback(SYSTEM_PROMPT)
-                    st.session_state.chat_session = model.start_chat(history=[])
-
-                # Send message
-                status.write(f"Generating structural response via {current_model}...")
-                response = st.session_state.chat_session.send_message(user_input)
+                # Initialize model and session
+                model = get_model_instance(current_model_name, SYSTEM_PROMPT)
+                st.session_state.active_model = current_model_name
+                
+                # We always start a fresh chat session for a new model attempt to avoid context bleed
+                chat = model.start_chat(history=[])
+                
+                status.write(f"Generating structural response via {current_model_name}...")
+                response = chat.send_message(user_input)
                 status.write("Response received. Parsing...")
                 
                 if not response.candidates or not response.candidates[0].content.parts:
@@ -660,23 +633,18 @@ if user_input:
                 else:
                     raw_response = response.text
 
-                # DEBUG: Show raw response in a toast
-                st.toast(f"Raw Response: {raw_response[:50]}...", icon="🎯")
-
                 # Parse metadata and clean response
                 clean_response, phase, tier = parse_metadata(raw_response)
 
                 if not clean_response:
                     clean_response = "[Empty response from engine. Please check your prompt.]"
 
-
-                # Update session state
+                # Update session state with successful response
                 st.session_state.current_phase = phase
                 st.session_state.detected_tier = tier
-
-                # Add mentor response
                 st.session_state.messages.append({"role": "mentor", "content": clean_response})
-
+                st.session_state.chat_session = chat # Persist successful session
+                
                 # Detect MVC validation signal
                 if "ready for stage 2" in clean_response.lower():
                     st.session_state.mvc_validated = True
@@ -687,19 +655,20 @@ if user_input:
                     save_commentary_to_firebase(problem, clean_response, tier)
                     st.session_state.session_saved = True
 
+                status.update(label="Response generated successfully!", state="complete")
                 st.rerun()
                 break # Success!
 
             except Exception as e:
-                status.error(f"Failure on {current_model}: {e}")
+                status.error(f"Failure on {current_model_name}: {e}")
+                # Only retry on quota or rate limits
                 if "429" in str(e) or "quota" in str(e).lower() or isinstance(e, google.api_core.exceptions.ResourceExhausted):
-                    st.session_state.chat_session = None
-                    st.session_state.active_model = None
                     retry_count += 1
                     continue
                 else:
-                    st.error(f"Fatal API Error: {e}")
+                    st.error(f"Fatal Engine Error: {e}")
                     break
+
 
 # --- EXPORT SESSION ---
 if st.session_state.messages and st.session_state.current_phase == 3:
