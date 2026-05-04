@@ -260,11 +260,15 @@ def get_credentials():
     def clean_key(val):
         return val.strip().replace('"', '').replace("'", "") if val else None
 
-    # Search paths: root and current dir
+    # Search paths: current working dir, root, and app dir
     paths = [
+        os.getcwd(),
         os.path.dirname(__file__),
         os.path.join(os.path.dirname(__file__), "..")
     ]
+    
+    # Standardize path list
+    paths = sorted(list(set(os.path.abspath(p) for p in paths)), key=len, reverse=True)
     
     for p in paths:
         if not api_k:
@@ -722,6 +726,12 @@ if user_input:
         
         status.write(f"Intent detected: {'Mathematical Structure' if is_math else 'Conversational/Greeting'}")
         status.write(f"Routing to {tier_name} model tier...")
+        
+        # Debug: Show key availability
+        if not groq_k:
+            status.write(f"🔍 Groq key not found in: {os.getcwd()}, {os.path.dirname(__file__)}")
+        if not samba_k:
+            status.write(f"🔍 SambaNova key not found in: {os.getcwd()}, {os.path.dirname(__file__)}")
         
         retry_count = 0
         while retry_count < len(active_tier):
