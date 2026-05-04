@@ -252,6 +252,7 @@ inferred_api_key, inferred_fb_cred = get_credentials()
 st.sidebar.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=90)
 st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
 
+# --- SIDEBAR CREDENTIALS ---
 if inferred_api_key:
     st.sidebar.markdown("<div style='background:#f0f7e6; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>● Gemini Connected</div>", unsafe_allow_html=True)
     api_key = inferred_api_key
@@ -267,7 +268,16 @@ else:
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("#### Engine Status")
-st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Model: {st.session_state.get('active_model', 'Initializing...')}</div>", unsafe_allow_html=True)
+
+# Auto-initialize model if API key is present
+if api_key and not st.session_state.get("active_model"):
+    try:
+        get_gemini_model_with_fallback(SYSTEM_PROMPT)
+    except Exception as e:
+        st.sidebar.error(f"Engine Init Error: {e}")
+
+model_status = st.session_state.get("active_model", "Waiting for API Key...")
+st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Model: {model_status}</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 
