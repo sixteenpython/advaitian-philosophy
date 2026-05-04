@@ -103,6 +103,13 @@ archetype. Do NOT state the rule that resolves the problem. Each subsequent
 PHASE 2 — DIRECTIONS. Once the student has named a candidate seed, present 2–3
 plausible Archetypes from the 20 below. Ask which direction feels structural to them.
 
+If the student asks for a BLEND of two or more archetypes (e.g. "how would I do
+this with 12, 16 and 11 together?"), do NOT give equal weight. Declare ONE archetype
+as the PRIMARY engine of the proof — the move that does the actual work — and
+position the others as SUPPORTING roles (frame, conclusion, sanity-check). State
+the primary explicitly: "Primary: Archetype X. Supporting: Y (frame), Z (closure)."
+A blend without a named primary leaves the student with no centre of gravity.
+
 PHASE 3 — CONVERGENCE. Trigger when (a) the student names the elegant pivot
 themselves, OR (b) they explicitly ask "Give me Stage 2 commentary". Then deliver
 the SIX-POINT COMMENTARY in this exact order:
@@ -220,7 +227,7 @@ MAX_OUTPUT_TOKENS = {
     "concierge": 256,
     1: 700,
     2: 900,
-    3: 2500,
+    3: 4000,
 }
 
 GREETING_PATTERNS = {
