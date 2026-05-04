@@ -1755,6 +1755,32 @@ st.markdown("""
         display: inline-block;
     }
 
+    /* ── DESKTOP-ONLY POSITIONING NOTE ── */
+    /* On desktop: subtle italic line that signals intentional design.
+       On mobile: prominent banner that warns users to switch to a computer. */
+    .desktop-note {
+        font-size: 0.82em;
+        color: #7a5a30;
+        font-style: italic;
+        margin-top: 4px;
+        line-height: 1.35;
+        opacity: 0.85;
+    }
+    @media (max-width: 768px) {
+        .desktop-note {
+            background: #fff5e0;
+            border-left: 4px solid #c2873b;
+            padding: 10px 12px;
+            margin: 10px 0 14px 0;
+            font-size: 0.95em;
+            font-style: normal;
+            color: #5c3d1e;
+            opacity: 1;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    }
+
     /* ── BUTTONS ── */
     .stButton>button {
         background-color: #ffffff;
@@ -1981,6 +2007,13 @@ with title_col_text:
     st.markdown("## ThinkMath.ai")
     st.markdown(
         "##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*"
+    )
+    st.markdown(
+        "<div class='desktop-note'>"
+        "ThinkMath.ai is a desktop application. "
+        "Math is hard work; it deserves a real keyboard and a real screen."
+        "</div>",
+        unsafe_allow_html=True,
     )
 
 # ─── HEADER BAR (3 cards: New Session · Session Progress · Support) ───
