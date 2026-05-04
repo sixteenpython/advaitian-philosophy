@@ -656,13 +656,21 @@ if user_input:
 
                 # Send message
                 response = st.session_state.chat_session.send_message(user_input)
+                
                 if not response.candidates or not response.candidates[0].content.parts:
                     raw_response = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
                 else:
                     raw_response = response.text
 
+                # DEBUG: Show raw response in a toast
+                st.toast(f"Raw Response: {raw_response[:50]}...", icon="🎯")
+
                 # Parse metadata and clean response
                 clean_response, phase, tier = parse_metadata(raw_response)
+
+                if not clean_response:
+                    clean_response = "[Empty response from engine. Please check your prompt.]"
+
 
                 # Update session state
                 st.session_state.current_phase = phase
