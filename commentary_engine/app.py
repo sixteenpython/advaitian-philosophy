@@ -1656,6 +1656,10 @@ with hdr_progress:
             unsafe_allow_html=True,
         )
 
+PAYPAL_HANDLE = "vasumathiiK"
+PAYPAL_PRESETS = (5, 10, 15, 20)
+PAYPAL_MIN = 2
+
 with hdr_donate:
     with st.container(border=True):
         st.markdown(
@@ -1665,9 +1669,20 @@ with hdr_donate:
             "</p>",
             unsafe_allow_html=True,
         )
+        # Quick-pick presets
+        preset_cols = st.columns(len(PAYPAL_PRESETS))
+        for col, amt in zip(preset_cols, PAYPAL_PRESETS):
+            with col:
+                st.link_button(
+                    f"${amt}",
+                    f"https://paypal.me/{PAYPAL_HANDLE}/{amt}",
+                    use_container_width=True,
+                )
+        # Open-ended donation (PayPal page with the minimum pre-filled;
+        # the donor can edit on PayPal before confirming)
         st.link_button(
-            "Support the Mission",
-            "https://paypal.me/vasumathiiK",
+            f"Other amount  (min ${PAYPAL_MIN})",
+            f"https://paypal.me/{PAYPAL_HANDLE}/{PAYPAL_MIN}",
             use_container_width=True,
         )
 
