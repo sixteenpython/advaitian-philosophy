@@ -421,13 +421,6 @@ groq_api_key = st.sidebar.text_input("Groq API Key", type="password", help="Fall
 samba_api_key = st.sidebar.text_input("SambaNova API Key", type="password", help="Secondary fallback")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("#### Engine Status")
-
-# Show model status
-model_status = st.session_state.get("active_model", "Ready. Send a message to start.")
-st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Engine Status: {model_status}</div>", unsafe_allow_html=True)
-
-st.sidebar.markdown("---")
 
 # --- PHASE INDICATOR ---
 def render_phase_indicator(current_phase):
