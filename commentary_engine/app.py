@@ -374,15 +374,9 @@ else:
 st.sidebar.markdown("---")
 st.sidebar.markdown("#### Engine Status")
 
-# Auto-initialize model if API key is present
-if api_key and not st.session_state.get("active_model"):
-    try:
-        get_gemini_model_with_fallback(SYSTEM_PROMPT)
-    except Exception as e:
-        st.sidebar.error(f"Engine Init Error: {e}")
-
-model_status = st.session_state.get("active_model", "Waiting for API Key...")
-st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Model: {model_status}</div>", unsafe_allow_html=True)
+# Show model status
+model_status = st.session_state.get("active_model", "Ready. Send a message to start.")
+st.sidebar.markdown(f"<div style='background:#f4f0e8; border:1px solid #8db543; border-radius:6px; padding:6px 12px; color:#5c3d1e; font-size:0.85em; margin:4px 0;'>Engine Status: {model_status}</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
 
@@ -645,9 +639,11 @@ if user_input:
     # Add user message to display
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    with st.spinner("Thinking structurally..."):
+    with st.status("Thinking structurally...", expanded=True) as status:
         retry_count = 0
         while retry_count < len(GEMINI_MODEL_PRIORITY):
+            current_model = GEMINI_MODEL_PRIORITY[retry_count]
+            status.write(f"Connecting to {current_model}...")
             try:
                 # Initialize or continue chat session
                 if st.session_state.chat_session is None:
@@ -655,7 +651,9 @@ if user_input:
                     st.session_state.chat_session = model.start_chat(history=[])
 
                 # Send message
+                status.write(f"Generating structural response via {current_model}...")
                 response = st.session_state.chat_session.send_message(user_input)
+                status.write("Response received. Parsing...")
                 
                 if not response.candidates or not response.candidates[0].content.parts:
                     raw_response = "I need a moment to reformulate. Could you rephrase your last message slightly and try again?"
