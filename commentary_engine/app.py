@@ -813,10 +813,30 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background-color: #f9f6f1 !important;
         border-right: 1px solid #ddd5c0;
+        font-family: 'Segoe UI', Arial, sans-serif;
     }
-    section[data-testid="stSidebar"] * {
+    /* Color cascade for text only — DO NOT touch font-family on * because
+       that breaks Material Symbols icons (expander chevron, etc.) */
+    section[data-testid="stSidebar"] p,
+    section[data-testid="stSidebar"] span:not([class*="material"]):not([class*="Icon"]),
+    section[data-testid="stSidebar"] div:not([class*="material"]):not([class*="Icon"]),
+    section[data-testid="stSidebar"] h1,
+    section[data-testid="stSidebar"] h2,
+    section[data-testid="stSidebar"] h3,
+    section[data-testid="stSidebar"] h4,
+    section[data-testid="stSidebar"] h5,
+    section[data-testid="stSidebar"] h6,
+    section[data-testid="stSidebar"] label,
+    section[data-testid="stSidebar"] a {
         color: #2d1f0e !important;
-        font-family: 'Segoe UI', Arial, sans-serif !important;
+    }
+    /* Make sure Material Symbols icons keep their icon font */
+    section[data-testid="stSidebar"] [class*="material-symbols"],
+    section[data-testid="stSidebar"] [class*="material-icons"],
+    section[data-testid="stSidebar"] [data-testid*="Icon"] {
+        font-family: 'Material Symbols Outlined', 'Material Symbols Rounded',
+                     'Material Symbols Sharp', 'Material Icons' !important;
+        color: #5c3d1e !important;
     }
 
     /* ── HEADINGS ── */
