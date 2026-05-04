@@ -243,31 +243,37 @@ st.markdown("""
 def get_credentials():
     api_k = None
     fb_cred = None
+    groq_k = None
+    samba_k = None
 
+    # 1. Try Streamlit Secrets
     try:
         if hasattr(st, "secrets") and st.secrets:
             api_k = st.secrets.get("GEMINI_API_KEY")
-            if api_k:
-                api_k = api_k.strip().replace('"', '').replace("'", "")
+            groq_k = st.secrets.get("GROQ_API_KEY")
+            samba_k = st.secrets.get("SAMBANOVA_API_KEY")
             if "firebase" in st.secrets:
                 fb_cred = dict(st.secrets["firebase"])
-    except (FileNotFoundError, RuntimeError, Exception):
-        pass
+    except: pass
+
+    # 2. Try Local File Fallbacks (for Gemini/Firebase)
+    def clean_key(val):
+        return val.strip().replace('"', '').replace("'", "") if val else None
 
     if not api_k:
         try:
             with open(os.path.join(os.path.dirname(__file__), "..", "AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt"), "r") as f:
-                api_k = f.read().strip().replace('"', '').replace("'", "")
-        except FileNotFoundError:
-            pass
+                api_k = clean_key(f.read())
+        except: pass
 
     fb_path = os.path.join(os.path.dirname(__file__), "..", "advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json")
     if not fb_cred and os.path.exists(fb_path):
         fb_cred = fb_path
 
-    return api_k, fb_cred
+    # Standardize values
+    return clean_key(api_k), fb_cred, clean_key(groq_k), clean_key(samba_k)
 
-inferred_api_key, inferred_fb_cred = get_credentials()
+api_key, firebase_cred, groq_api_key, samba_api_key = get_credentials()
 
 # --- TIER DISPLAY ---
 TIER_LABELS = {
@@ -400,25 +406,6 @@ class SambaNovaWrapper(ModelWrapper):
 # --- SIDEBAR ---
 st.sidebar.image("https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png", width=90)
 st.sidebar.markdown("<hr style='border:none; border-top:1px solid #ddd5c0; margin:8px 0;'>", unsafe_allow_html=True)
-
-# --- SIDEBAR CREDENTIALS ---
-col1, col2 = st.sidebar.columns(2)
-with col1:
-    if inferred_api_key:
-        st.markdown("<div class='connected-badge'>● Gemini ✓</div>", unsafe_allow_html=True)
-        api_key = inferred_api_key
-    else:
-        api_key = st.text_input("Gemini Key", type="password")
-
-with col2:
-    if inferred_fb_cred:
-        st.markdown("<div class='connected-badge'>● Firebase ✓</div>", unsafe_allow_html=True)
-        firebase_cred = inferred_fb_cred
-    else:
-        firebase_cred = st.text_input("Firebase JSON", type="password")
-
-groq_api_key = st.sidebar.text_input("Groq API Key", type="password", help="Fallback provider on Gemini 429")
-samba_api_key = st.sidebar.text_input("SambaNova API Key", type="password", help="Secondary fallback")
 
 st.sidebar.markdown("---")
 
