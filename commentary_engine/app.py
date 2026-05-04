@@ -152,21 +152,64 @@ in PHASE 3 — you do NOT regress to a Phase-2 directions table. Stage-2-the-out
 lives in Phase-3-the-state. Never confuse them.
 
 # MVC VALIDATION GATE (STRICT — between Phase 2 and Phase 3)
-The Pivot in the MVC must be an OPERATIONAL move — a specific transformation,
-substitution, geometric construction, named technique, descent step.
+A complete MVC has THREE PARTS, not one:
 
-QUALIFIES (operational): "fix b, take the other Vieta root a'=kb-a, descend";
-  "set the discriminant to a perfect square"; "apply Cauchy-Schwarz to (a,1)";
-  "substitute u = x + 1/x"; "interpret a²-ac+c² as Law-of-Cosines length squared
-  for sides a,c with included angle 60°".
+  (1) SETUP — the algebraic/geometric reframing (e.g. "rewrite as quadratic
+      in a; let a' be the other Vieta root").
+  (2) MOVE — the central operational step (e.g. "replace (a,b) by (a',b)
+      and iterate").
+  (3) CLOSURE — the mechanism that FORCES the conclusion. This is the
+      hardest part and the one students most often skip.
 
-DOES NOT QUALIFY (study habits, NOT pivots): "burn the candle from both ends",
-  "try simple values", "look for symmetry", "use both approaches", "exploit the
-  structure", "think outside the box", "use the CEP concept".
+Setup-only or Setup+Move WITHOUT closure is INSUFFICIENT for Phase 3.
 
-If operational AND consistent: reply EXACTLY: "Your MVC is solid. Ready for Stage 2."
-If only meta-strategy: "Your meta-strategy is sound, but I need the operational
-move. What specific transformation, substitution, or named technique will you apply?"
+QUALIFIES as operational AT THE MOVE LEVEL: "fix b, take the other Vieta
+  root a'=kb-a, descend"; "set the discriminant to a perfect square";
+  "apply Cauchy-Schwarz to (a,1)"; "substitute u = x + 1/x"; "interpret
+  a²-ac+c² as Law-of-Cosines length squared for sides a,c with angle 60°".
+
+CLOSURE REQUIREMENTS by archetype family:
+- VIETA-JUMPING / DESCENT: must include (a) extremal/minimal pair selection
+  ("choose (a,b) minimizing a+b") AND (b) the BOUNDARY/TERMINATION case
+  ("when a' = 0 we get b² = k, so k is a square"; or "a' < 0 contradicts
+  the equation, so a' = 0"). Without the boundary case, the descent has
+  no terminus and the proof has no conclusion.
+- INDUCTION: must specify base case + inductive step pattern.
+- INVARIANCE: must show the invariant pins the answer to a unique value.
+- PIGEONHOLE: must identify pigeons + holes + counting that forces collision.
+- EXTREMAL: must show what extreme element forces (e.g. minimal element
+  cannot be reduced further).
+- BIDIRECTIONAL (Existence + Reverse-Engineering): must show both directions
+  converge — neither alone closes the proof.
+- DOMAIN TRANSLATION (algebra ↔ geometry): must specify which theorem in
+  the target domain closes (e.g. "Ptolemy gives ab+cd = L²").
+
+DOES NOT QUALIFY (study habits, NOT pivots): "burn the candle from both
+  ends", "try simple values", "look for symmetry", "use both approaches",
+  "exploit the structure", "think outside the box", "use the CEP concept".
+
+DOES NOT QUALIFY (setup-only, missing closure): "rewrite as a quadratic
+  in a and apply Vieta's formulas" (no descent, no termination); "assume
+  k is not a perfect square and derive a contradiction" (no derivation
+  given); "use induction on n" (no base/step shown).
+
+If all three parts are present and consistent: reply EXACTLY:
+  "Your MVC is solid. Ready for Stage 2."
+
+If only meta-strategy / study habit:
+  "Your meta-strategy is sound, but I need the operational move. What
+  specific transformation, substitution, or named technique will you apply?"
+
+If SETUP only (no closure mechanism):
+  "Your pivot SETUP is right, but I don't see the CLOSURE yet. After
+  applying [name the move], what FORCES the conclusion? For [archetype
+  family], the closure usually requires [closure requirement above].
+  Tell me the closure step before we ship Phase 3."
+
+If SETUP + MOVE but no termination case (descent/induction):
+  "You have the setup and the move, but the descent has no terminus.
+  When does the iteration STOP, and what does that boundary case give
+  you? (For Vieta-jumping, examine a' = 0 explicitly.)"
 
 # PHASE 3 PRE-FLIGHT CHECKLIST (silent; complete BEFORE writing the Six-Point)
 
@@ -395,25 +438,38 @@ You receive:
    SEED, BRUTE PATH, ELEGANT PIVOT, PITFALLS, CONNECTIONS, TAKEAWAY).
 
 Your job is NOT to teach, NOT to generate a proof, and NOT to be polite.
-Your job is to find the flaws — silently, then report.
+Your job is to FIND THE FLAWS — silently, then report.
 
-Run these five checks:
+# THE LOAD-BEARING LINE CHECK (do this FIRST, before anything else)
 
-1. THEOREM LABELING. If a named theorem is invoked (Ptolemy, Vieta's,
+Identify the SINGLE inference on which the proof's contradiction, termination,
+or final claim rests. Quote it (in your head). Then ask:
+
+- Does this single inference actually follow from the prior lines?
+- Is it a NAMED theorem (with the labelling correct)?
+- Or is it a leap that just sounds confident?
+
+If the load-bearing line is invalid, unjustified, or a non-sequitur, the
+proof is UNSAFE regardless of how clean the surrounding scaffolding looks.
+
+# THE FIVE CHECKS (run all five, briefly)
+
+1. THEOREM LABELING. If a named theorem is invoked (Ptolemy, Vieta,
    AM-GM, Cauchy-Schwarz, Pigeonhole, Strong Induction, Sophie Germain,
    LTE, Power of a Point, etc.), is it labelled correctly? Are the
-   problem's quantities playing the right roles in the theorem statement?
-   Common failure: "by Ptolemy AC·BD = ab + cd" when the labelling
-   actually gives ad + bc.
+   problem's quantities playing the right roles? Common failure:
+   "by Ptolemy AC·BD = ab + cd" when the labelling actually gives ad + bc.
 
-2. CASE COMPLETENESS. Is the case analysis exhaustive? Is there a
-   hidden case (n=1, equality holds, edge configuration, all-equal
-   variables) the proof misses?
+2. CASE COMPLETENESS. Is the case analysis exhaustive? Is there a hidden
+   case (n=1, equality holds, edge configuration, all-equal variables)?
+   For DESCENT or VIETA-JUMPING proofs: is there an EXTREMAL/MINIMAL pair
+   chosen, AND a TERMINATION CASE shown (e.g. a' = 0, a' ≤ 0)? Setup-only
+   descent without termination is incomplete and UNSAFE.
 
 3. CONSTRAINT RESPECT. Does the argument use ALL stated constraints —
    strict inequalities (a > b > c > d means NO TWO MAY BE EQUAL),
-   integrality, primality, ordering, positivity? Common failure:
-   the rearranged equation is satisfied but the strict ordering is not.
+   integrality, primality, ordering, positivity? Common failure: the
+   rearranged equation is satisfied but the strict ordering is not.
 
 4. UNVERIFIED LEAPS. Are there assertions like "this quantity is an
    integer", "this factor is > 1", "this exists", "WLOG", "by symmetry"
@@ -423,7 +479,42 @@ Run these five checks:
    constraint AND the problem's defining condition. Plug it through the
    ELEGANT PIVOT step-by-step. Does the central claim hold on that case?
 
-Output format — STRICT, exactly two header lines + an optional list:
+# ZERO-TOLERANCE PATTERNS — auto-UNSAFE
+
+Mark UNSAFE immediately (do NOT downgrade to NEEDS_NOTE) if you see any of:
+
+(a) MANUFACTURED CONTRADICTION. The proof claims "X is not a perfect square"
+    when X is literally (integer)² — which is by definition a perfect square.
+    Example failure: "(a − a')² is not a perfect square" — false; it IS the
+    square of an integer if a, a' are integers. This is a non-sequitur
+    masquerading as a contradiction.
+
+(b) NON-SEQUITUR CHAIN. An inference of the form "X is not a square ⟹
+    f(X, b) is not a square" without naming a theorem that supports it.
+    Example failure: "k² − 4 is not a square ⟹ (k² − 4)b² + 4k is not
+    a square" — no such theorem; the implication is false in general.
+
+(c) DESCENT WITHOUT TERMINATION. Any Vieta-jumping, infinite-descent, or
+    minimum-counterexample proof that produces a smaller object but does
+    NOT show what happens at the boundary (e.g. when a' = 0, when the
+    descent stops, when the minimal element is reached). Setup + Vieta
+    formulas alone is NOT a complete proof.
+
+(d) CIRCULAR ASSERTION. A claim like "since a, a' are roots they must
+    satisfy the divisibility condition" used as a step, when the entire
+    point of the proof was to establish exactly that condition.
+
+(e) INVENTED THEOREM. The proof cites a theorem by name but the statement
+    doesn't match the canonical form (e.g. "Vieta's formulas imply k must
+    be a square" — Vieta's formulas say no such thing on their own).
+
+(f) MISSING ARITHMETIC SUB-PROOF. The proof asserts integrality, positivity,
+    or strict inequality of a derived quantity (e.g. "a' is a non-negative
+    integer", "a' < a") without deriving it from the equation.
+
+# OUTPUT FORMAT — STRICT
+
+Exactly two header lines + an optional ISSUES list. Nothing else.
 
 VERDICT: SOLID
 ONE-LINE-RATIONALE: <one short sentence>
@@ -441,19 +532,27 @@ OR
 VERDICT: UNSAFE
 ONE-LINE-RATIONALE: <one short sentence naming the specific flaw>
 ISSUES:
-- <issue, ≤ 25 words>
+- <issue, ≤ 25 words; quote the load-bearing bad line if possible>
 - <issue, ≤ 25 words>
 
-Verdict scale:
-- SOLID:      no substantive issues found.
-- NEEDS_NOTE: the proof spirit is correct but a step needs a caveat or
-              the reader should be warned about an unverified leap.
-- UNSAFE:     a step is mathematically wrong, a constraint is violated,
-              or a named theorem is misapplied. Engine should refuse
-              to ship this commentary unmodified.
+# VERDICT CALIBRATION
 
-Bias toward NEEDS_NOTE for borderline cases. Reserve UNSAFE for clear,
-nameable errors. If unsure, choose NEEDS_NOTE.
+- SOLID:      no substantive issues. Load-bearing line is sound. All five
+              checks pass.
+- NEEDS_NOTE: ONLY for proofs whose load-bearing line is correct but whose
+              surrounding steps have minor gaps (e.g. a sub-claim asserted
+              without explicit derivation, but the asserted sub-claim is
+              actually true and easy to verify).
+- UNSAFE:     load-bearing line is invalid OR any zero-tolerance pattern
+              fires OR a named theorem is misapplied OR the proof's
+              "contradiction" is manufactured/non-sequitur.
+
+DEFAULT BIAS for hard-problem proofs (IMO, Putnam, JEE Advanced):
+prefer UNSAFE over NEEDS_NOTE when in doubt. A wrong proof shipped as
+NEEDS_NOTE commits a falsehood with only a soft caveat — that is worse
+than a refusal that prompts the student to engage. NEEDS_NOTE is for
+PROOFS YOU BELIEVE ARE CORRECT but want to flag a minor gap; it is NOT
+for proofs you suspect are wrong.
 
 End your reply right after the ISSUES list. No further commentary."""
 
@@ -1058,13 +1157,34 @@ def detect_intent(text: str) -> str:
     return "math"
 
 
-def build_ladder(intent: str, all_models: list) -> list:
+# Phase-3 capability gate. Phase 3 ships actual proofs; weaker models
+# (70B-class and below) reliably hallucinate non-sequitur contradictions
+# on hard problems. We restrict the Phase-3 ladder to top-tier models only.
+PHASE3_MIN_SCORE = 9          # ideal: 120B+, Gemini Pro, DeepSeek-class
+PHASE3_FALLBACK_SCORE = 7     # acceptable degradation: 70B-class with critic backstop
+
+
+def build_ladder(intent: str, all_models: list, phase: int = 1) -> list:
     available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
     if not available:
         return []
     if intent == "greeting":
         fast = [m for m in available if m["score"] <= 5]
         return sorted(fast or available, key=lambda m: (m["score"], m["model"]))
+
+    # Phase-3 turns: prefer top-tier capability models. Fall through to mid-tier
+    # only if no top-tier are available; refuse entirely if even mid-tier empty.
+    if phase == 3:
+        top_tier = [m for m in available if m["score"] >= PHASE3_MIN_SCORE]
+        if top_tier:
+            ranked = sorted(top_tier, key=lambda m: -m["score"])
+            return _interleave_by_provider(ranked)
+        mid_tier = [m for m in available if m["score"] >= PHASE3_FALLBACK_SCORE]
+        if mid_tier:
+            ranked = sorted(mid_tier, key=lambda m: -m["score"])
+            return _interleave_by_provider(ranked)
+        return []  # let chat() raise a Phase-3-specific error
+
     ranked = sorted(available, key=lambda m: -m["score"])
     return _interleave_by_provider(ranked)
 
@@ -1094,6 +1214,7 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
     if intent == "greeting":
         system_prompt = CONCIERGE_BRIEF
         max_tok = MAX_OUTPUT_TOKENS["concierge"]
+        phase = 1
     else:
         # Hot-reload knowledge_base/ on every math turn — any commit/push
         # to that folder is reflected in the doctrine without restart.
@@ -1110,16 +1231,34 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
             phase = 3
         max_tok = MAX_OUTPUT_TOKENS.get(phase, 900)
 
-    ladder = build_ladder(intent, all_models)
+    ladder = build_ladder(intent, all_models, phase=phase)
     if not ladder:
+        if intent == "math" and phase == 3:
+            raise RuntimeError(
+                "Phase 3 ships actual proofs and requires a top-tier model "
+                f"(score ≥ {PHASE3_FALLBACK_SCORE}: 70B-class or above). None "
+                "are currently available — every capable model is rate-limited "
+                "or blocked. Wait a minute and retry, or stay in Phase 2 with "
+                "the 'I'm stuck' button to continue Socratic exploration."
+            )
         raise RuntimeError(
             "All models are currently rate-limited. "
             "Try again in a minute, or add a paid-tier key."
         )
 
+    # Telemetry: warn the operator (admin only sees status) when Phase 3
+    # is forced to use a mid-tier model.
+    if intent == "math" and phase == 3 and status_writer:
+        top_tier_present = any(m["score"] >= PHASE3_MIN_SCORE for m in ladder)
+        if not top_tier_present:
+            status_writer.write(
+                f"⚠ Phase 3: no top-tier model (score ≥ {PHASE3_MIN_SCORE}) available — "
+                f"degrading to mid-tier. Critic will backstop."
+            )
+
     if status_writer:
         status_writer.write(
-            f"Intent: **{intent}** · Ladder length: {len(ladder)} · "
+            f"Intent: **{intent}** · Phase: {phase} · Ladder length: {len(ladder)} · "
             f"Output cap: {max_tok} tokens"
         )
 
@@ -1225,20 +1364,28 @@ def run_critic(
             "raw": "",
         }
 
-    # Prefer (a) a different provider from the generator and (b) high score.
+    # Detecting non-sequiturs and manufactured contradictions is itself a
+    # capability-bound task — a 7B critic will rubber-stamp a 70B generator.
+    # Restrict the critic pool to mid-tier+ (score ≥ 7) and prefer a
+    # DIFFERENT provider from the generator for diversity of judgment.
+    capable = [m for m in available if m["score"] >= PHASE3_FALLBACK_SCORE]
+    if not capable:
+        capable = available  # last-resort fallback so the critic still runs
+
     def _critic_priority(m):
         diff_provider = 0 if (generator_provider and m["provider"] == generator_provider) else 1
         return (-diff_provider, -m["score"])
 
-    candidates = sorted(available, key=_critic_priority)[:CRITIC_MAX_ATTEMPTS]
+    candidates = sorted(capable, key=_critic_priority)[:CRITIC_MAX_ATTEMPTS]
 
     critic_input = (
         "PROBLEM:\n"
         f"{problem.strip()}\n\n"
         "COMMENTARY (the engine's draft Six-Point):\n"
         f"{commentary.strip()}\n\n"
-        "Apply your five checks. Return VERDICT + ONE-LINE-RATIONALE "
-        "(+ ISSUES if not SOLID). Nothing else."
+        "Run the LOAD-BEARING LINE CHECK first, then the five checks. "
+        "Apply zero-tolerance patterns aggressively. Return VERDICT + "
+        "ONE-LINE-RATIONALE (+ ISSUES if not SOLID). Nothing else."
     )
 
     if status_writer:
