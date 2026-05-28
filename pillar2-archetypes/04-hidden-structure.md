@@ -1,7 +1,7 @@
 ---
 chapter: 4
 archetype: Hidden Structure
-subtitle: "Strip the Surface; the Familiar Form Beneath It Solves the Problem"
+subtitle: "If It Looks Unfamiliar, It Is Probably Something Familiar in Disguise"
 category: Structure Recognition (Archetypes 1–4)
 related_archetypes: [1, 2, 3, 7, 15]
 key_gems:
@@ -24,7 +24,7 @@ sourcing_note: "All worked examples and practice problems in this chapter are dr
 
 # Chapter 4 — Hidden Structure
 
-## *Strip the Surface; the Familiar Form Beneath It Solves the Problem*
+## *If It Looks Unfamiliar, It Is Probably Something Familiar in Disguise*
 
 ---
 

@@ -2,9 +2,9 @@
 
 *Source-of-truth document for the Advaitian Foundation's first volume. All chapter writing, problem selection, voice calibration, and build decisions defer to this file.*
 
-**Author:** Anand Vempati (with AI co-author, Claude Opus 4.7)  
+**Author:** Anand Venkat  
 **Working title:** *The Advaitian Philosophy of Problem Solving — Volume 1*  
-**Status:** v2.0 — Production-mode setup, May 26, 2026  
+**Status:** v2.4 — Pillar 4 closure, May 28, 2026 (post-Phase-E.1). Previous: v2.3 (Pillar 3 closure); v2.2 (Pillar 4 sourcing in workspace); v2.0 (Production-mode setup, May 26, 2026).  
 **Format:** Markdown canonical → LaTeX (Pandoc) → Overleaf-friendly `.txt`  
 **Repository root:** `advaitian-philosophy/`
 
@@ -843,7 +843,24 @@ Target: **40,000–55,000 words** for Pillar 4 (roughly 120–160 typeset pages)
 
 ### 8.7 Write Status
 
-**Pending.** Drafting begins after Pillar 3 first draft is stable.
+**DRAFTED (Phase E.1 complete, May 28, 2026).** All 9 chapters first-draft complete; total ≈ 53,218 words, fitting comfortably inside the 40,000–55,000 budget (§8.5). Batch 1 (Chs. 1–4) approved May 28; Batch 2 (Chs. 5–9) approved May 28. Slate v0.2.0 locked all 25 case studies (`pillar4-case-study-slate-v0.1.0.md` carries the v0.2.0 LOCKED status in-file). Verification record at `pillar4-cep-design/pillar4-problems-locked.md` v0.2.0 covers 31 distinct problems (26 ✓ / 2 ◆ corrections noted / 3 ☼ Compendium-verification deferred to Anand's pass).
+
+**Per-chapter word counts (first draft):**
+
+| Chapter | Words | Status |
+|---|---|---|
+| Ch. 1 — Problem as Art Object | 5,111 | ✓ drafted |
+| Ch. 2 — Anatomy of a Designed Problem | 5,050 | ✓ drafted |
+| Ch. 3 — 5-Step CEP Design Framework | 6,030 | ✓ drafted |
+| Ch. 4 — Case Studies (Moderate) | 5,516 | ✓ drafted |
+| Ch. 5 — Case Studies (Mid) | 6,330 | ✓ drafted |
+| Ch. 6 — Case Studies (High-mid) | 6,437 | ✓ drafted |
+| Ch. 7 — Case Studies (High) | 6,733 | ✓ drafted |
+| Ch. 8 — Case Studies (Extreme, capstone IMO 1988 P6) | 6,977 | ✓ drafted |
+| Ch. 9 — Design Your Own + Ethics of Difficulty | 5,034 | ✓ drafted |
+| **TOTAL** | **53,218** | All 9 lint-clean |
+
+**Open items at v0.2.0** (carried to Anand's verification pass): Case 19 (IMO 2001 P3 refined incidence-counting), Case 21 (IMO 1992 P3 explicit Turán construction), Case 22 (IMO 2003 P6 order-theoretic precision). All three are flagged ☼ in `pillar4-problems-locked.md` and have cautious draft phrasing in the chapters.
 
 ### 8.8 Note on Vieta jumping placement
 
@@ -1341,35 +1358,58 @@ This is a substantial volume — larger than Engel's *Problem-Solving Strategies
 
 ```
 Phase 1 (Complete):   Re-instrument Chapter 1 (Invariance) — DONE May 26, 2026
-Phase 2 (Current):    Draft Chapters 2–5 (Symmetry, Duality, Hidden Structure, Substitution)
+Phase 2:              Draft Chapters 2–5 (Symmetry, Duality, Hidden Structure, Substitution)
 Phase 3:              Draft Chapters 6–10
 Phase 4:              Draft Chapters 11–15
 Phase 5:              Draft Chapters 16–19
 Phase 6:              Pillar 3 entry — begin parallel drafting once Pillar 2 mid-point reached
 Phase 7:              Draft Chapter 20 (Analogy / Transfer) — Pillar 2 capstone, written last
-Phase 8:              Complete Pillar 3 (all 8 chapters)
-Phase 9:              Draft Pillar 4 (all 9 chapters + 25 case studies)
-Phase 10:             Draft Pillar 5 (gem catalog, expand to 108)
+Phase 8 (Complete):   Complete Pillar 3 (all 8 chapters) — DONE May 28, 2026
+Phase 9 (Complete):   Draft Pillar 4 (all 9 chapters + 25 case studies + 3 design exercises) — DONE May 28, 2026
+                      (Phase E.1 closure: slate v0.2.0 LOCKED + problems-locked v0.2.0 + Blueprint v2.4)
+Phase 10 (Current):   Draft Pillar 5 (gem catalog, expand to 108)
 Phase 11:             Draft Pillar 1 (meta-grammar) — written last
 Phase 12:             Draft front matter and closing essays
 Phase 13:             Full editorial pass — voice consistency, citation audit, length trim
 Phase 14:             Build pipeline final — Pandoc LaTeX generation, Overleaf validation
 ```
 
-### 14.2 Current Status by File (May 26, 2026)
+### 14.2 Current Status by File (May 28, 2026 — post-Pillar-4 closure)
 
 | File | Status | Notes |
 |------|--------|-------|
 | `pillar2-archetypes/01-invariance.md` | **Drafted, Joshi-re-instrumented** | All WE / PP / appendix solutions are Joshi-sourced. Two Anand-verification flags remain (PP4 solution argument, PP7 functional-equation closure). |
 | `pillar2-archetypes/_template/chapter-template.md` | Complete | Canonical scaffold; do not modify without a version bump |
 | `pillar2-archetypes/_template/01-invariance-outline.md` | Complete | Approved outline; historical reference |
-| `pillar2-archetypes/_template/02-symmetry-outline.md` | **New (May 26)** | Outline approved-pending; 7 decisions flagged for Anand |
-| `pillar2-archetypes/_template/joshi-archetype-map.md` | **New (May 26)** | v0.1 working map; full archetype-to-chapter routing |
+| `pillar2-archetypes/_template/02-symmetry-outline.md` | Stable | Outline approved-pending; 7 decisions flagged for Anand |
+| `pillar2-archetypes/_template/joshi-archetype-map.md` | Stable | v0.1 working map; full archetype-to-chapter routing |
+| `pillar2-archetypes/12-extremal-principles.md` | **Drafted** | Pillar 2 Ch. 12 |
+| `pillar2-archetypes/15-bijection-correspondence.md` | **Drafted** | Pillar 2 Ch. 15 |
+| `pillar2-archetypes/16-reverse-engineering.md` | **Drafted** | Pillar 2 Ch. 16 |
+| `pillar2-archetypes/17-degrees-of-freedom.md` | **Drafted** | Pillar 2 Ch. 17 |
+| `pillar3-multidirectional/` | **Pillar 3 COMPLETE (8 chapters, signed off)** | All 8 chapters drafted + `pillar3-problems-locked.md` + slate locked |
+| `pillar4-cep-design/01-problem-as-art-object.md` | **Drafted (5,111 words)** | Lockhart polemic + Tao warmth register |
+| `pillar4-cep-design/02-anatomy-of-designed-problem.md` | **Drafted (5,050 words)** | Tao register; 4-axis anatomy + IMO 1959 P1 demo |
+| `pillar4-cep-design/03-cep-design-framework.md` | **Drafted (6,030 words)** | Polya-inverted 5-step framework; author-designed demo |
+| `pillar4-cep-design/04-case-studies-moderate.md` | **Drafted (5,516 words)** | Cases 1–5 (Moderate CEP) |
+| `pillar4-cep-design/05-case-studies-mid.md` | **Drafted (6,330 words)** | Cases 6–10 (Mid CEP) |
+| `pillar4-cep-design/06-case-studies-high-mid.md` | **Drafted (6,437 words)** | Cases 11–15 (High-mid CEP) |
+| `pillar4-cep-design/07-case-studies-high.md` | **Drafted (6,733 words)** | Cases 16–20 (High CEP); 1 ☼ open item (Case 19) |
+| `pillar4-cep-design/08-case-studies-extreme.md` | **Drafted (6,977 words)** | Cases 21–25 (Extreme); capstone IMO 1988 P6; 2 ☼ open items (Cases 21, 22) |
+| `pillar4-cep-design/09-design-your-own.md` | **Drafted (5,034 words)** | 3 design exercises + 5-criterion Rubric + 6-commitment Ethics |
+| `pillar4-cep-design/pillar4-case-study-slate-v0.1.0.md` | **v0.2.0 LOCKED** | 25 cases locked May 28 |
+| `pillar4-cep-design/pillar4-problems-locked.md` | **v0.2.0 LOCKED** | 31 distinct problems verified |
+| `pillar4-cep-design/_template/chapter-template.md` | Complete | Pillar 4 canonical scaffold (3 chassis types) |
+| `advaitian-philosophy/Cursor-Joshi.md` | Stable | Joshi consolidated memory file |
+| `advaitian-philosophy/Cursor-Engel.md` | Stable | Engel consolidated memory file |
+| `advaitian-philosophy/Cursor-Zeitz.md` | Stable | Zeitz consolidated memory file |
+| `advaitian-philosophy/Cursor-Polya.md` | Stable | Polya memory file (image-PDF caveats noted) |
+| `advaitian-philosophy/Cursor-IMO.md` | Stable | IMO Compendium memory file |
+| `advaitian-philosophy/Cursor-Lockhart.md` | Stable | Lockhart memory file |
+| `advaitian-philosophy/Cursor-Tao.md` | Stable | Tao memory file |
 | `knowledge_base/ThinkMath_Blueprint_v3.md` | Stable (read-only reference) | Primary source for Pillar 1 |
 | `knowledge_base/Advaitian_Master_Framework.txt` | Stable (read-only reference) | The 20 archetypes + Six-Point Framework canonical definition |
-| `my_references/edujeejoshi2ed.pdf` | Available (1039 pages) | Primary problem bank for Pillar 2 |
-| `my_references/edujeejoshi2ed.txt` | Available (52,591 lines) | Searchable text extraction; used as Joshi problem inventory |
-| `Advaitian_Book_vol1_Blueprint.md` | **This file** | v2.0 — source of truth |
+| `Advaitian_Book_vol1_Blueprint.md` | **This file** | v2.4 — source of truth (post-Pillar-4 closure) |
 
 ---
 
@@ -1406,27 +1446,28 @@ These are the concrete deliverables for the immediate work session (May 26 onwar
 
 | Source | Location | Status |
 |--------|----------|--------|
-| K.D. Joshi, *Educative JEE Mathematics* (2nd ed.) | `my_references/edujeejoshi2ed.pdf` + `.txt` | Available; partially read |
+| K.D. Joshi, *Educative JEE Mathematics* (2nd ed.) | `my_references/edujeejoshi2ed.pdf` + `.txt` | IN WORKSPACE; Cursor-Joshi.md memory file built |
+| Arthur Engel, *Problem-Solving Strategies* (Springer, 1998) | `my_references/engel-problem-solving-strategies.pdf` + `.txt` | IN WORKSPACE; Cursor-Engel.md memory file built |
+| Paul Zeitz, *The Art and Craft of Problem Solving* (2nd ed.) | `my_references/zeitz-art-craft.pdf` + `.txt` | IN WORKSPACE; Cursor-Zeitz.md memory file built |
+| George Polya, *How to Solve It* (Princeton, 1945/2004) | `my_references/PolyaHowToSolveIt.pdf` + `polya-pages/*.png` | IN WORKSPACE (image-only PDF; PNG rasters extracted; Cursor-Polya.md memory file built with transparent caveats) |
+| IMO Compendium (Dušan Djukić et al., Springer) | `my_references/imo_compendium.pdf` + `imo-compendium.txt` | IN WORKSPACE; Cursor-IMO.md memory file built |
+| Paul Lockhart, *A Mathematician's Lament* | `my_references/A Mathematician's Lament - Paul Lockhart.pdf` + `lockhart-lament.txt` | IN WORKSPACE; Cursor-Lockhart.md memory file built |
+| Terence Tao, *Solving Mathematical Problems* | `my_references/solving-mathematical-problems-terence-tao.pdf` + `tao-solving-math-problems.txt` | IN WORKSPACE; Cursor-Tao.md memory file built |
 | ThinkMath Advaitian operating manual v3 | `knowledge_base/ThinkMath_Blueprint_v3.md` | Stable |
 | Advaitian Master Framework | `knowledge_base/Advaitian_Master_Framework.txt` | Stable |
 | Prior chatGPT/Claude discussion archives | `chatgpt-*`, `claude-chat-*` files in repo root | Historical record; not authoritative |
 
-### 16.2 Sources to Acquire Before Pillar 3
+**Sourcing note (Pillar 4 closure, May 28, 2026):** All Pillar-3 and Pillar-4 primary references are now in workspace with consolidated Cursor memory files. The Polya PDF is image-only and was processed via PNG rasterisation; the `Cursor-Polya.md` file documents the caveats and reconstructs Polya's framework from visual transcription + training knowledge. No further source acquisition is required for Pillar 4. Pillar 5 (Mathematical Gems) will continue to use these references plus Hardy & Wright (still to acquire — low priority).
 
-The following physical or digital books are required before Pillar 3 drafting begins. They are not in the repository yet:
+### 16.2 Sources to Acquire Before Pillar 5
+
+Only one remaining acquisition:
 
 | Source | Needed For | Priority |
 |--------|-----------|----------|
-| Engel, *Problem-Solving Strategies* (Springer, 1998) | Pillar 3 baseline | High |
-| Zeitz, *The Art and Craft of Problem Solving* (2nd ed.) | Pillar 3 baseline | High |
-| Polya, *How to Solve It* (Princeton, 1945/2004) | Pillar 3 + Pillar 1 | High |
-| Polya, *Mathematics and Plausible Reasoning* (2 vols.) | Pillar 3 supplementary | Medium |
-| IMO Compendium (Dušan Djukić et al., Springer) | Pillar 4 case-study corpus | High |
-| Andreescu, *Mathematical Olympiad Treasures* | Pillar 4 supplementary | Medium |
-| Lockhart, *A Mathematician's Lament* | Pillar 4 opening + interludes | Medium |
-| Sawyer, *Mathematician's Delight* | Pillar 2 vignettes, Pillar 1 | Medium |
-| Tao, *Solving Mathematical Problems* | Pillar 2 + Pillar 4 | Medium |
-| Hardy & Wright, *An Introduction to the Theory of Numbers* | Pillar 5 Cluster C reference | Low |
+| Hardy & Wright, *An Introduction to the Theory of Numbers* | Pillar 5 Cluster C reference (number-theory gems) | Low |
+| Andreescu, *Mathematical Olympiad Treasures* | Pillar 5 supplementary (already covered by IMO Compendium for case-study purposes) | Optional |
+| Sawyer, *Mathematician's Delight* | Pillar 1 vignettes (deferred to Pillar 1 drafting phase) | Low |
 
 ### 16.3 Open Architectural Questions (updated May 26, 2026)
 
@@ -1438,10 +1479,15 @@ Resolved since v1.0:
 4. ✅ Authorial voice — **locked: mixed-register per Section 3.10**.
 5. ✅ Vieta jumping placement — **locked: Pillar 4 Case Study 25**.
 
-Still open (pending Anand decision):
+Resolved at Pillar 3 / Pillar 4 closure (May 28, 2026):
 
-6. **Pillar 3 chapter count** — eight chapters is the working lock (Section 7.3). Confirm or compress to six.
-7. **Pillar 3 case-study slate** — five candidates proposed (Section 7.9); Anand to confirm or substitute.
+6. ✅ **Pillar 3 chapter count** — locked at 8 chapters (drafted and signed off May 28).
+7. ✅ **Pillar 3 case-study slate** — locked and drafted (see `pillar3-multidirectional/pillar3-problems-locked.md`).
+8a. ✅ **Pillar 4 chapter count** — locked at 9 chapters (drafted May 28).
+8b. ✅ **Pillar 4 case-study slate** — locked at 25 cases (`pillar4-case-study-slate-v0.1.0.md` v0.2.0 LOCKED).
+8c. ✅ **Pillar 4 problems-locked** — 31 distinct problems verified (`pillar4-problems-locked.md` v0.2.0).
+
+Still open (pending Anand decision):
 8. **Developmental tiers in the printed book** — Section 5.8 defines five tiers (0–4); the book primarily addresses 3–4. Should Tier 0–2 be visible to the reader at all, or only referenced obliquely? My recommendation: brief mention in Pillar 1 §5.5.5; otherwise invisible.
 9. **Index design** — every problem will carry an archetype-tag (e.g., `[1, 9]` for a problem using Invariance + Domain Constraints). The aggregate index at end of volume will list all problems by primary archetype. Build pipeline (Section 12.8) generates this automatically from front-matter YAML.
 10. **Pre-publication Anand review checkpoints** — per Section 21.
@@ -1496,9 +1542,21 @@ advaitian-philosophy/
 |       |-- 02-symmetry-outline.md        <- NEW: Chapter 2 outline awaiting sign-off
 |       |-- joshi-archetype-map.md        <- NEW: 24-chapter to 20-archetype map
 |
-|-- pillar3-multidirectional/             <- Scoped (Section 7); drafting after Pillar 2 mid-point
-|-- pillar4-cep-design/                   <- 25-case slate locked (Section 8.9)
-|-- pillar5-gems/                         <- 108 target locked; cluster targets set
+|-- pillar3-multidirectional/             <- COMPLETE (8 chapters drafted + problems-locked)
+|-- pillar4-cep-design/                   <- COMPLETE (9 chapters drafted + slate v0.2.0 + problems-locked v0.2.0)
+|   |-- 01-problem-as-art-object.md       <- Ch.1 (5,111 words)
+|   |-- 02-anatomy-of-designed-problem.md <- Ch.2 (5,050 words)
+|   |-- 03-cep-design-framework.md        <- Ch.3 (6,030 words)
+|   |-- 04-case-studies-moderate.md       <- Ch.4 (5,516 words)
+|   |-- 05-case-studies-mid.md            <- Ch.5 (6,330 words)
+|   |-- 06-case-studies-high-mid.md       <- Ch.6 (6,437 words)
+|   |-- 07-case-studies-high.md           <- Ch.7 (6,733 words)
+|   |-- 08-case-studies-extreme.md        <- Ch.8 (6,977 words; capstone IMO 1988 P6)
+|   |-- 09-design-your-own.md             <- Ch.9 (5,034 words)
+|   |-- pillar4-case-study-slate-v0.1.0.md <- v0.2.0 LOCKED (25 cases)
+|   |-- pillar4-problems-locked.md        <- v0.2.0 LOCKED (31 distinct problems)
+|   |-- _template/chapter-template.md     <- Pillar 4 canonical scaffold (3 chassis types)
+|-- pillar5-gems/                         <- 108 target locked; cluster targets set (CURRENT next-pillar)
 |
 |-- templates/                            <- LaTeX preamble (to be created — Section 12.6)
 |-- scripts/                              <- Pandoc build scripts (to be created — Section 12.8)
@@ -1661,7 +1719,7 @@ How the book is written, verified, and released.
 
 ### 21.1 Roles
 
-- **Author (Anand Vempati):** owns mathematical correctness, pedagogical strategy, voice authority, and all final commits.
+- **Author (Anand Venkat):** owns mathematical correctness, pedagogical strategy, voice authority, and all final commits.
 - **AI co-author (Claude Opus 4.7):** owns drafting velocity, structural editing, cross-pillar consistency, citation checking, and build-pipeline construction.
 
 The split is structurally important: AI cannot certify a mathematical claim. Every theorem, every solution, every problem statement is Anand-verified before it leaves draft status.

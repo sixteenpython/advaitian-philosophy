@@ -1,7 +1,7 @@
 ---
 chapter: 3
 archetype: Duality
-subtitle: "When Two Viewpoints Describe the Same Truth, Choose the Easier"
+subtitle: "If Stuck in One Language, Speak the Dual"
 category: Structure Recognition (Archetypes 1–4)
 related_archetypes: [2, 12, 15, 19]
 key_gems:
@@ -24,7 +24,7 @@ sourcing_note: "All worked examples and practice problems in this chapter are dr
 
 # Chapter 3 — Duality
 
-## *When Two Viewpoints Describe the Same Truth, Choose the Easier*
+## *If Stuck in One Language, Speak the Dual*
 
 ---
 

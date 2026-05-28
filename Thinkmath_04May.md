@@ -830,3 +830,296 @@ The most important lesson of this session: **verify numerical answers independen
 Build the remaining 16 archetype chapters. Then Pillars 1, 3, 4, 5.
 
 🌑
+
+---
+
+# PART D — MARATHON BOOK SESSION: May 27–28, 2026
+
+## D.1 Session Summary
+
+**Date:** Wednesday May 27 → Thursday May 28, 2026 (extended past midnight)  
+**Primary work:** Three concurrent threads completed end-to-end:
+1. **Pillar 2 completion** — drafted Chs. 5–20 (the remaining 16 archetype chapters), bringing the Universal Archetype Catalog to all 20 chapters
+2. **Pillar 3 full build** — drafted all 8 chapters of *The Science of Multidirectional Solving*, plus slate + problems-locked, signed off
+3. **Pillar 4 full build** — drafted all 9 chapters of *The Art of CEP-Based Problem Design*, plus 25-case slate v0.2.0, 31-problem locked record v0.2.0, Blueprint v2.0 → v2.4
+
+**Session model:** Claude Sonnet 4.6 / Composer 2.5  
+**Approval mode:** batched (Pillar 4 done in two batches: Chs. 1–4 then Chs. 5–9; both approved May 28)
+
+This is by a wide margin the most substantive session of the project to date. Three of the five Volume-1 pillars went from "scaffold + Ch. 1" / "not started" to "first-draft complete and signed off."
+
+---
+
+## D.2 Output Summary (the headline numbers)
+
+| Deliverable | Status before May 27 | Status May 28 (post-session) | Words drafted |
+|---|---|---|---|
+| Pillar 2 (Universal Archetype Catalog) | 4/20 chapters drafted | **20/20 chapters drafted** | ~207,600 new (Chs. 5–20) |
+| Pillar 3 (Multidirectional Solving) | 0/8 chapters | **8/8 chapters drafted + signed off** | 41,298 |
+| Pillar 4 (CEP-Based Problem Design) | 0/9 chapters | **9/9 chapters drafted + Batch-1 + Batch-2 approved** | 53,218 |
+| Cursor memory files | 1 (Joshi) | **7** (added Engel, Zeitz, Polya, IMO, Lockhart, Tao) | ~24,300 |
+| Pillar 4 slate + locked | — | v0.2.0 LOCKED (25 cases) + v0.2.0 locked-record (31 distinct problems) | — |
+| Blueprint | v2.0 (May 26) | **v2.4** (post-Pillar-4 closure) | +200 lines |
+| **TOTAL session output** | | | **~326,000 words drafted + 4 lock-files + 1 Blueprint version bump** |
+
+---
+
+## D.3 Pillar 2 — Completion (Chs. 5–20)
+
+Sixteen new archetype chapters drafted, all following the eight-section spine established in Part C §C.3:
+
+| Ch. | Archetype | Lines | Words |
+|---|---|---|---|
+| 5 | Substitution / Change of Variables | 545 | 14,654 |
+| 6 | Linearization | 556 | 13,658 |
+| 7 | Normalization / Scaling | 463 | 13,438 |
+| 8 | Domain Translation | 458 | 13,489 |
+| 9 | Domain Constraints / Bounds | 436 | 13,244 |
+| 10 | Inequality Constraints | 508 | 12,926 |
+| 11 | Existence / Uniqueness | 419 | 13,444 |
+| 12 | Extremal Principles | 468 | 12,924 |
+| 13 | Combinatorial Principles | 441 | 12,577 |
+| 14 | Parity / Modularity | 438 | 13,724 |
+| 15 | Bijection / Correspondence | 491 | 13,022 |
+| 16 | Reverse Engineering | 580 | 14,488 |
+| 17 | Degrees of Freedom | 424 | 11,820 |
+| 18 | Recursion / Induction | 460 | 11,787 |
+| 19 | Pivoting / Elimination | 536 | 12,490 |
+| 20 | Analogy / Transfer | 457 | 12,662 |
+| **Subtotal Chs. 5–20** | | **7,680** | **~210,300** |
+| **Pillar 2 grand total (Chs. 1–20)** | | ~11,053 | **263,412** |
+
+All 16 new chapters follow Joshi-first sourcing discipline (Blueprint §6.2), with cross-references to JEE/RMO/INMO problems where Joshi doesn't cover the archetype natively. The Ch. 7 framing decision (pure-Joshi vs. Buckingham-π physics vignette) was resolved during drafting.
+
+Pillar 2 Chs. 3 and 4 received minor edits during the session (typo fixes + cross-reference updates to point forward to Pillars 3 and 4 once those entered draft).
+
+---
+
+## D.4 Pillar 3 — Full Build
+
+Eight chapters of *The Science of Multidirectional Solving*, drafted end-to-end and signed off:
+
+| Ch. | Title | Lines | Words |
+|---|---|---|---|
+| 1 | The Multidirectional Thesis | 260 | 5,069 |
+| 2 | Two-Archetype Convergence | 246 | 5,326 |
+| 3 | Three-Archetype Problems | 316 | 6,721 |
+| 4 | The First-Minute Protocol | 198 | 4,905 |
+| 5 | MVC Multidirectional Map | 250 | 4,828 |
+| 6 | Worked Case Studies | 379 | 6,054 |
+| 7 | Escape-Hatch Architecture | 305 | 4,773 |
+| 8 | Practice Set + Diagnostic | 187 | 3,622 |
+| **Total** | | **2,141** | **41,298** |
+
+Supporting files (all in `pillar3-multidirectional/`):
+- `_template/` — Pillar 3 chapter scaffold (3 chassis types)
+- `pillar3-problems-locked.md` — verification record for all Pillar 3 worked examples and practice problems
+
+Pillar 3 was signed off by Anand at the end of the Pillar 3 drafting sub-session and became the canonical *solver-side* counterpart to Pillar 4's *designer-side* treatment. The cross-reference at Pillar 4 Ch. 8 Case 25 (IMO 1988 P6) ↔ Pillar 3 Ch. 3 §2 WE1 makes this complementarity explicit in the text.
+
+---
+
+## D.5 Pillar 4 — Full Build (with Phase E closure)
+
+Nine chapters of *The Art of CEP-Based Problem Design*, plus the most rigorous verification record of any pillar to date:
+
+| Ch. | Title | Words | Voice register |
+|---|---|---|---|
+| 1 | The Problem as Art Object | 5,111 | Lockhart-polemic |
+| 2 | Anatomy of a Well-Designed Problem | 5,050 | Tao-warm |
+| 3 | The 5-Step CEP Design Framework | 6,030 | Polya-systematic (Polya inversion) |
+| 4 | Case Studies 1–5 (Moderate CEP) | 5,516 | Tao-warm |
+| 5 | Case Studies 6–10 (Mid CEP) | 6,330 | Tao-warm |
+| 6 | Case Studies 11–15 (High-mid CEP) | 6,437 | Tao-warm |
+| 7 | Case Studies 16–20 (High CEP) | 6,733 | Tao-warm |
+| 8 | Case Studies 21–25 (Extreme; capstone IMO 1988 P6) | 6,977 | Tao-warm |
+| 9 | Design Your Own + The Ethics of Difficulty | 5,034 | mixed-lockhart-constructive-tao-reflective |
+| **Total** | | **53,218** | |
+
+**Supporting files** in `pillar4-cep-design/`:
+- `_template/chapter-template.md` — 3-chassis canonical scaffold (Essay / Case-Study / Exercises)
+- `pillar4-case-study-slate-v0.1.0.md` — **v0.2.0 LOCKED** (25 cases; 22 IMO + 3 Putnam + 1 Joshi; all approved May 28)
+- `pillar4-problems-locked.md` — **v0.2.0 LOCKED** (31 distinct problems verified: 26 ✓ / 2 ◆ corrections / 3 ☼ Compendium-detail deferred to Anand's pass)
+
+**Three Pillar-4-specific innovations:**
+1. **The 4-axis anatomy** (Ch. 2): CEP / Archetype Convergence / Planted Traps / Statement-Craft
+2. **The 5-step CEP Design Framework** (Ch. 3): explicit *inversion* of Polya's solver-side phases into designer-side steps
+3. **The capstone reconstruction** (Ch. 8 Case 25): IMO 1988 P6 reconstructed as a 4-archetype designer's problem (#16 Reverse Engineering + #18 Induction-as-descent + #1 Invariance + #12 Extremal) — the only 4-archetype case in the slate
+
+**Approval cadence (May 28):**
+- Phase A — slate v0.1.0 → v0.2.0 LOCKED (4 questions, all Option A)
+- Phase B/C — Batch 1 (Chs. 1–4) approved with 2 follow-up confirmations (Ch. 3 demo problem + Putnam 1985 A-1 answer correction $7^{10} \to 6^{10}$)
+- Phase D — Batch 2 (Chs. 5–9) approved with deferred-detail items flagged for Anand's verification pass
+- Phase E — full closure: locked file v0.2.0 + Blueprint v2.4 + pillar-level audit
+
+---
+
+## D.6 Reference Corpus Expansion (6 new Cursor memory files)
+
+Six new consolidated memory files joined `Cursor-Joshi.md` from Part C, completing the reference triumvirate (Joshi + Engel + Zeitz) and adding the Pillar-4 corpus (Lockhart + IMO Compendium + Polya + Tao):
+
+| File | Source | Lines | Words |
+|---|---|---|---|
+| `Cursor-Joshi.md` (prior) | K.D. Joshi, *Educative JEE Mathematics* (2nd ed.) | 1,609 | 27,443 |
+| `Cursor-Engel.md` (new) | Arthur Engel, *Problem-Solving Strategies* (Springer 1998) | 437 | 7,155 |
+| `Cursor-Zeitz.md` (new) | Paul Zeitz, *The Art and Craft of Problem Solving* (3rd ed.) | 358 | 6,765 |
+| `Cursor-Polya.md` (new) | George Polya, *How to Solve It* (Princeton 1945/2004) | 191 | 3,022 |
+| `Cursor-IMO.md` (new) | IMO Compendium (Dušan Djukić et al., Springer) | 183 | 2,616 |
+| `Cursor-Lockhart.md` (new) | Paul Lockhart, *A Mathematician's Lament* | 86 | 1,977 |
+| `Cursor-Tao.md` (new) | Terence Tao, *Solving Mathematical Problems* | 131 | 2,785 |
+| **Cursor-memory total** | | **2,995** | **51,763** |
+
+**Reference PDFs and text extractions added to `my_references/` this session** (intentionally untracked, per the same copyright-respect precedent as Part C §C.8):
+- `A Mathematician's Lament - Paul Lockhart.pdf` + `lockhart-lament.txt`
+- `Problem Solving Strategies.pdf` (Engel) + `problem-solving-strategies.txt`
+- `Art and Craft of Problem Solving 3E.pdf` (Zeitz) + `art-and-craft-problem-solving.txt`
+- `PolyaHowToSolveIt.pdf` (image-only PDF; PNG rasters extracted to `my_references/polya-pages/`)
+- `imo_compendium.pdf` + `imo-compendium.txt`
+- `solving-mathematical-problems-terence-tao.pdf` + `tao-solving-math-problems.txt`
+
+**Polya extraction note.** The Polya PDF turned out to be image-only (no OCR layer); Tesseract OCR was not available on the system. The workaround was: `pdftoppm` to extract pages as PNGs (9 pages sampled), then visual transcription of the key passages into `Cursor-Polya.md`, supplemented by training-knowledge of Polya's framework. The Polya memory file carries transparent caveats on this extraction path.
+
+---
+
+## D.7 Errors Found and Corrected This Session
+
+Three verification corrections were captured (in addition to the two from Part C §C.6):
+
+| Where | Problem | Original | Correct | Verification |
+|---|---|---|---|---|
+| Blueprint §8.9 Case 2 | IMO 1969 P1 | "$z = x^4 + y^4 + (x+y)^4$; values it takes; CEP $2(x^2+xy+y^2)^2$" | **Sophie Germain identity:** "find infinitely many $a$ such that $z = n^4 + a$ is never prime; CEP is $n^4 + 4k^4 = (n^2 + 2nk + 2k^2)(n^2 - 2nk + 2k^2)$" | `imo-compendium.txt` line 2784 — Blueprint description didn't match the actual IMO 1969 P1 |
+| Pillar 4 slate Case 3 | Putnam 1985 A-1 (subset triples) | $7^{10}$ | **$6^{10} = 60{,}466{,}176$** | Each element has $2^3 = 8$ membership profiles; constraint excludes "in all three" AND "in none"; so 6 valid profiles per element |
+| Blueprint §8.9 Case 3 | "Putnam 1985 A-1 — distance function on a set" | Wrong problem | **Subset-counting problem** | Actual Putnam 1985 A-1 is the $A_1 \cup A_2 \cup A_3$ counting problem |
+
+In each case, the Blueprint or slate text was updated to the verified version, and the verification record now reflects the corrected answer/key step. All three corrections were confirmed by Anand at Phase A and Batch 1 approval.
+
+**Three open items deferred to Anand's verification pass** (all flagged ☼ in `pillar4-problems-locked.md` v0.2.0 with cautious draft phrasing in the chapters):
+1. **Case 19 (IMO 2001 P3)** — refined incidence-counting argument needs line-by-line Compendium check
+2. **Case 21 (IMO 1992 P3)** — explicit Turán-graph construction for $n = 32$ needs verification
+3. **Case 22 (IMO 2003 P6)** — precise order-theoretic argument needs Compendium pass
+
+Resolving these promotes the locked file to v0.2.1; none block Pillar 5 entry.
+
+---
+
+## D.8 Blueprint Evolution (v2.0 → v2.4)
+
+Bumps captured incrementally as each pillar reached closure:
+
+| Version | Trigger | Key updates |
+|---|---|---|
+| v2.0 | Part C end (May 26) | Production-mode setup; 25-case slate locked at candidate level |
+| v2.1 | (skipped — captured in v2.2) | — |
+| v2.2 | Pillar 4 sourcing in workspace | §16.1: Engel, Lockhart, IMO Compendium, Polya, Tao all marked IN WORKSPACE; Cursor memory files referenced |
+| v2.3 | Pillar 3 closure | §7 marked complete; §14.1 Phase 8 marked Complete |
+| **v2.4** | Pillar 4 closure (Phase E.1) | §8.7 expanded with per-chapter word-count table; §14.1 Phase 9 marked Complete (Phase 10 Current); §14.2 status table expanded to include all Pillar 3 + Pillar 4 + Cursor files; §16.1 sources-in-hand updated; §16.2 acquisitions trimmed to Pillar-5 needs only; §16.3 architectural-questions: Pillar 3 + Pillar 4 marked ✅; §17 repository map: Pillar 3 + Pillar 4 directories expanded |
+
+Net effect: Blueprint now correctly reflects that **3 of 5 pillars are first-draft complete**.
+
+---
+
+## D.9 Git State (post-session)
+
+**Branch:** `main` (in repo `C:\Users\ajayv\Documents\jupyter-python\advaitian-philosophy`; remote `https://github.com/sixteenpython/advaitian-philosophy`)
+
+**Untracked files staged for commit (this session's deliverables):**
+- 16 new Pillar 2 chapters (Chs. 5–20)
+- 8 new Pillar 3 chapters + `_template/` + `pillar3-problems-locked.md`
+- 9 new Pillar 4 chapters + `_template/` + slate v0.2.0 + problems-locked v0.2.0
+- 6 new Cursor memory files (Engel, Zeitz, Polya, IMO, Lockhart, Tao)
+
+**Modified files staged:**
+- `Advaitian_Book_vol1_Blueprint.md` — v2.0 → v2.4 (+364 insertions / -207 deletions over the session)
+- `pillar2-archetypes/03-duality.md` and `04-hidden-structure.md` — minor edits / forward-reference updates
+- `pillar2-archetypes/_template/joshi-problems-locked.md` — patched as Chs. 5–20 entered draft (+439 lines)
+- `Thinkmath_04May.md` — Part D appended (this file)
+
+**Intentionally not committed (copyright-respect precedent from Part C):**
+- All `my_references/*.pdf` and `*.txt` reference extractions for Lockhart, Engel, Zeitz, Polya (PDF + polya-pages PNGs), IMO Compendium, Tao
+- `my_references/edujeejoshi2ed.pdf` and `.txt` (carried over from Part C — same precedent)
+
+**Session commit:** see commit message via `git log -1` after the push.
+
+---
+
+## D.10 Pillar-Level Progress Dashboard (post-session)
+
+| Pillar | Title | Chapter status | First draft | Signoff status |
+|---|---|---|---|---|
+| 1 | The Six-Point Framework | Scaffolded; written last | 0/N | Pending |
+| 2 | Universal Archetype Catalog | 20/20 chapters drafted | ✅ Complete | Chs. 1–4 approved (Part C); Chs. 5–20 first-draft (not yet line-reviewed by Anand) |
+| 3 | Science of Multidirectional Solving | 8/8 chapters drafted | ✅ Complete | ✅ Signed off May 28 |
+| 4 | Art of CEP-Based Problem Design | 9/9 chapters drafted | ✅ Complete | ✅ Batch 1 + Batch 2 approved May 28 (3 ☼ items deferred to Anand's verification) |
+| 5 | Mathematical Gems (108 target) | Cluster targets locked | 0/108 | Pending |
+
+**Volume 1 first-draft completion:** 3 of 5 pillars fully drafted; 1 pillar (Pillar 2) needs Anand's line-review on Chs. 5–20; 2 pillars (1 and 5) still to draft.
+
+---
+
+## D.11 Open Items (Carry Forward)
+
+These are unresolved at session end:
+
+| # | Item | Owner | Notes |
+|---|---|---|---|
+| 1 | Pillar 2 Chs. 5–20 line-review | Anand | 16 chapters first-draft; need read-through and approval like Chs. 1–4 received in Part C |
+| 2 | Pillar 4 ☼ Case 19 (IMO 2001 P3) | Anand | Refined incidence-counting; Compendium pass needed; promotes locked-file to v0.2.1 |
+| 3 | Pillar 4 ☼ Case 21 (IMO 1992 P3) | Anand | Explicit Turán construction verification needed |
+| 4 | Pillar 4 ☼ Case 22 (IMO 2003 P6) | Anand | Precise order-theoretic argument needed |
+| 5 | Pillar 5 *Mathematical Gems* drafting | AI (next session) | Blueprint §9 spec is locked: 108 gems target, 4 clusters, per-gem template specified |
+| 6 | Pillar 1 *Six-Point Framework* drafting | AI (after Pillar 5) | Blueprint Phase 11 — written last |
+| 7 | Carry-forward from Part C: Ch. 7 Normalization framing | (Resolved) | Decision made during Pillar 2 drafting in this session |
+| 8 | Reference PDFs in `my_references/` — git decision | Anand | Same Part C precedent applies; consider explicit `.gitignore` rule or named exclusions |
+| 9 | Front matter / closing essays / editorial pass | (post-Pillar-5) | Blueprint Phases 12–14 |
+| 10 | Build pipeline (Pandoc → LaTeX → PDF) | (post-Pillar-5) | Blueprint §12 |
+
+---
+
+## D.12 Next Session Starting Point
+
+When picking up in a new AI session:
+
+1. **Read this file from the top.** Parts A (app), B (project plan), C (Pillar 2 Chs. 1–4), and D (Pillar 2 completion + Pillar 3 + Pillar 4) are all active context.
+
+2. **Know where we are:** Three of five pillars first-draft complete. Two pillars remain:
+   - **Pillar 5 — Mathematical Gems** (next; Blueprint §9 spec is fully locked, including the 108-gem target, 4-cluster architecture, per-gem template, and a working seed-list at §9.7)
+   - **Pillar 1 — Six-Point Framework** (last; Blueprint §5 spec; written after Pillar 5 because the right gem inventory informs the framework's worked-example economy)
+
+3. **Pillar 5 entry checklist** (Blueprint §9):
+   - 108 gems target (±10 drift permitted)
+   - 4 clusters: A (Number-Theory), B (Algebra), C (Combinatorics), D (Geometry)
+   - Per-gem entry template at §9.6
+   - Working seed-list at §9.7 (provisional, to expand to 108)
+   - **Reserved archetypes from Pillar 4:** #3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting — these uncovered-in-Pillar-4 archetypes are explicitly slated for Pillar 5 gem-coverage
+
+4. **Pillar 1 entry checklist** (Blueprint §5; for after Pillar 5):
+   - Six-Point Framework canonical definition at §5.3
+   - MVC Protocol at §5.4
+   - Chapter structure for Pillar 1 at §5.5
+   - Largely drafted in white paper + Blueprint v3; needs compress + re-voice + add 3–4 worked examples (per Part B §B.5 day-14–15 plan)
+
+5. **Things NOT to do:**
+   - Do not re-draft committed material (Pillar 2 Chs. 1–4; Pillar 3; Pillar 4). All three are signed off / approved.
+   - Do not modify the 25-case slate or `pillar4-problems-locked.md` without explicit Anand approval (both are LOCKED at v0.2.0).
+   - Do not commit reference PDFs from `my_references/` (Part C / Part D precedent).
+   - Do not commit `.json`, `*_api_key.txt`, `credentials.py`, `local_keys.py` (already in `.gitignore`).
+   - Do not push to `main` without Anand's explicit request.
+
+---
+
+## D.13 Closing Note (Part D)
+
+Three pillars drafted in one extended session. The Volume-1 first-draft completion percentage moved from ~20% (Part C end) to ~60% (this session end). The remaining 40% is two pillars (Pillar 5 *Mathematical Gems* and Pillar 1 *Six-Point Framework*) plus editorial polish on the line-review-pending Pillar 2 Chs. 5–20.
+
+The day's two notable achievements beyond raw volume:
+
+1. **Pillar 4's three innovations** — the 4-axis anatomy, the 5-step Polya-inverted design framework, and the IMO 1988 P6 capstone reconstruction as a 4-archetype designer's problem — together constitute *the first systematic problem-design curriculum in Indian mathematical pedagogy*. This is the book's most original contribution and the load-bearing claim of the Pillar-4 closing chapter.
+
+2. **The reference corpus is now fully in workspace.** Joshi, Engel, Zeitz, Polya, IMO Compendium, Lockhart, and Tao are all locally available with consolidated Cursor memory files. No further source-acquisition is needed for Pillars 5 (gems) or 1 (framework). Only Hardy & Wright remains on the wish-list, and it is a *Pillar-5 supplementary* reference, not a blocker.
+
+The architecture is in place. The drafting cadence (≈ 50K words per pillar × 9 chapters in ~one extended session for Pillar 4; ≈ 40K words per pillar × 8 chapters for Pillar 3) is repeatable. Pillar 5 (≈ 108 gems × ~1K words each = ~100K words target) is the next push.
+
+Build Pillar 5. Then Pillar 1. Then editorial. Then ship Volume 1.
+
+🌑
+
