@@ -1066,7 +1066,7 @@ These are unresolved at session end:
 | 2 | Pillar 4 ☼ Case 19 (IMO 2001 P3) | Anand | Refined incidence-counting; Compendium pass needed; promotes locked-file to v0.2.1 |
 | 3 | Pillar 4 ☼ Case 21 (IMO 1992 P3) | Anand | Explicit Turán construction verification needed |
 | 4 | Pillar 4 ☼ Case 22 (IMO 2003 P6) | Anand | Precise order-theoretic argument needed |
-| 5 | Pillar 5 *Mathematical Gems* drafting | AI (next session) | Blueprint §9 spec is locked: 108 gems target, 4 clusters, per-gem template specified |
+| 5 | Pillar 5 *Mathematical Gems* drafting | AI (May 29) | Blueprint §9 spec is locked: 108 gems target, **7 clusters (A–G)**, per-gem template specified at §9.6 |
 | 6 | Pillar 1 *Six-Point Framework* drafting | AI (after Pillar 5) | Blueprint Phase 11 — written last |
 | 7 | Carry-forward from Part C: Ch. 7 Normalization framing | (Resolved) | Decision made during Pillar 2 drafting in this session |
 | 8 | Reference PDFs in `my_references/` — git decision | Anand | Same Part C precedent applies; consider explicit `.gitignore` rule or named exclusions |
@@ -1075,35 +1075,59 @@ These are unresolved at session end:
 
 ---
 
-## D.12 Next Session Starting Point
+## D.12 Tomorrow's Plan — May 29, 2026 (Volume-1-first-draft completion day)
 
-When picking up in a new AI session:
+**Confirmed at session end (May 28, 2026, ~01:00 IST):** Pillar 5 and Pillar 1 are scheduled for tomorrow (May 29) as a same-day push. This will close out the Volume-1 first-draft sprint. After May 29, the remaining work is editorial polish + build pipeline + front matter, none of which require new pillar drafting.
 
-1. **Read this file from the top.** Parts A (app), B (project plan), C (Pillar 2 Chs. 1–4), and D (Pillar 2 completion + Pillar 3 + Pillar 4) are all active context.
+### Drafting order: Pillar 5 first, then Pillar 1
 
-2. **Know where we are:** Three of five pillars first-draft complete. Two pillars remain:
-   - **Pillar 5 — Mathematical Gems** (next; Blueprint §9 spec is fully locked, including the 108-gem target, 4-cluster architecture, per-gem template, and a working seed-list at §9.7)
-   - **Pillar 1 — Six-Point Framework** (last; Blueprint §5 spec; written after Pillar 5 because the right gem inventory informs the framework's worked-example economy)
+Per Blueprint Phase ordering (§14.1 Phases 10 → 11): Pillar 5 is drafted first because the right gem inventory informs Pillar 1's worked-example economy. The same ordering matches Part B §B.5 day-14–15 (Pillar 1 last) and Anand's pre-flight intuition.
 
-3. **Pillar 5 entry checklist** (Blueprint §9):
-   - 108 gems target (±10 drift permitted)
-   - 4 clusters: A (Number-Theory), B (Algebra), C (Combinatorics), D (Geometry)
-   - Per-gem entry template at §9.6
-   - Working seed-list at §9.7 (provisional, to expand to 108)
-   - **Reserved archetypes from Pillar 4:** #3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting — these uncovered-in-Pillar-4 archetypes are explicitly slated for Pillar 5 gem-coverage
+### Pillar 5 entry checklist (Blueprint §9 spec — fully locked)
 
-4. **Pillar 1 entry checklist** (Blueprint §5; for after Pillar 5):
-   - Six-Point Framework canonical definition at §5.3
-   - MVC Protocol at §5.4
-   - Chapter structure for Pillar 1 at §5.5
-   - Largely drafted in white paper + Blueprint v3; needs compress + re-voice + add 3–4 worked examples (per Part B §B.5 day-14–15 plan)
+- **108 gems target** (±10 drift permitted; §9.3)
+- **7 clusters, A–G** (§9.4):
+  - **A** Algebraic Identities — current 8, target 15
+  - **B** Inequalities — current 8, target 15
+  - **C** Number Theory — current 6, target 18
+  - **D** Geometry — current 8, target 20
+  - **E** Sequences and Series — current 5, target 12
+  - **F** Calculus — current 5, target 12
+  - **G** Combinatorics — current 5, target 16
+  - Current inventory: **45 gems**; expansion this session: **+63 to reach 108**
+- **Per-gem entry template** at §9.6 (300–600 words; Statement / Hypothesis / Named proof / Archetype uses / Worked applications / Common misuses / Connections)
+- **Indexing scheme** at §9.5: cluster-letter + 2-digit number (A01, B02, …)
+- **Working seed list** at §9.7 (provisional numbering; final lock at first draft)
+- **Reserved-archetype coverage from Pillar 4:** #3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting must each surface in Pillar 5 through canonical-gem coverage (per Pillar-4-problems-locked Coverage Matrix and Blueprint §9.2 new text)
+- **Reverse-lookup pre-flight:** before drafting, scan the as-drafted Pillars 2, 3, 4 chapters for explicit gem invocations (AM-GM, Vieta jumping, CRT, Sophie Germain, Fibonacci, golden ratio, order-modulo-p, etc.) and reconcile against §9.7
 
-5. **Things NOT to do:**
-   - Do not re-draft committed material (Pillar 2 Chs. 1–4; Pillar 3; Pillar 4). All three are signed off / approved.
-   - Do not modify the 25-case slate or `pillar4-problems-locked.md` without explicit Anand approval (both are LOCKED at v0.2.0).
-   - Do not commit reference PDFs from `my_references/` (Part C / Part D precedent).
-   - Do not commit `.json`, `*_api_key.txt`, `credentials.py`, `local_keys.py` (already in `.gitignore`).
-   - Do not push to `main` without Anand's explicit request.
+### Pillar 1 entry checklist (Blueprint §5 spec — fully locked)
+
+- **Single multi-section chapter**, not 20 sub-chapters (§5.5)
+- **Target length ~7,000 words** across 7 sub-sections (§5.5.1 through §5.5.7)
+- **Canonical source:** `knowledge_base/ThinkMath_Blueprint_v3.md` (§5.2 — re-read in full before drafting)
+- **Running example (locked):** the polygon-with-AP-angles problem (§5.7) — interior angles in AP, smallest 120°, common difference 5°, find number of sides
+- **Six-Point Framework** definition at §5.3; **MVC Protocol** at §5.4
+- **Developmental Tiers 0–4** at §5.8 — referenced in §5.5.5
+- **Voice register** for §5.5.1: Lockhart-polemic opening ("I" voice); §5.5.2–§5.5.6: "we" voice; §5.5.7: hybrid
+
+### Hard constraints for May 29 drafting
+
+- Do not re-draft committed material (Pillar 2 Chs. 1–4; Pillar 3; Pillar 4). All three are signed off / approved.
+- Do not modify the 25-case slate or `pillar4-problems-locked.md` without explicit Anand approval (both LOCKED at v0.2.0).
+- Do not commit reference PDFs from `my_references/` (Part C / Part D precedent).
+- Do not commit `.json`, `*_api_key.txt`, `credentials.py`, `local_keys.py` (already in `.gitignore`).
+- Do not push to `main` without Anand's explicit request.
+
+### End-of-day May 29 expected deliverables
+
+1. **`pillar5-gems/`** — 108 gem entries across 7 clusters + cluster-index files + Pillar-5 chapter scaffold
+2. **`pillar1-framework/`** — single Pillar-1 chapter (~7K words) covering all 7 sub-sections
+3. **`Advaitian_Book_vol1_Blueprint.md` v2.6** reflecting Pillar 5 + Pillar 1 first-draft complete
+4. **`Thinkmath_04May.md` Part E** appended (closing the Volume-1-first-draft sprint)
+5. **Commit + push** to `main`
+
+After May 29: Volume 1 is first-draft complete; remaining work is editorial polish + build pipeline + front matter.
 
 ---
 

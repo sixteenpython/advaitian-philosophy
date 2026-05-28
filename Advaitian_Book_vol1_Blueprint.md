@@ -4,7 +4,7 @@
 
 **Author:** Anand Venkat  
 **Working title:** *The Advaitian Philosophy of Problem Solving — Volume 1*  
-**Status:** v2.4 — Pillar 4 closure, May 28, 2026 (post-Phase-E.1). Previous: v2.3 (Pillar 3 closure); v2.2 (Pillar 4 sourcing in workspace); v2.0 (Production-mode setup, May 26, 2026).  
+**Status:** v2.5 — Pre-flight for May 29 (Pillar 5 + Pillar 1 same-day push); §15 refreshed, §5.6 & §9.2 flipped to "Ready to Draft." Previous: v2.4 (Pillar 4 closure, May 28); v2.3 (Pillar 3 closure); v2.2 (Pillar 4 sourcing in workspace); v2.0 (Production-mode setup, May 26).  
 **Format:** Markdown canonical → LaTeX (Pandoc) → Overleaf-friendly `.txt`  
 **Repository root:** `advaitian-philosophy/`
 
@@ -284,7 +284,7 @@ A self-administered checklist: 12 questions, each pointing at a specific point i
 
 ### 5.6 Write Status
 
-**Deferred until Pillars 2, 3, and 4 are substantially complete.** The `ThinkMath_Blueprint_v3.md` source is stable. When Pillar 1 enters draft, begin with a full re-read of that source and of the running example (Pillar 1 §5.5.3) as the chapter's spine.
+**READY TO DRAFT (May 29, 2026).** The pre-condition (Pillars 2, 3, 4 substantially complete) is now satisfied: Pillar 2 is 20/20 chapters first-drafted; Pillar 3 is signed off; Pillar 4 closed at Phase E.1 (slate v0.2.0 LOCKED). When Pillar 1 enters draft, begin with a full re-read of `ThinkMath_Blueprint_v3.md` and the locked running example (§5.7) as the chapter's spine. **Drafting order for May 29:** Pillar 5 first (gem inventory informs Pillar 1's worked-example economy), then Pillar 1. Per Blueprint Phase ordering (§14.1), this matches the as-planned sequence.
 
 ### 5.7 The Running Example — Locked
 
@@ -970,9 +970,11 @@ The rubric in the chapter ends with five criteria: cleanness of surface statemen
 
 Pillar 5 is the operational execution toolkit — the collection of specific identities, inequalities, theorems, and computational tools that implement the elegant pivots identified in Pillars 2–4. Where archetypes tell the solver *what* the problem is, gems tell the solver *how* to execute the insight once it is recognized.
 
-### 9.2 Deferred Status
+### 9.2 Write Status
 
-**Pillar 5 will not be drafted until Pillars 2, 3, and 4 are substantially complete.** The reason is structural: the right gems to include are determined by which pivots actually appear in the solved problems across the other pillars. Writing Pillar 5 in advance risks both under-inclusion and over-inclusion.
+**READY TO DRAFT (May 29, 2026).** Pre-condition satisfied: Pillars 2 (20/20), 3 (8/8 signed off), and 4 (9/9 closed at Phase E.1) are all first-draft complete. The right gems to include can now be determined by which pivots actually appeared in the solved problems across the other pillars — exactly the conditions §9.2 originally required.
+
+**Pillar-5-to-Pillars-2/3/4 reverse-lookup needed at drafting start.** Before drafting begins, scan the as-drafted chapters for explicit gem invocations (e.g., AM-GM in Pillar 2 Ch. 10 + Pillar 4 Case 5; Vieta jumping in Pillar 4 Case 25; CRT in Pillar 4 Case 15; Sophie Germain in Pillar 4 Case 2; Fibonacci in Pillar 4 Case 12; the golden ratio in Pillar 4 Ch. 9 Ex. 2; the order-modulo-p argument in Pillar 4 Cases 22, 23; etc.) and reconcile against the §9.7 working list. The 4 archetypes deliberately uncovered in Pillar 4 (#3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting — see `pillar4-problems-locked.md` v0.2.0 Coverage Matrix) must each surface in Pillar 5 through gem-coverage of their canonical instances.
 
 ### 9.3 Gem Count (locked at 108)
 
@@ -1415,28 +1417,44 @@ Phase 14:             Build pipeline final — Pandoc LaTeX generation, Overleaf
 
 ## SECTION 15 — IMMEDIATE COMMITMENTS
 
-These are the concrete deliverables for the immediate work session (May 26 onward), updated from the original Day 1 commitment list to reflect tasks completed and tasks newly in scope.
+These are the concrete deliverables for the immediate work sessions, updated to reflect Pillar-4 closure and the May 29 plan.
 
-### 15.1 Completed (May 26, 2026)
+### 15.1 Completed through May 28, 2026
 
-1. ✅ Re-instrument Chapter 1 — Joshi-sourced WE / PP / appendix solutions; Vieta-jumping forward-reference to Pillar 4.
-2. ✅ Produce `joshi-archetype-map.md` v0.1.
-3. ✅ Draft `02-symmetry-outline.md`.
-4. ✅ Enrich Blueprint to v2.0 (this document).
+1. ✅ **Pillar 2 — Universal Archetype Catalog** (20/20 chapters drafted; Chs. 1–4 Anand-approved per Part C; Chs. 5–20 first-draft, line-review pending).
+2. ✅ **Pillar 3 — Science of Multidirectional Solving** (8/8 chapters drafted + signed off May 28; `pillar3-problems-locked.md` complete).
+3. ✅ **Pillar 4 — Art of CEP-Based Problem Design** (9/9 chapters drafted; Batch 1 + Batch 2 approved May 28; slate v0.2.0 LOCKED; 31-problem locked record v0.2.0 with 3 ☼ Compendium-detail items deferred to Anand's verification pass).
+4. ✅ **Reference corpus expanded** — 7 Cursor memory files (Joshi + Engel + Zeitz + Polya + IMO + Lockhart + Tao), totalling ~52K words of consolidated reference doctrine. All copyrighted source PDFs in workspace but untracked per Part C precedent.
+5. ✅ **Blueprint v2.0 → v2.5** — sources-in-hand, status table, repository map, write-status flips for Pillar 1 + Pillar 5, immediate commitments all refreshed.
+6. ✅ **Commits pushed to GitHub** — `565677c` (Pillar 2 Chs. 1–4 + supporting framework), `5fd4efa` (Pillars 2 completion + 3 + 4 + Cursor memory files + Blueprint v2.4).
 
-### 15.2 Pending (next session)
+### 15.2 Tomorrow's work — May 29, 2026 (planned same-day push)
 
-5. **Anand reviews Blueprint v2.0** and the four locked decisions (case-study count 25, gem-count 108, reader = JEE Advanced aspirant, mixed voice).
-6. **Commit Blueprint v2.0 and the other Day-1 files to git** (task originally numbered 4 in the May 26 session).
-7. **Anand reviews Chapter 1's two flagged solution-sketch gaps** (PP4 mod-2001 argument, PP7 INMO functional-equation closure).
-8. **Anand reviews Chapter 2 outline** and confirms the 7 outline decisions.
-9. **Draft Chapter 2 (Symmetry)** — begins once Chapter 2 outline is signed off.
+7. **Pillar 5 — Mathematical Gems** drafting:
+   - Pre-flight: scan as-drafted Pillars 2, 3, 4 for gem invocations; reconcile against §9.7 working list.
+   - Expand current 45-gem inventory to 108 target across the 7 clusters (§9.4: A Algebraic / B Inequalities / C Number Theory / D Geometry / E Sequences & Series / F Calculus / G Combinatorics).
+   - Each gem follows the §9.6 per-gem template (300–600 words).
+   - Especially ensure coverage of the 4 archetypes uncovered in Pillar 4 (#3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting).
+8. **Pillar 1 — Six-Point Framework** drafting (immediately after Pillar 5):
+   - Single multi-section chapter, ~7,000 words target (§5.5).
+   - Re-read `ThinkMath_Blueprint_v3.md` as canonical source.
+   - Running example locked: the polygon-with-AP-angles problem (§5.7).
+   - 7 sub-sections per §5.5.1–§5.5.7.
+9. **End-of-day deliverables on May 29:**
+   - Pillar 5 first-draft (108 ± 10 gems) + Cluster-by-Cluster locked index
+   - Pillar 1 first-draft (single chapter, ~7K words)
+   - Blueprint v2.6 reflecting Pillar 5 + Pillar 1 first-draft complete
+   - `Thinkmath_04May.md` Part E appended
+   - Commit + push (final session of the Volume-1 first-draft sprint)
 
-### 15.3 Mid-term (after Chapter 2 enters draft)
+### 15.3 Post-Volume-1-first-draft (after May 29)
 
-10. Produce outlines for Chapters 3–5 (Duality, Hidden Structure, Substitution) using the same outline template.
-11. Begin construction of `scripts/build-chapter.ps1` and `templates/advaitian-preamble.tex` once Chapter 2 is one-third drafted (parallel work that doesn't block the writing).
-12. Compile a working Pillar 3 chapter-1 outline (The Multidirectional Thesis) once Pillar 2 Chapter 5 is drafted.
+10. **Editorial pass** — voice consistency check across all 5 pillars; citation audit (Pillar 4 ☼ items, Pillar 2 Anand-flagged solution-sketch gaps from Ch. 1 PP4 / PP7); length-trim where chapters exceed Blueprint length budgets.
+11. **Pillar 4 ☼ items** — Anand's verification pass on Cases 19, 21, 22 against IMO Compendium; on completion, promotes locked file to v0.2.1.
+12. **Build pipeline** (Blueprint §12) — Pandoc → LaTeX → PDF; Overleaf-friendly `.txt` generation for each chapter.
+13. **Front matter + closing essays** — Preface, Introduction, Vision chapter; glossary; cross-pillar index by archetype + gem.
+14. **8-commentary Appendix A** — insert the polished commentaries from Volume 2 pipeline.
+15. **Pre-publication review** per Section 21.
 
 ---
 
