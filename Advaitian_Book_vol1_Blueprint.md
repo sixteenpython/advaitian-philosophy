@@ -1575,7 +1575,7 @@ Per Anand's May 29 sign-off, Volume 1 is **build-complete** with the following i
 | V7 | **Pillar 3 problem bank unsigned** | 3 | Ch. 8 diagnostic (10 problems), Ch. 6 CS#2–4, Ch. 4 WE4.3, the Czech & Slovak construction; and `pillar3-multidirectional/_template/pillar3-problems-locked.md` still marks Chs. 5–8 "TBD" though those chapters are locked. Reconcile the locked-index with the drafted chapters. |
 | V8 | **Pillar 5 foundation + cross-ref gaps** | 5 | No Number-Theory prerequisite block for Cluster C (C01–C16) in `prerequisites.md`; ~27 gems cite `Blueprint §9.7` placeholders instead of locked P2/P3/P4 locations; the per-Stretch-gem Zeitz motivation line promised in front matter is absent (45 Stretch gems). |
 | V9 | **Pillar 1 dual-role + tier note** | 1 | Add explicit capstone/spiral re-read language to §7 (Pillar 1 is read first for orientation, re-read last as capstone per §20.1); reconcile the "exactly six points" claim with the Tier-3 "compress to four or five" line. |
-| V10 | **Book-wide spelling: British (RESOLVED May 29)** | all | Ruling: **British** `-ise/-isation` throughout (matches the dominant prose). Executed May 29: canonical labels #6/#7 → **Linearisation** / **Normalisation**; British normalisation pass applied to Pillar 2 Chs. 5–7, 10, 20 prose and this Blueprint (`organis-`, `recognis-`, `generalis-`, `internalis-`, `realis-`, `synthesis-`, `popularis-`, `emphasis-`, `parametris-`). **Filenames keep their American slugs** (`06-linearisation.md`) to preserve links/history. No American `-ize/-ization` outstanding from the May 29 scan; a light confirmatory sweep of Pillars 1, 3–5 prose is the only residual. |
+| V10 | **Book-wide spelling: British (RESOLVED May 29)** | all | Ruling: **British** `-ise/-isation` throughout (matches the dominant prose). Executed May 29: canonical labels #6/#7 → **Linearisation** / **Normalisation**; British normalisation pass applied to Pillar 2 Chs. 5–7, 10, 20 prose and this Blueprint (`organis-`, `recognis-`, `generalis-`, `internalis-`, `realis-`, `synthesis-`, `popularis-`, `emphasis-`, `parametris-`). **Filenames keep their American slugs** (`06-linearization.md`) to preserve links/history. No American `-ize/-ization` outstanding from the May 29 scan; a light confirmatory sweep of Pillars 1, 3–5 prose is the only residual. |
 
 **Post-build, beyond verification:** editorial pass (voice consistency across all 5 pillars; length-trim), build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays, and the 8-commentary Appendix A.
 
@@ -1604,7 +1604,7 @@ A whole-volume coherence review (all 5 pillars read in reading order against the
 | 9 | Domain Constraints | 19 | Pivoting / Elimination |
 | 10 | Inequality Constraints | 20 | Analogy / Transfer |
 
-*Separator convention: compound names use a spaced slash ` / ` (not `&` or en-dash). Spelling follows the book-wide **British** ruling (V10, resolved May 29): #6 **Linearisation**, #7 **Normalisation / Scaling**. Filenames retain their American slugs (`06-linearisation.md`, `07-normalisation.md`) as stable internal identifiers.*
+*Separator convention: compound names use a spaced slash ` / ` (not `&` or en-dash). Spelling follows the book-wide **British** ruling (V10, resolved May 29): #6 **Linearisation**, #7 **Normalisation / Scaling**. Filenames retain their American slugs (`06-linearization.md`, `07-normalization.md`) as stable internal identifiers.*
 
 These rulings govern the editorial pass; the pass itself (B2–B5 enforcement across chapters) is the next unit of work after this review.
 
