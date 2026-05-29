@@ -42,7 +42,7 @@ Each of the five case studies that follow uses an identical five-section interna
 
 1. **Problem statement.** Verbatim, with source cited.
 2. **First-Minute Protocol scratchpad.** The 60-second diagnostic, displayed exactly as it would appear on the actual paper.
-3. **MVC sketch.** The drawn Mental Visualization Canvas, in the ASCII grammar of Chapter 5.
+3. **MVC sketch.** The drawn Mental Visualisation Canvas, in the ASCII grammar of Chapter 5.
 4. **Solution walkthrough.** The proof, executed against the MVC's order-of-work prescription. Compressed prose; the MVC carries the structural weight.
 5. **Verification + Connections.** A one-paragraph verification of the answer (mirroring the Pillar 2 audit discipline) plus a one-paragraph mapping of the case study's archetype-profile to the Pillar 2 cross-references and (where applicable) to Pillar 4 design considerations.
 

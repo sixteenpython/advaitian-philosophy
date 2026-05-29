@@ -15,7 +15,7 @@ key_gems: [A01, A06, A11]
   - "Substitution as forward-elimination: $u = g(x)$ replaces the variable $x$ with $u$, eliminating the original $x$-dependence; the substitution is a *pivot* on the variable $x$, and the chain rule provides the inverse transformation $dx = (du)/g'(x)$"
   - "Pencil-of-curves elimination: a 1-parameter family $\\lambda C_1 + (1 - \\lambda) C_2 = 0$ traces out the pencil of curves through the intersection of $C_1, C_2$; eliminating $\\lambda$ between two members of the pencil recovers $C_1 \\cap C_2$ as the residual"
   - "Subtraction-as-simplification meta-principle: pivoting and elimination operate by *subtracting* a multiple of one equation from another (Gaussian), or by *subtracting* one variable from the system via the resultant (polynomial), or by *subtracting* a parameter from a parametric representation (trig elimination); the systematic preference for subtractive operations over additive ones is the chapter's defining cognitive habit"
-canonical_takeaway: "Simplify by subtraction, not addition. Every elimination move *removes* a variable, an unknown, a parameter, or a degree-of-freedom from the problem; the chapter's discipline is to *choose the pivot* that maximises the structural simplification produced by the elimination, then iterate until the residual problem is trivial."
+canonical_takeaway: "Simplify by subtraction: choose the pivot that removes the most, then iterate."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29

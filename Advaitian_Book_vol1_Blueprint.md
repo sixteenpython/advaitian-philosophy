@@ -49,7 +49,7 @@ This document supersedes all earlier scattered notes in `knowledge_base/`, `chat
 
 ### 1.1 What This Book Is
 
-This book is a **bhāṣya** — a structured commentary — on the wisdom of nine masters of mathematical thinking, organized around a single architectural insight: that every mathematical problem is a *Seed–Elegance Connection* orchestrated around a *Central Elegant Point*, and that the entire landscape of solvable problems collapses into roughly twenty fundamental archetypes.
+This book is a **bhāṣya** — a structured commentary — on the wisdom of nine masters of mathematical thinking, organised around a single architectural insight: that every mathematical problem is a *Seed–Elegance Connection* orchestrated around a *Central Elegant Point*, and that the entire landscape of solvable problems collapses into roughly twenty fundamental archetypes.
 
 It is, in its essence:
 
@@ -61,9 +61,9 @@ The volume's charge is to make a working mathematician of the reader — not a m
 
 ### 1.2 What This Book Is Not
 
-It is not a problem book. It is not a JEE crash-course. It is not a coffee-table popularization. It does not compete with Joshi's *Educative JEE Mathematics*, Engel's *Problem-Solving Strategies*, or Andreescu's olympiad volumes — it stands on their shoulders.
+It is not a problem book. It is not a JEE crash-course. It is not a coffee-table popularisation. It does not compete with Joshi's *Educative JEE Mathematics*, Engel's *Problem-Solving Strategies*, or Andreescu's olympiad volumes — it stands on their shoulders.
 
-It does not contain a thousand problems. It contains roughly eighty, chosen with surgical care, each illustrating a structural principle that generalizes to ten thousand others.
+It does not contain a thousand problems. It contains roughly eighty, chosen with surgical care, each illustrating a structural principle that generalises to ten thousand others.
 
 It is not authored from a position of original problem invention. The problems we use are taken from established sources — primarily K.D. Joshi's *Educative JEE Mathematics* for Pillar 2, the IMO Compendium for Pillar 4, and the Engel/Polya/Zeitz canon for Pillar 3. Our contribution is the *commentary architecture* — the lens through which they are read.
 
@@ -120,7 +120,7 @@ Three primitives:
 - **Brute Path** — the mechanical, expensive approach that almost every student reaches for first. It is not wrong, only blind.
 - **Elegant Pivot** — the single insight that collapses the brute path into a one-line solution. Often a constraint, a symmetry, an invariant, or a change of frame.
 
-Around these three primitives, two further structures organize the doctrine:
+Around these three primitives, two further structures organise the doctrine:
 
 - **The Six-Point Framework** — the canonical commentary grammar (Pillar 1): Seed → Brute Path → Elegant Pivot → Pitfalls → Connections → Takeaway.
 - **The Twenty Universal Archetypes** — the finite vocabulary of structural patterns through which all problems can be read (Pillar 2).
@@ -131,9 +131,9 @@ The Advaitian (अद्वैत, "non-dual") name signals the philosophical cl
 
 The book's pedagogical wager, repeated throughout:
 
-> Mastery is not solving 1,000 problems. Mastery is internalizing 20 patterns and learning to see them everywhere, simultaneously, from multiple directions at once.
+> Mastery is not solving 1,000 problems. Mastery is internalising 20 patterns and learning to see them everywhere, simultaneously, from multiple directions at once.
 
-This is the inversion of the volume-based pedagogy that dominates Indian competitive coaching. We do not deny the value of practice; we deny that practice without structural recognition compounds. A student who has internalized the twenty archetypes will read a new problem the way a chess grandmaster reads a position — by structural pattern, not piece-by-piece calculation.
+This is the inversion of the volume-based pedagogy that dominates Indian competitive coaching. We do not deny the value of practice; we deny that practice without structural recognition compounds. A student who has internalised the twenty archetypes will read a new problem the way a chess grandmaster reads a position — by structural pattern, not piece-by-piece calculation.
 
 ### 2.3 The Structural Mirror Stance
 
@@ -175,7 +175,7 @@ The book's authority derives from its conversation with nine independent traditi
 
 ### 3.4 Paul Zeitz
 - **Key works:** *The Art and Craft of Problem Solving* (1999, 2nd ed. 2007).
-- **Contribution:** The strategic synthesis — Zeitz organizes problem-solving around three layers (strategies, tactics, tools) that map cleanly onto our pillars (archetypes, multidirectional moves, gems). His "investigate–wishful thinking–draw a picture" preamble is the intellectual ancestor of our MVC protocol.
+- **Contribution:** The strategic synthesis — Zeitz organises problem-solving around three layers (strategies, tactics, tools) that map cleanly onto our pillars (archetypes, multidirectional moves, gems). His "investigate–wishful thinking–draw a picture" preamble is the intellectual ancestor of our MVC protocol.
 - **Where he appears:** Pillar 3 baseline, Pillar 4 (problem-design heuristics).
 - **Voice signature:** Patient, expansive, openly affectionate toward problems. Zeitz writes as someone who genuinely loves the mathematics.
 
@@ -187,7 +187,7 @@ The book's authority derives from its conversation with nine independent traditi
 
 ### 3.6 K.D. Joshi (IIT Bombay)
 - **Key works:** *Educative JEE Mathematics* (2nd ed., the 1039-page volume in `my_references/edujeejoshi2ed.pdf`).
-- **Contribution:** **The single most important reference for this book.** Joshi is the only author in the world canon who has written a JEE-anchored problem book in the *commentary mode* — every Main Problem is followed by extended Comments that surface alternative approaches, generalizations, pitfalls, and connections. This is, in microcosm, exactly our six-point framework. Joshi is also the **sole problem bank for Pillar 2**: every worked example and practice problem in the Twenty Archetypes chapters is sourced from his book or from JEE/RMO/INMO exams he himself has commented on.
+- **Contribution:** **The single most important reference for this book.** Joshi is the only author in the world canon who has written a JEE-anchored problem book in the *commentary mode* — every Main Problem is followed by extended Comments that surface alternative approaches, generalisations, pitfalls, and connections. This is, in microcosm, exactly our six-point framework. Joshi is also the **sole problem bank for Pillar 2**: every worked example and practice problem in the Twenty Archetypes chapters is sourced from his book or from JEE/RMO/INMO exams he himself has commented on.
 - **Where he appears:** Pillar 2 (problem source-of-truth, voice baseline), the front-matter dedication, the methodological appendix.
 - **Voice signature:** Senior Indian-academic — formally precise, generous in commentary, faithful to the JEE reader's frame of reference. Joshi treats the JEE student as an intellectual peer, not a customer.
 
@@ -199,7 +199,7 @@ The book's authority derives from its conversation with nine independent traditi
 
 ### 3.8 W.W. Sawyer (1911–2008)
 - **Key works:** *Mathematician's Delight* (1943), *Prelude to Mathematics* (1955), *A Concrete Approach to Abstract Algebra* (1959).
-- **Contribution:** The affective onramp — Sawyer is the master at converting an abstract mathematical idea into an experience the reader has *already had* without realizing it. Where Polya teaches heuristics, Sawyer teaches *recognition that mathematics is yours by birthright*.
+- **Contribution:** The affective onramp — Sawyer is the master at converting an abstract mathematical idea into an experience the reader has *already had* without realising it. Where Polya teaches heuristics, Sawyer teaches *recognition that mathematics is yours by birthright*.
 - **Where he appears:** Chapter 1 opening vignettes across Pillar 2, the Pillar 1 introduction.
 - **Voice signature:** Warm, English-pedagogical, quietly subversive of mathematical self-importance.
 
@@ -225,15 +225,15 @@ Section-by-section voice mapping is given in Section 10. The mixed-register rule
 
 ## SECTION 4 — THE FIVE-PILLAR ARCHITECTURE (OVERVIEW)
 
-The book is organized as five pillars. Each pillar has a distinct pedagogical function, a distinct voice register, and a distinct problem-source canon. They are not five independent books — they are five floors of one building, and the staircase between floors is explicit.
+The book is organised as five pillars. Each pillar has a distinct pedagogical function, a distinct voice register, and a distinct problem-source canon. They are not five independent books — they are five floors of one building, and the staircase between floors is explicit.
 
 | Pillar | Title | Pedagogical Function | Primary Source | Write Order | Status |
 |--------|-------|----------------------|----------------|-------------|--------|
 | 1 | The Six-Point Framework | Meta-grammar: the analytical lens applied to every problem in the book | `ThinkMath_Blueprint_v3.md` | **Last (5th)** | Pending |
-| 2 | The Twenty Universal Archetypes | Conceptual clarity: what each structural pattern is, how to recognize it | K.D. Joshi *EJM* + JEE/RMO | **First (1st)** | Chapter 1 drafted, Chapter 2 outlined |
+| 2 | The Twenty Universal Archetypes | Conceptual clarity: what each structural pattern is, how to recognise it | K.D. Joshi *EJM* + JEE/RMO | **First (1st)** | Chapter 1 drafted, Chapter 2 outlined |
 | 3 | The Science of Multidirectional Solving | Technique geometry: how archetypes combine and converge | Engel, Polya, Zeitz | **Second (2nd)** | Scoped (Section 7); drafting begins after Pillar 2 mid-point |
 | 4 | The Art of Problem Framing | CEP design: how problems are built and dissected | IMO Compendium + Tao, Lockhart, Sawyer | **Third (3rd)** | 25-case slate locked (Section 8.9) |
-| 5 | The Gems | Operational execution toolkit: the 108 identities and theorems that implement the pivots | Synthesized from all pillars | **Fourth (4th)** | 108 target locked; cluster targets defined |
+| 5 | The Gems | Operational execution toolkit: the 108 identities and theorems that implement the pivots | Synthesised from all pillars | **Fourth (4th)** | 108 target locked; cluster targets defined |
 
 **Sequencing rationale:**
 - Pillar 2 first because it establishes the vocabulary every other pillar uses.
@@ -320,7 +320,7 @@ Tiers describe reader-developmental stages, *not* problem difficulty. They calib
 |---|---|---|---|
 | 0 | Pre-recognition: solves by formula recall | All six points expanded, ~5–10 sentences each | (Not addressed.) |
 | 1 | Surface recognition: spots familiar patterns | 6 points present, ~3–5 sentences each | Pillar 2 PP1–PP2; warm-up half of each chapter |
-| 2 | Pattern fluency: applies recognized archetype | 6 points present, terser; ~2–4 sentences each | Pillar 2 PP3–PP4; WE1–WE2 |
+| 2 | Pattern fluency: applies recognised archetype | 6 points present, terser; ~2–4 sentences each | Pillar 2 PP3–PP4; WE1–WE2 |
 | 3 | Multi-archetype: holds 2–3 archetypes simultaneously | 6 points sometimes compressed to 4–5; emphasis on convergence | Pillar 2 WE3; Pillar 3 baseline; Pillar 4 cases 1–10 |
 | 4 | Designer: reverse-engineers problems from CEPs | 6 points as analytic skeleton; analysis exceeds them | Pillar 4 cases 11–25; Pillar 5 advanced commentary |
 
@@ -334,7 +334,7 @@ The book primarily addresses **Tiers 3–4**. Tier 1 is the entry difficulty (PP
 
 Pillar 2 is the conceptual core — the vocabulary. It teaches the reader to identify, name, and apply each of the twenty structural archetypes that account for all solvable mathematical problems at the JEE Advanced / Olympiad / Putnam level.
 
-The standard for each archetype chapter: a student who has read and internalized it should be able to look at any unseen problem that belongs to that archetype and — before writing a single equation — name the archetype, describe the brute path, and gesture at the pivot. That recognition is the deliverable, not the ability to write the solution.
+The standard for each archetype chapter: a student who has read and internalised it should be able to look at any unseen problem that belongs to that archetype and — before writing a single equation — name the archetype, describe the brute path, and gesture at the pivot. That recognition is the deliverable, not the ability to write the solution.
 
 ### 6.2 Problem-Source Canon for Pillar 2
 
@@ -350,7 +350,7 @@ The map of Joshi chapters → archetypes is maintained in `pillar2-archetypes/_t
 
 ### 6.3 The Twenty Archetypes (Canonical Listing)
 
-The archetypes are organized into five categories. Numbers are stable identifiers used throughout the book.
+The archetypes are organised into five categories. Numbers are stable identifiers used throughout the book.
 
 **Category 1 — Structure Recognition (Seeing the Hidden Architecture)**
 
@@ -366,8 +366,8 @@ The archetypes are organized into five categories. Numbers are stable identifier
 | # | Archetype | Meta-Principle |
 |---|-----------|---------------|
 | 5 | **Substitution / Change of Variables** | The right coordinate system makes the problem transparent. |
-| 6 | **Linearization** | If nonlinear, find the linear core underneath. |
-| 7 | **Normalization / Scaling** | Remove the clutter; keep only the structure. |
+| 6 | **Linearisation** | If nonlinear, find the linear core underneath. |
+| 7 | **Normalisation / Scaling** | Remove the clutter; keep only the structure. |
 | 8 | **Domain Translation** | If the language is wrong, speak a different one. |
 
 **Category 3 — Constraint Exploitation (Using Restrictions as Solutions)**
@@ -377,9 +377,9 @@ The archetypes are organized into five categories. Numbers are stable identifier
 | 9 | **Domain Constraints / Bounds** | Algebra generates candidates; domain selects the winner. |
 | 10 | **Inequality Constraints** | Sometimes the bounds tell the whole story. |
 | 11 | **Existence / Uniqueness Conditions** | Existence precedes computation. |
-| 12 | **Extremal Principles** | Nature optimizes; so should your solution. |
+| 12 | **Extremal Principles** | Nature optimises; so should your solution. |
 
-**Category 4 — Counting and Extremization (Structuring Chaos)**
+**Category 4 — Counting and Extremisation (Structuring Chaos)**
 
 | # | Archetype | Meta-Principle |
 |---|-----------|---------------|
@@ -496,9 +496,9 @@ Status: **scope only; outline pending.**
 #### 6.10.04 Archetype 4: Hidden Structure
 
 Joshi primary: Ch. 5 (Binomial Identities), Ch. 4 (Number Theory).
-WE candidates: A binomial identity proved combinatorially (Joshi Ch. 5); a number-theory problem whose solution recognizes a hidden modular structure (Joshi Ch. 4).
+WE candidates: A binomial identity proved combinatorially (Joshi Ch. 5); a number-theory problem whose solution recognises a hidden modular structure (Joshi Ch. 4).
 PP candidates: Joshi Ch. 5 reduction-formula problems; Joshi Ex. 24.49 ($(2m)!(2n)!/(m+n)!$ integer).
-Distinctive cognitive shift: From surface-pattern matching to *recognizing that an unfamiliar problem is something familiar in disguise*. The unmasking move — "this is really a..." (binomial, recursion, group action, etc.).
+Distinctive cognitive shift: From surface-pattern matching to *recognising that an unfamiliar problem is something familiar in disguise*. The unmasking move — "this is really a..." (binomial, recursion, group action, etc.).
 Forward-references: #5 (Substitution is the most common disguise-remover), #20 (Analogy is its meta-cousin).
 Status: **scope only; outline pending.**
 
@@ -508,23 +508,23 @@ Joshi primary: Ch. 9 (Coordinate Geometry), Ch. 17 (Areas and Antiderivatives), 
 WE candidates: A coordinate-choice problem where polar / shifted coordinates collapse the geometry (Joshi Ch. 9); an integral where substitution kills a hard integrand (Joshi Ch. 17); an ODE solved by substitution (Joshi Ch. 19).
 PP candidates: Tschirnhaus-substitution problems (Joshi Ch. 3); Weierstrass $t = \tan(\theta/2)$ problems (Joshi Ch. 10); Joshi Ex. 24.13 (the affine shift from Pillar 2 Ch. 1 PP5 reappears here as Tier-1 illustration).
 Distinctive cognitive shift: From "the variables given are sacred" to "the variables are coordinates, and the right coordinates make the problem transparent." The Cartesian-coordinates illusion is broken here.
-Forward-references: #4 (Hidden Structure; substitution is the move that reveals it), #7 (Normalization is a special case), #8 (Domain Translation as substitution-across-domains).
+Forward-references: #4 (Hidden Structure; substitution is the move that reveals it), #7 (Normalisation is a special case), #8 (Domain Translation as substitution-across-domains).
 Status: **scope only; outline pending.**
 
-#### 6.10.06 Archetype 6: Linearization
+#### 6.10.06 Archetype 6: Linearisation
 
 Joshi primary: Ch. 13 (Maxima, Minima and Concavity), Ch. 15 (Limits, Continuity and Derivatives), Ch. 16 (Theoretical Calculus).
-WE candidates: A non-linear optimization with linear-approximation insight (Joshi Ch. 13); a derivative-as-linearization problem (Joshi Ch. 15); an MVT-style existence proof (Joshi Ch. 16).
+WE candidates: A non-linear optimisation with linear-approximation insight (Joshi Ch. 13); a derivative-as-linearisation problem (Joshi Ch. 15); an MVT-style existence proof (Joshi Ch. 16).
 PP candidates: Tangent-line-trick inequalities (Joshi Ch. 6); concavity / convexity problems (Joshi Ch. 13).
 Distinctive cognitive shift: From "non-linear means difficult" to "non-linear has a linear core — find it." Newton's method as the canonical illustration; Taylor expansion as the systematic case.
-Forward-references: #12 (Extremal Principles; linearization is how extrema get located), #11 (Existence; IVT/MVT live here).
+Forward-references: #12 (Extremal Principles; linearisation is how extrema get located), #11 (Existence; IVT/MVT live here).
 Status: **scope only; outline pending.**
 
-#### 6.10.07 Archetype 7: Normalization / Scaling
+#### 6.10.07 Archetype 7: Normalisation / Scaling
 
 Joshi primary: Ch. 6 (Inequalities), Ch. 13 (Max/Min).
-WE candidates: An AM-GM problem where WLOG-normalize-the-sum kills the constraint (Joshi Ch. 6); a homogeneous geometry problem solved by scale-fixing (Joshi Ch. 11).
-PP candidates: Joshi Ch. 6 normalization problems; Buckingham-$\pi$-style dimensional-analysis sketches.
+WE candidates: An AM-GM problem where WLOG-normalise-the-sum kills the constraint (Joshi Ch. 6); a homogeneous geometry problem solved by scale-fixing (Joshi Ch. 11).
+PP candidates: Joshi Ch. 6 normalisation problems; Buckingham-$\pi$-style dimensional-analysis sketches.
 Distinctive cognitive shift: From "all the variables are independent" to "many problems are scale-invariant — pin one variable, the rest follow." WLOG-pricing is the move.
 Forward-references: #5 (Substitution; a special form of it), #2 (Symmetry; scaling is a continuous symmetry).
 Status: **scope only; outline pending.**
@@ -553,7 +553,7 @@ Joshi primary: Ch. 6 (Inequalities).
 WE candidates: AM-GM applied non-obviously (Joshi Ch. 6); Cauchy–Schwarz in a competition setting (Joshi Ch. 6); Jensen's inequality (Joshi Ch. 6 or 13).
 PP candidates: Joshi Ch. 6 SOS-style problems; Joshi Ex. 24.65 (sides-of-triangle inequality, RMO).
 Distinctive cognitive shift: From "inequalities are obstacles" to "inequalities are constraints that *determine the answer*." The canonical move: convert an equality problem into an inequality problem (or vice versa) when one form makes the structure visible.
-Forward-references: #7 (Normalization; the WLOG step), #9 (Domain Constraints; bounded by inequality), #12 (Extremal Principles; equality cases of inequalities are extrema).
+Forward-references: #7 (Normalisation; the WLOG step), #9 (Domain Constraints; bounded by inequality), #12 (Extremal Principles; equality cases of inequalities are extrema).
 Status: **scope only; outline pending.**
 
 #### 6.10.11 Archetype 11: Existence / Uniqueness Conditions
@@ -568,9 +568,9 @@ Status: **scope only; outline pending.**
 #### 6.10.12 Archetype 12: Extremal Principles
 
 Joshi primary: Ch. 13 (Max/Min and Concavity), Ch. 14 (Trigonometric Optimisation).
-WE candidates: An optimization solved by Lagrange-multiplier-style invariance + extremum (Joshi Ch. 13); a trig-optimization solved by symmetry (Joshi Ch. 14); an *extremal*-set problem (e.g., the largest subset of $\{1, \ldots, n\}$ with property $P$).
+WE candidates: An optimisation solved by Lagrange-multiplier-style invariance + extremum (Joshi Ch. 13); a trig-optimisation solved by symmetry (Joshi Ch. 14); an *extremal*-set problem (e.g., the largest subset of $\{1, \ldots, n\}$ with property $P$).
 PP candidates: Joshi Ch. 13 calculus optimisation; Joshi Ch. 14 trig optimisation; Joshi Ex. 24.74 (extremal quadrilateral).
-Distinctive cognitive shift: From "optimize by calculus" to "the extremum is where the structure breaks down." Pigeon-hole-extremal duality: extremal arguments often reach into structures the smooth optimization cannot see.
+Distinctive cognitive shift: From "optimise by calculus" to "the extremum is where the structure breaks down." Pigeon-hole-extremal duality: extremal arguments often reach into structures the smooth optimisation cannot see.
 Forward-references: #10 (Inequality; extremum = equality case), #1 (Invariance; the conserved quantity at the optimum), #2 (Symmetry; extrema sit at symmetric points).
 Status: **scope only; outline pending.**
 
@@ -606,7 +606,7 @@ Status: **scope only; outline pending.**
 Joshi primary: Ch. 3 (Theory of Equations), Ch. 24 (constructing polynomials with given properties).
 WE candidates: Construct a polynomial whose roots have a prescribed property (Joshi Ch. 3); construct a sequence whose closed form has a prescribed structure; construct a problem from a given CEP (forward-references Pillar 4).
 PP candidates: Joshi Ch. 3 problems; reverse-engineered Diophantine equations.
-Distinctive cognitive shift: From "solve the given problem" to "what problem would have this answer?" The designer's lens. Pillar 4 picks up where this archetype ends — Chapter 16 of Pillar 2 *introduces* the move; Pillar 4 generalizes it to systematic CEP design.
+Distinctive cognitive shift: From "solve the given problem" to "what problem would have this answer?" The designer's lens. Pillar 4 picks up where this archetype ends — Chapter 16 of Pillar 2 *introduces* the move; Pillar 4 generalises it to systematic CEP design.
 Forward-references: **Pillar 4** (the natural extension), #5 (Substitution; reverse-substitution is its first instance), #20 (Analogy).
 Status: **scope only; outline pending.**
 
@@ -624,7 +624,7 @@ Status: **scope only; outline pending.**
 Joshi primary: Ch. 4 (Number Theory — Joshi notes induction is the JEE workhorse here), Ch. 5 (Binomial), Ch. 23 (Infinitistic Probability).
 WE candidates: A divisibility proof by induction with non-trivial shift-coefficient (Joshi Ch. 4 Comment 8 — the JEE 1982 $7^{2n}+\ldots$ problem); a recursive-sequence closed-form derivation (Joshi Ch. 23); a binomial-identity inductive proof (Joshi Ch. 5).
 PP candidates: Joshi Ch. 4 induction problems; Joshi Ch. 23 random-walk recurrences.
-Distinctive cognitive shift: From "solve directly" to "solve for one step, propagate by structure." The canonical move: identify the right *inductive parameter* — and recognize when double induction or shift-difference techniques are needed.
+Distinctive cognitive shift: From "solve directly" to "solve for one step, propagate by structure." The canonical move: identify the right *inductive parameter* — and recognise when double induction or shift-difference techniques are needed.
 Forward-references: #4 (Hidden Structure; the right inductive hypothesis), #20 (Analogy; the inductive step is structural analogy).
 Status: **scope only; outline pending.**
 
@@ -642,7 +642,7 @@ Status: **scope only; outline pending.**
 Joshi primary: Ch. 24 (synthesis), and all chapters via the *connections* sub-section in Joshi's Comments.
 WE candidates: A problem from one domain whose solution structure is identical to a famous problem in another (e.g., a counting problem isomorphic to a geometry problem); a problem solved by *carrying over* a technique from a different archetype-chapter.
 PP candidates: Cross-domain transfer problems; Joshi Ex. 24.20 (regular-polygon-triangle-count).
-Distinctive cognitive shift: From "this problem is new" to "this problem is structurally identical to one I have already solved." The fluency-payoff archetype — late in Pillar 2, the reader has seen 19 archetypes; Chapter 20 is the chapter where they realize *all 19 generalize*.
+Distinctive cognitive shift: From "this problem is new" to "this problem is structurally identical to one I have already solved." The fluency-payoff archetype — late in Pillar 2, the reader has seen 19 archetypes; Chapter 20 is the chapter where they realise *all 19 generalise*.
 Forward-references: **Pillar 3** (multidirectional convergence is analogy at the level of solution-paths), all earlier archetypes.
 Status: **scope only; outline pending. Note: Chapter 20 is positioned as the Pillar 2 capstone and should be drafted *last*, after all other archetype chapters are stable — its content is partially a synthesis of them.**
 
@@ -652,7 +652,7 @@ Status: **scope only; outline pending. Note: Chapter 20 is positioned as the Pil
 
 ### 7.1 Role and Scope
 
-Pillar 3 teaches the *geometry* of problem-solving — how archetypes combine, converge, and interact. If Pillar 2 gives the vocabulary (the twenty archetypes), Pillar 3 gives the syntax: how to work from two or three directions simultaneously and recognize when they are about to converge on the Central Elegant Point.
+Pillar 3 teaches the *geometry* of problem-solving — how archetypes combine, converge, and interact. If Pillar 2 gives the vocabulary (the twenty archetypes), Pillar 3 gives the syntax: how to work from two or three directions simultaneously and recognise when they are about to converge on the Central Elegant Point.
 
 The central claim of Pillar 3: **hard problems are not hard because the archetype is exotic. They are hard because the solution requires two or three archetypes to operate simultaneously, and the solver must maintain all of them in working memory long enough for the convergence point to appear.**
 
@@ -738,7 +738,7 @@ B ───┘                    │
 
 IMO 1988 P6 (Vieta jumping, treated in Pillar 4) is the canonical illustration. Pillar 3 Chapter 3 develops three-archetype problems systematically.
 
-**Cognitive hardware claim.** Holding two intermediate results in working memory long enough to recognize their convergence is *the central cognitive bottleneck* of multidirectional solving. Working-memory load grows linearly with the number of active archetypes; the practical ceiling for an unaided human solver is three. Beyond three, paper-and-pencil externalization becomes mandatory.
+**Cognitive hardware claim.** Holding two intermediate results in working memory long enough to recognise their convergence is *the central cognitive bottleneck* of multidirectional solving. Working-memory load grows linearly with the number of active archetypes; the practical ceiling for an unaided human solver is three. Beyond three, paper-and-pencil externalization becomes mandatory.
 
 This claim is the structural justification for the *First-Minute Protocol* (§7.7): externalize the active archetypes *before* attempting the solution.
 
@@ -809,7 +809,7 @@ The two modes are:
 
 ### 8.2 The CEP (Central Elegant Point)
 
-The CEP Library (from `knowledge_base/ThinkMath_Blueprint_v3.md`) lists canonical CEPs organized by difficulty:
+The CEP Library (from `knowledge_base/ThinkMath_Blueprint_v3.md`) lists canonical CEPs organised by difficulty:
 
 | Tier | CEP | Structural Signature |
 |------|-----|---------------------|
@@ -851,7 +851,7 @@ Target: **40,000–55,000 words** for Pillar 4 (roughly 120–160 typeset pages)
 
 1. **The Problem as Art Object** *(Lockhart register: opening polemic + Sawyer-warmth; "I" voice)* — Why problems matter as cultural artifacts, not just exam fodder.
 2. **Anatomy of a Well-Designed Problem** *(Tao register, "we" voice)* — Walk through one canonical problem identifying the CEP, archetypes, traps, statement-craft. Sets the analytical vocabulary.
-3. **The 5-Step CEP Design Framework** *(Prescriptive, "we" voice)* — The 5 steps formalized, with a step-by-step construction of one author-designed problem to demonstrate.
+3. **The 5-Step CEP Design Framework** *(Prescriptive, "we" voice)* — The 5 steps formalised, with a step-by-step construction of one author-designed problem to demonstrate.
 4. **Case Studies 1–5** *(IMO problems, Tier 3-low / Tier 3-mid)* — Moderate-CEP cases. Sub-template per §8.10 below.
 5. **Case Studies 6–10** *(Tier 3-mid / Tier 3-high)* — Increasing archetypal complexity.
 6. **Case Studies 11–15** *(Tier 3-high / Tier 4-low)*.
@@ -886,7 +886,7 @@ IMO 1988 P6 was originally treated in Pillar 2 Chapter 1 (Invariance) §4.3. As 
 
 ### 8.9 Full Case-Study Slate (locked candidates, 25 problems)
 
-The full slate of 25 case studies, organized by Pillar 4 chapter. Each case is identified by: source, problem-statement gist, CEP, archetype combination. Slate is locked at *candidate* level; final lock occurs at Pillar 4 chapter drafting.
+The full slate of 25 case studies, organised by Pillar 4 chapter. Each case is identified by: source, problem-statement gist, CEP, archetype combination. Slate is locked at *candidate* level; final lock occurs at Pillar 4 chapter drafting.
 
 #### Chapter 4 (cases 1–5): Moderate CEP
 
@@ -986,7 +986,7 @@ The rubric in the chapter ends with five criteria: cleanness of surface statemen
 
 ### 9.1 Role and Scope
 
-Pillar 5 is the operational execution toolkit — the collection of specific identities, inequalities, theorems, and computational tools that implement the elegant pivots identified in Pillars 2–4. Where archetypes tell the solver *what* the problem is, gems tell the solver *how* to execute the insight once it is recognized.
+Pillar 5 is the operational execution toolkit — the collection of specific identities, inequalities, theorems, and computational tools that implement the elegant pivots identified in Pillars 2–4. Where archetypes tell the solver *what* the problem is, gems tell the solver *how* to execute the insight once it is recognised.
 
 ### 9.2 Write Status
 
@@ -1137,6 +1137,18 @@ The drafted volume converged on a consistent house style that **supersedes** the
 - **Bodies** use **"we" / instructional "you" / impersonal** per the section type, as in the table above (this part held up well).
 
 The three constants (warm, precise, uncompromising) and the worked-example / definition registers in §10.2 remain in force. Treat §10.2's "Person" column for *openers/takeaways* as superseded by this amendment.
+
+### 10.2.2 Pillar 2 scaffold families (SIGNPOSTED May 29, 2026 — §16.6 B4)
+
+Pillar 2's twenty chapters do **not** all use an identical section scaffold, and the variation is **deliberate, not drift**. Three families exist:
+
+| Family | Chapters | Scaffold | Rationale |
+|---|---|---|---|
+| **Standard archetype** | 1–16 | Opening vignette → Archetype Defined → worked examples (WE) → practice problems (PP) → Master Takeaways → bridge | The default teaching unit: a single technique drilled through worked + practice problems. |
+| **Meta-reasoning** | 17–19 | Same as standard, but the WE/PP operate *one level above* the problem (DOF budgets, recursion variables, pivot choices) | These archetypes are *about how to reason*, so their examples are meta-problems; the scaffold is unchanged but the content register lifts. |
+| **Capstone synthesis** | 20 | Opening vignette → synthesis essay → three anchor WE (themselves meta-problems about transfer) → seven *transfer prompts* (not fully-worked PP) → 20-archetype master synthesis | Ch. 20 *integrates* the catalogue rather than extending it, so it adopts a synthesis-essay form distinct from Chs. 2–19. |
+
+Each affected chapter also self-signposts in its opening (Ch. 17 line 39 "first chapter of the Meta-Reasoning sub-pillar"; Ch. 20 line 42 "synthesis-essay form, distinct from Chapters 2–19's worked-example form"). A reader encountering a different shape at Ch. 17 or Ch. 20 is meeting an intended variation, not an inconsistency.
 
 ### 10.3 Voice Checkpoints
 
@@ -1563,7 +1575,7 @@ Per Anand's May 29 sign-off, Volume 1 is **build-complete** with the following i
 | V7 | **Pillar 3 problem bank unsigned** | 3 | Ch. 8 diagnostic (10 problems), Ch. 6 CS#2–4, Ch. 4 WE4.3, the Czech & Slovak construction; and `pillar3-multidirectional/_template/pillar3-problems-locked.md` still marks Chs. 5–8 "TBD" though those chapters are locked. Reconcile the locked-index with the drafted chapters. |
 | V8 | **Pillar 5 foundation + cross-ref gaps** | 5 | No Number-Theory prerequisite block for Cluster C (C01–C16) in `prerequisites.md`; ~27 gems cite `Blueprint §9.7` placeholders instead of locked P2/P3/P4 locations; the per-Stretch-gem Zeitz motivation line promised in front matter is absent (45 Stretch gems). |
 | V9 | **Pillar 1 dual-role + tier note** | 1 | Add explicit capstone/spiral re-read language to §7 (Pillar 1 is read first for orientation, re-read last as capstone per §20.1); reconcile the "exactly six points" claim with the Tier-3 "compress to four or five" line. |
-| V10 | **Book-wide spelling convention** | all | Decide `-ise/-ize` (and `-isation/-ization`) globally. Prose is predominantly British (`recognise`, `summarised`); some archetype labels/filenames are American (`Linearization`, `Normalization`). One ruling, then a global normalize pass. (B3 deliberately left spelling untouched.) |
+| V10 | **Book-wide spelling: British (RESOLVED May 29)** | all | Ruling: **British** `-ise/-isation` throughout (matches the dominant prose). Executed May 29: canonical labels #6/#7 → **Linearisation** / **Normalisation**; British normalisation pass applied to Pillar 2 Chs. 5–7, 10, 20 prose and this Blueprint (`organis-`, `recognis-`, `generalis-`, `internalis-`, `realis-`, `synthesis-`, `popularis-`, `emphasis-`, `parametris-`). **Filenames keep their American slugs** (`06-linearisation.md`) to preserve links/history. No American `-ize/-ization` outstanding from the May 29 scan; a light confirmatory sweep of Pillars 1, 3–5 prose is the only residual. |
 
 **Post-build, beyond verification:** editorial pass (voice consistency across all 5 pillars; length-trim), build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays, and the 8-commentary Appendix A.
 
@@ -1586,13 +1598,13 @@ A whole-volume coherence review (all 5 pillars read in reading order against the
 | 3 | Duality | 13 | Combinatorial Principles |
 | 4 | Hidden Structure | 14 | Parity / Modularity |
 | 5 | Substitution / Change of Variables | 15 | Bijection / Correspondence |
-| 6 | Linearization | 16 | Reverse Engineering |
-| 7 | Normalization / Scaling | 17 | Degrees of Freedom |
+| 6 | Linearisation | 16 | Reverse Engineering |
+| 7 | Normalisation / Scaling | 17 | Degrees of Freedom |
 | 8 | Domain Translation | 18 | Recursion / Induction |
 | 9 | Domain Constraints | 19 | Pivoting / Elimination |
 | 10 | Inequality Constraints | 20 | Analogy / Transfer |
 
-*Separator convention: compound names use a spaced slash ` / ` (not `&` or en-dash). Spelling of #6/#7 (Linear**ize**/**ise**, Normal**ize**/**ise**) follows the book-wide spelling ruling pending in V10; the B3 pass normalized separators and wrong-word labels only, not `-ise/-ize` spelling.*
+*Separator convention: compound names use a spaced slash ` / ` (not `&` or en-dash). Spelling follows the book-wide **British** ruling (V10, resolved May 29): #6 **Linearisation**, #7 **Normalisation / Scaling**. Filenames retain their American slugs (`06-linearisation.md`, `07-normalisation.md`) as stable internal identifiers.*
 
 These rulings govern the editorial pass; the pass itself (B2–B5 enforcement across chapters) is the next unit of work after this review.
 
@@ -1677,7 +1689,7 @@ A compact reference for the book's specialized vocabulary. Every term here is us
 | **Elegant Pivot** | The single insight that collapses the brute path into a clean solution. Named, explained, and shown in full in every six-point commentary. |
 | **First-Minute Protocol** | The 60-second silent internal diagnostic run before writing a single equation (§7.7). Identify the given, the find, the active archetypes, the candidate CEP, and the brute path to avoid. |
 | **Gem** | One of the 108 specific identities, inequalities, and theorems in Pillar 5 (§9.3) that implement the elegant pivots. Gems are tools; archetypes are lenses. Cited as `[Cluster-letter][NN]`, e.g., A03 or G11. |
-| **Meta-principle** | The archetype's one-sentence generalization, written in domain-general language. Appears in the six-point commentary Seed section. |
+| **Meta-principle** | The archetype's one-sentence generalisation, written in domain-general language. Appears in the six-point commentary Seed section. |
 | **Mixed-register voice** | The locked voice rule (§3.10): "I" for philosophical interludes, "we" for worked examples, impersonal for definitions. |
 | **Monovariant** | A quantity that strictly increases or decreases with each step of a process; used in proofs of termination. A special case of invariance. |
 | **MVC (Minimum Viable Commentary)** | Stage 1 of the two-stage commentary process: a conversational paragraph capturing the seed, brute trap, and pivot, written before the full six-point apparatus. |
@@ -1783,7 +1795,7 @@ Each Pillar 2 chapter ends with a Self-Assessment Checklist (Pillar 2 chapter sc
 - **One or two unhesitating:** re-read the chapter's §1 (plain-language intro) and §4 (worked examples). Do not advance to next chapter.
 - **More than two failures:** the chapter is not yet absorbed. Wait a week, re-attempt.
 
-The discipline: *recognition* before progress. A reader who has not internalized Chapter $K$ is not ready for Chapter $K+1$.
+The discipline: *recognition* before progress. A reader who has not internalised Chapter $K$ is not ready for Chapter $K+1$.
 
 ### 20.3 The Coach / Teacher Reader
 
@@ -1800,7 +1812,7 @@ The book contains no separate "coach's edition"; the same volume serves both rea
 
 - **Skim-and-skip:** the book is not designed for chapter-flipping. The chapter scaffold (Pillar 2 §6.4) is a *progressive* unfolding that breaks under selective reading.
 - **Solve-without-reading:** the practice problems do not stand alone; the worked examples and the §1–§3 exposition are the necessary scaffolding. A reader who only does practice problems is using the book as a problem bank — which it explicitly is not (Section 1.2).
-- **Memorization-over-recognition:** the Six-Point Framework is not a recipe to memorize; it is a grammar to internalize. The book repeatedly reminds the reader that the goal is *seeing*, not *remembering*.
+- **Memorization-over-recognition:** the Six-Point Framework is not a recipe to memorize; it is a grammar to internalise. The book repeatedly reminds the reader that the goal is *seeing*, not *remembering*.
 
 ---
 

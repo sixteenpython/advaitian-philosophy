@@ -15,7 +15,7 @@ key_gems: [A08, F01, F02, F06, G01, G16]
   - "Rolle-iteration corollary: a real polynomial of degree $n$ with $n$ distinct real roots has a derivative with exactly $n - 1$ distinct real roots, all in the convex hull of the original roots"
   - "Odd-degree-polynomial existence: every polynomial of odd degree with real coefficients has at least one real root (IVT applied at $\\pm\\infty$)"
   - "Existence-then-uniqueness pattern: many problems split into a separate existence proof (constructive or non-constructive) and a separate uniqueness proof (typically by contradiction or by a contraction / convexity argument)"
-canonical_takeaway: "Prove it exists before you find it. Existence and uniqueness are separable questions; many problems ask only one of the two."
+canonical_takeaway: "Prove it exists before you find it; existence and uniqueness are separate questions."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29

@@ -15,7 +15,7 @@ key_gems: [A02, A09, A15, C08, C09, D08, E03]
   - "Lattice-path bijection: choices become monotone paths"
   - "Telescoping via partial fractions: a sum is a difference of consecutive values"
   - "Inclusion-exclusion for surjections (with Stirling numbers of the second kind)"
-canonical_takeaway: "Strip the surface notation; the problem is almost always a familiar structure you have already learned to solve."
+canonical_takeaway: "Strip the surface notation; underneath is almost always a structure you already know."
 status: locked
 last_revised: 2026-05-29
 approved_on: 2026-05-26

@@ -15,7 +15,7 @@ key_gems: [A04, A08, A14, F12]
   - "Markov chain stationary distribution: $\\pi P = \\pi$ contributes $n - 1$ independent equations (the $n$th is a tautology), and normalisation $\\sum \\pi_i = 1$ contributes one more, totalling $n$ constraints on $n$ unknowns; hence DOF = 0 and uniqueness"
   - "Inflection-point constraint: at a point $P$, requiring a plane curve $F = 0$ to pass through $P$ and have an inflection there imposes *two* conditions ($F(P) = 0$ and the Hessian condition $H_F(P) = 0$); inflection costs 2 DOF, not 1"
   - "Rank argument over $\\mathbb{F}_p$: reducing an integer matrix mod a prime $p$ can only *decrease* rank, so $\\mathrm{rank}_{\\mathbb{F}_p}(\\bar A) \\le \\mathrm{rank}_{\\mathbb{Q}}(A)$; computing rank mod 2 gives a *lower bound* on the rational rank, the workhorse of the eleven-stones WE1 proof"
-canonical_takeaway: "Count constraints before solving. A problem's DOF — its parameter count minus its constraint count — tells you whether you are over-determined (generically no solution), exactly determined (unique solution), or under-determined (a family of solutions); this scoping is the first move, not the last."
+canonical_takeaway: "Count parameters minus constraints first; the degrees of freedom scope the solution."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29

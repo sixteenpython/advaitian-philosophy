@@ -157,7 +157,7 @@ Every continuous one-parameter symmetry of an action functional in classical mec
 
 Chapter 1 framed Noether as *invariance comes from symmetry*. Chapter 2 frames the same theorem the other way: *every conservation law is a symmetry in disguise*. The structural symmetry of physical law — time-translation invariance, spatial-translation invariance, rotational invariance, gauge invariance — produces, respectively, conservation of energy, of momentum, of angular momentum, of charge. The remarkable thing about Noether's theorem is its *exhaustiveness*: in a strict mathematical sense, all conservation laws of fundamental physics are accounted for by continuous symmetries. The Standard Model of particle physics is, structurally, a list of gauge symmetries and the conservation laws they imply.
 
-The Noether direction matters for problem solving because it tells us that *the moment we see a continuous symmetry in a problem, we already know there is a conserved quantity*. The conservation law is not an additional fact to be discovered; it is forced by the symmetry. The Noether bridge gives the solver permission to *anticipate* the invariant. We use this anticipation throughout §4 and Chapter 6 (Linearization).
+The Noether direction matters for problem solving because it tells us that *the moment we see a continuous symmetry in a problem, we already know there is a conserved quantity*. The conservation law is not an additional fact to be discovered; it is forced by the symmetry. The Noether bridge gives the solver permission to *anticipate* the invariant. We use this anticipation throughout §4 and Chapter 6 (Linearisation).
 
 ### 2.2 Physical and Cross-Domain Foundations
 

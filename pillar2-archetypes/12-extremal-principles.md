@@ -1,7 +1,7 @@
 ---
 chapter: 12
 archetype: Extremal Principles
-subtitle: "Nature Optimizes; So Should Your Solution"
+subtitle: "Nature Optimises; So Should Your Solution"
 category: Constraint Exploitation (Archetypes 9–12) — fourth and closing chapter
 related_archetypes: [1, 2, 10, 11, 13]
 key_gems: [B01, B05, B07, F07, F12, G07]
@@ -15,7 +15,7 @@ key_gems: [B01, B05, B07, F07, F12, G07]
   - "Symmetry principle for extrema (cross-reference Ch. 2): an extremum of a symmetric function on a symmetric domain is typically attained at a symmetric configuration"
   - "Josephus survivor formula: in a circular elimination process with stride $2$, the survivor for $n$ contestants is at position $J(n) = 2r + 1$ where $n = 2^k + r$ with $0 \\le r < 2^k$"
   - "Erdős-Mordell inequality: for $P$ inside $\\triangle ABC$ with vertex-distances $p_a, p_b, p_c$ and pedal-distances $d_a, d_b, d_c$, $p_a + p_b + p_c \\ge 2(d_a + d_b + d_c)$, equality iff $\\triangle ABC$ is equilateral and $P$ is its centre"
-canonical_takeaway: "The extremum is where the structure becomes sharp. Whether it lives at a vertex, on a boundary, or at an interior critical point is the first question — and often the most consequential one."
+canonical_takeaway: "The extremum is where structure becomes sharp — vertex, boundary, or interior critical point."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
@@ -24,7 +24,7 @@ sourcing_note: "All worked examples and practice problems in this chapter are dr
 
 # Chapter 12 — Extremal Principles
 
-## *Nature Optimizes; So Should Your Solution*
+## *Nature Optimises; So Should Your Solution*
 
 ---
 

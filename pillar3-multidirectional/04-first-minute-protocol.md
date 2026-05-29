@@ -82,6 +82,8 @@ The 5 steps map to 5 different cognitive functions:
 
 - **Step 5 (Brute Path)** is the *anti-default move*. The solver writes the brute-force computation they would attempt if they had no archetype tools. The point is not to attempt the brute path; the point is to *commit to not attempting it*. Once the brute path is written down and marked-as-not-chosen, the solver is operationally committed to finding the elegant path, and the temptation to fall back to brute-force during the proof is weakened.
 
+The arc that Steps 4 and 5 trace — *Seed → Brute Path → Elegant Pivot* — is the opening movement of Pillar 1's six-point grammar of a solution. The First-Minute Protocol is that grammar compressed into a 60-second pre-flight check: the solver names the seed (Given/Find/archetypes), commits to *not* taking the brute path, and guesses the elegant pivot before a single equation is written.
+
 The total time budget is 60 seconds. This is short enough that the protocol does not feel like a delay; long enough that the solver can produce a meaningful scratchpad. With practice (typically 20–40 problems), the protocol becomes automatic — the solver runs it without thinking, the way a chess player at expert level automatically considers piece-development before tactics.
 
 ### §1.2 Why the protocol works (the cognitive justification)

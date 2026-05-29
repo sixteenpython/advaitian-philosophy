@@ -25,7 +25,7 @@ lock_note: "Content, structure, and prose locked by Anand. Sole open carve-out: 
 
 The archetypes of Pillar 2 tell you *what a problem is*. The multidirectional method of Pillar 3 tells you *which way to enter it*. The design lens of Pillar 4 tells you *how a problem was built*. None of that moves a single symbol on the page. The **gems** are what move the symbols.
 
-A gem is a named, reusable mathematical tool — an identity, an inequality, a theorem, a technique — that *implements* an elegant pivot. When a solver recognises that a problem has a fixed sum and a product to bound, the recognition is the archetype (Invariance, Extremal); the execution is a gem (AM–GM). This pillar is the catalogue of those executions, organised so you can both **look a gem up** in seconds and **read a cluster through** as a refresher.
+A gem is a named, reusable mathematical tool — an identity, an inequality, a theorem, a technique — that *implements* an elegant pivot, the third move of Pillar 1's *Seed → Brute Path → Elegant Pivot* grammar. When a solver recognises that a problem has a fixed sum and a product to bound, the recognition is the archetype (Invariance, Extremal); the execution is a gem (AM–GM). This pillar is the catalogue of those executions, organised so you can both **look a gem up** in seconds and **read a cluster through** as a refresher.
 
 This is deliberately not an appendix of formulae. Every entry foregrounds *the move the gem makes* and *the signal that tells you to reach for it* — because a formula you cannot trigger on is dead weight, and a formula whose purpose you understand is a reflex.
 

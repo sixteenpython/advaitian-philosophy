@@ -18,7 +18,7 @@ key_gems: [A10, A15, D09, D14]
   - "Markov-chain transfer: two physically distinct stochastic processes (Pólya urn ↔ self-similar game) that share the same Markov chain have the same probabilistic answers; the transfer is the recognition that the *process* matters, not the *realisation*"
   - "Cayley–Dickson construction as iterated analogy: $\\mathbb{R} \\to \\mathbb{C} \\to \\mathbb{H} \\to \\mathbb{O}$ (reals, complex, quaternions, octonions) is a sequence of algebras each doubling the previous; sums-of-squares identities transfer $1 \\to 2 \\to 4 \\to 8$ squares (the only dimensions admitting such an identity, by Hurwitz's theorem)"
   - "Twenty-archetype master synthesis: the 19 prior archetypes are *themselves* transferable patterns; recognising that a current problem invokes a known archetype, and applying the archetype's canonical move, is the central capability that Volume 1's twenty chapters are designed to install"
-canonical_takeaway: "If you have solved it once, you have solved it everywhere. The recurring observation across thousands of mathematical problems — and across mathematics, science, engineering, computer science, and the humanities — is that the same structural patterns recur in radically different surface contexts; the trained solver's deepest capability is the *recognition* of these patterns and the *transfer* of the corresponding techniques. Pillar 2 of this volume is the catalogue of twenty such patterns; Chapter 20 is the meta-skill of seeing them everywhere."
+canonical_takeaway: "Solve it once and you've solved it everywhere — recognise the pattern, transfer the technique."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
@@ -180,8 +180,8 @@ A second-order diagnostic is *archetype recognition*. Across the twenty Pillar 2
 - **Duality (Ch. 3)**: ``swap variables and constraints; the problem maps to itself.''
 - **Hidden Structure (Ch. 4)**: ``the surface presentation hides an algebraic / geometric pattern.''
 - **Substitution (Ch. 5)**: ``replace one variable with a function of another.''
-- **Linearization (Ch. 6)**: ``take logs, derivatives, or first-order expansions.''
-- **Normalization (Ch. 7)**: ``scale to unit measure to remove dimensional baggage.''
+- **Linearisation (Ch. 6)**: ``take logs, derivatives, or first-order expansions.''
+- **Normalisation (Ch. 7)**: ``scale to unit measure to remove dimensional baggage.''
 - **Domain Translation (Ch. 8)**: ``move from one representation to another (algebraic ↔ geometric ↔ complex).''
 - **Domain Constraints (Ch. 9)**: ``the natural domain restricts the solution space.''
 - **Inequality Constraints (Ch. 10)**: ``the answer is bounded by some classical inequality.''
@@ -548,7 +548,7 @@ Chapter 20 connects to *every* prior chapter of Pillar 2 — by design, since th
 
 - **Ch. 5 (Substitution)** — substitution often arises by analogy with a previously-used substitution; the trained solver's substitution choices are shaped by the catalogue of prior substitutions encountered.
 
-- **Ch. 6 (Linearization)** — log-linearisation, derivative-linearisation, etc., are all transferable patterns; once internalised, they apply universally.
+- **Ch. 6 (Linearisation)** — log-linearisation, derivative-linearisation, etc., are all transferable patterns; once internalised, they apply universally.
 
 - **Ch. 7 (Normalisation / Scaling)** — Buckingham-π dimensional analysis is *purely* about transfer: the dimensionless groups of one problem are isomorphic to those of any other problem with the same physical scaling structure.
 
@@ -595,7 +595,7 @@ The capstone of Pillar 2 is not the introduction of a twenty-first archetype but
 
 \item \textbf{Substitution / Change of Variables (Ch. 5)} — *Diagnostic:* the original variables are inconvenient; a re-parameterisation simplifies. *Canonical move:* substitute; solve in the new variables; transform back if needed.
 
-\item \textbf{Linearization (Ch. 6)} — *Diagnostic:* the problem is non-linear but admits a local-linear approximation, log-linearisation, or first-order Taylor expansion. *Canonical move:* linearise; solve the linear approximation; check via verification.
+\item \textbf{Linearisation (Ch. 6)} — *Diagnostic:* the problem is non-linear but admits a local-linear approximation, log-linearisation, or first-order Taylor expansion. *Canonical move:* linearise; solve the linear approximation; check via verification.
 
 \item \textbf{Normalisation / Scaling (Ch. 7)} — *Diagnostic:* the problem has dimensional or scale freedom. *Canonical move:* scale to unit measure; solve the dimensionless problem; rescale to recover the answer.
 

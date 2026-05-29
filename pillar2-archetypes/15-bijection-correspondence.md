@@ -14,7 +14,7 @@ key_gems: [A12, E05, G03, G05, G10, G11]
   - "Surjection counting via Stirling numbers: the number of surjective functions $\\{1, \\ldots, n\\} \\twoheadrightarrow \\{1, \\ldots, k\\}$ equals $k! \\, S(n, k) = \\sum_{j = 0}^{k}(-1)^j \\binom{k}{j}(k - j)^n$ where $S(n, k)$ is the Stirling number of the second kind"
   - "Block-merging for adjacency probability: treating $k$ adjacent objects as a single block reduces the position-counting problem from $n!$ arrangements to $(n - k + 1) \\cdot k!\\cdot (n - k)!$ favourable outcomes"
   - "Lindström-Gessel-Viennot lemma: the number of non-intersecting tuples of lattice paths between source-target pairs equals the determinant of a path-count matrix, generalising the reflection bijection to higher-dimensional counting"
-canonical_takeaway: "If two problems are isomorphic, solve the simpler one. The bijection is the proof — exhibit a one-to-one correspondence and the equality is automatic."
+canonical_takeaway: "If two problems are isomorphic, solve the simpler one — the bijection is the proof."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29

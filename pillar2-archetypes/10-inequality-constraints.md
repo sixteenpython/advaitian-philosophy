@@ -15,7 +15,7 @@ key_gems: [B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11, B13, B14, B15,
   - "Ravi substitution: a triangle with sides $a, b, c$ admits the parametrisation $a = y + z$, $b = z + x$, $c = x + y$ with $x, y, z > 0$ that converts the triangle-inequality constraint into the unconstrained positivity of $x, y, z$"
   - "SOS (Sum-of-Squares) decomposition: every symmetric inequality $P(a, b, c) \\ge 0$ that is true and *sharp* admits, after suitable manipulation, an expression as a sum of squares of polynomials in $a - b, b - c, c - a$"
   - "Equality-case principle: the equality case of a tight inequality often *characterises* the extremum, turning a maximisation problem into an algebraic equation"
-canonical_takeaway: "Inequalities are not obstacles; they are constraints that determine the answer. The equality case is the answer."
+canonical_takeaway: "Inequalities aren't obstacles but constraints; the equality case is the answer."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
@@ -80,7 +80,7 @@ This sentence reframes inequalities at every level of the problem. *Pedagogicall
 
 *Operationally*: the equality-case principle says that the optimum of an inequality-bounded quantity is attained at the *binding* equality. The discipline is to *identify which inequality binds at the optimum*, and to read the binding equality as the *algebraic equation* characterising the optimum. AM-GM binds at $a = b = c = \cdots$; Cauchy-Schwarz binds at $a_i = \lambda b_i$ for some constant $\lambda$; Jensen binds at the *constant* (degenerate) configuration; rearrangement binds at the *same-order* (or *reverse-order*) pairing; the triangle inequality binds at the *degenerate* triangle. *Reading the binding equality is reading the answer*.
 
-*Cross-archetype*: inequalities are the most common kind of constraint, and the inequality-constraint discipline subsumes most of what Chapters 9 (Domain Constraints), 7 (Normalization), 2 (Symmetry), and 12 (Extremal Principles) develop. The present chapter is the *named-tools* version — the version that supplies the labels (AM-GM, Cauchy-Schwarz, Jensen, ...) and tells the solver which tool to deploy when.
+*Cross-archetype*: inequalities are the most common kind of constraint, and the inequality-constraint discipline subsumes most of what Chapters 9 (Domain Constraints), 7 (Normalisation), 2 (Symmetry), and 12 (Extremal Principles) develop. The present chapter is the *named-tools* version — the version that supplies the labels (AM-GM, Cauchy-Schwarz, Jensen, ...) and tells the solver which tool to deploy when.
 
 ### 1.3 The Cognitive Shift
 
@@ -245,7 +245,7 @@ The Ravi re-framing converts a *constrained triangle-inequality problem* (Ch. 9'
 
 - *Multiplying inequalities of different signs.* The product of three strict inequalities $|p - q| < p + q$ requires the factors on both sides to be non-negative (which they are, since we took absolute values on the LHS and used positivity on the RHS). The remedy is to *take absolute values before multiplying*.
 
-- *Conflating Ch. 9 WE3's "domain" framing with Ch. 10 WE1's "Ravi" framing*. Both routes prove the same inequality, but they emphasize different structural ingredients. Ch. 9 emphasizes the *triangle inequality as a filter on the candidate set*; Ch. 10 emphasizes *Ravi as a substitution that absorbs the constraint*. A student who learns only one framing misses half the lesson. The remedy is to *internalise both*.
+- *Conflating Ch. 9 WE3's "domain" framing with Ch. 10 WE1's "Ravi" framing*. Both routes prove the same inequality, but they emphasise different structural ingredients. Ch. 9 emphasises the *triangle inequality as a filter on the candidate set*; Ch. 10 emphasises *Ravi as a substitution that absorbs the constraint*. A student who learns only one framing misses half the lesson. The remedy is to *internalise both*.
 
 **CONNECTIONS.**
 
@@ -514,7 +514,7 @@ Inequality constraints interact with five other archetypes in particularly tight
 
 - **Archetype 2 (Symmetry).** The equality case of most symmetric inequalities is at the *symmetric configuration* $x_1 = \cdots = x_n$. Chapter 2's symmetry machinery and Chapter 10's inequality machinery are tightly interlocked: *symmetry tells you where the equality case is; the inequality machinery tells you the value*.
 
-- **Archetype 7 (Normalization / Scaling).** Many inequality problems become tractable after a normalisation step (Ch. 7's WE2 demonstrated $a + b + c = 1$ normalisation on a Cauchy-Schwarz problem). The normalisation absorbs a degree of freedom; the remaining inequality is on a constrained set.
+- **Archetype 7 (Normalisation / Scaling).** Many inequality problems become tractable after a normalisation step (Ch. 7's WE2 demonstrated $a + b + c = 1$ normalisation on a Cauchy-Schwarz problem). The normalisation absorbs a degree of freedom; the remaining inequality is on a constrained set.
 
 - **Archetype 9 (Domain Constraints).** Inequalities are the most common kind of domain constraint. Ch. 9 (Domain Constraints) treats the general filter; Ch. 10 (Inequality Constraints) specialises to inequalities and supplies the named-tool machinery. The two chapters together cover the constraint side of problem-solving.
 

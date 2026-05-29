@@ -1,6 +1,6 @@
 ---
 chapter: 7
-archetype: Normalization / Scaling
+archetype: Normalisation / Scaling
 subtitle: "Remove the Clutter; Keep Only the Structure"
 category: Method Selection (Archetypes 5–8)
 related_archetypes: [2, 5, 6, 10, 12, 17]
@@ -15,14 +15,14 @@ key_gems: [A17, B13, B14, D07d]
   - "Chebyshev's sum inequality: $n \\sum a_i b_i \\ge \\left(\\sum a_i\\right)\\left(\\sum b_i\\right)$ for similarly ordered sequences"
   - "z-score normalisation: $(x - \\mu)/\\sigma$ as the canonical statistical rescaling that fixes mean $0$, variance $1$"
   - "Natural units in physics: setting $c = \\hbar = G = k_B = 1$ to expose the dimensionless skeleton of a theory"
-canonical_takeaway: "Normalisation strips a problem of every degree of freedom that does not matter; what remains is the structure that does."
+canonical_takeaway: "Normalisation strips away every degree of freedom that doesn't matter; what remains is structure."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
-sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text, **with one named exception**: Worked Example 1 (Buckingham-$\\pi$ Pendulum) is a standard physics-pedagogy result that illustrates dimensional normalisation more cleanly than any single Joshi problem can. The exception is permitted under Blueprint §6.10.07 (Normalization scope), which explicitly anticipates the dimensional-analysis framing as the natural carrier of normalisation as a cognitive move. See Blueprint §6.2 for the general sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 7 for the locked slate and the framing-decision change-log."
+sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text, **with one named exception**: Worked Example 1 (Buckingham-$\\pi$ Pendulum) is a standard physics-pedagogy result that illustrates dimensional normalisation more cleanly than any single Joshi problem can. The exception is permitted under Blueprint §6.10.07 (Normalisation scope), which explicitly anticipates the dimensional-analysis framing as the natural carrier of normalisation as a cognitive move. See Blueprint §6.2 for the general sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 7 for the locked slate and the framing-decision change-log."
 ---
 
-# Chapter 7 — Normalization / Scaling
+# Chapter 7 — Normalisation / Scaling
 
 ## *Remove the Clutter; Keep Only the Structure*
 
@@ -38,7 +38,7 @@ Now consider a humbler scene. A graduate student is asked to draw a map of her u
 
 These two scenes look unrelated. A laboratory in Versailles redefining a base unit; a graduate student choosing the scale of a map. They share one of the most consequential observations in mathematics and the sciences. In each, *a problem is laden with a degree of freedom that does not matter to the question being asked*, and the resolution is the same: *choose a value for that degree of freedom — pick the scale — and the structure that does matter becomes visible*. The physicist sets $c = 1$ because the absolute speed of light is irrelevant to whether $E$ equals $mc^2$; what is relevant is the algebraic relation. The cartographer chooses $1:10{,}000$ because the absolute size of the campus is irrelevant to whether the freshman can find her way; what is relevant is the relative geometry. *In both cases, the move is identical: quotient out the irrelevant degree of freedom by fixing it to a convenient value.*
 
-This is *Normalization*. It is the third archetype of the *Method Selection* sub-pillar, and where Substitution chose a clever variable and Linearization chose a local linear approximation, Normalization chooses a *value for an irrelevant scaling degree of freedom*, thereby reducing the problem to a strictly smaller form in which only the structural content remains. The move appears under many names — *non-dimensionalisation*, *scale-fixing*, *WLOG-the-sum-equals-one*, *projective normalisation*, *gauge-fixing*, *z-score normalisation*, *Buckingham-$\pi$ reduction* — and it appears in every quantitative discipline. What unifies them is the same logic: *identify a transformation under which the problem is invariant; pick a representative orbit of that transformation; solve only on the representative*. The rest is bookkeeping.
+This is *Normalisation*. It is the third archetype of the *Method Selection* sub-pillar, and where Substitution chose a clever variable and Linearisation chose a local linear approximation, Normalisation chooses a *value for an irrelevant scaling degree of freedom*, thereby reducing the problem to a strictly smaller form in which only the structural content remains. The move appears under many names — *non-dimensionalisation*, *scale-fixing*, *WLOG-the-sum-equals-one*, *projective normalisation*, *gauge-fixing*, *z-score normalisation*, *Buckingham-$\pi$ reduction* — and it appears in every quantitative discipline. What unifies them is the same logic: *identify a transformation under which the problem is invariant; pick a representative orbit of that transformation; solve only on the representative*. The rest is bookkeeping.
 
 > *Normalisation strips a problem of every degree of freedom that does not matter; what remains is the structure that does.*
 
@@ -241,7 +241,7 @@ giving $c = 2\pi$. The work expended on the physics is one line; the dimensional
 
 *Primary archetype applications.* Buckingham-$\pi$ governs (a) the period of *any* simple harmonic oscillator: $T = 2\pi \sqrt{m/k}$ for a mass on a spring, $T = 2\pi \sqrt{LC}$ for an LC electrical circuit, each derived dimensionally up to the $2\pi$; (b) the *terminal velocity* of a falling sphere in a viscous fluid, $v_\text{term} \sim \rho g R^2 / \mu$ (Stokes's law in dimensional form, modulo factors of $\pi$); (c) the *Kepler third law* $T^2 \propto R^3$ for planetary orbits, which falls out of dimensional analysis of $T, R, GM$ (and the dimensionless constant $4\pi^2$ comes from Newton's laws).
 
-*Alternative solution archetypes.* The pendulum period can also be derived by *Linearization* (Archetype 6) of the nonlinear ODE — which is in fact part of the elegant pivot above — or by *Hidden Structure* (Archetype 4): recognising the equation $\ddot\theta + \omega^2 \theta = 0$ as the canonical SHM equation. Each archetype contributes a piece: Normalisation forces the *form* of the answer, Linearisation supplies the *equation*, Hidden Structure supplies the *interpretation*.
+*Alternative solution archetypes.* The pendulum period can also be derived by *Linearisation* (Archetype 6) of the nonlinear ODE — which is in fact part of the elegant pivot above — or by *Hidden Structure* (Archetype 4): recognising the equation $\ddot\theta + \omega^2 \theta = 0$ as the canonical SHM equation. Each archetype contributes a piece: Normalisation forces the *form* of the answer, Linearisation supplies the *equation*, Hidden Structure supplies the *interpretation*.
 
 *Cross-domain manifestations.* The Reynolds number $\mathrm{Re} = \rho v L / \mu$ in fluid dynamics, the Mach number $M = v / c_s$ in compressible flow, the Péclet number in heat transfer — each is a Buckingham-$\pi$ group, and each defines a regime of behaviour invariant under change of unit. In *biology*, the Strouhal number $\mathrm{St} = f L / v$ governs vortex shedding and animal locomotion, predicting (remarkably) that fish, birds, and insects propel themselves at universal values of $\mathrm{St}$ across a range of body sizes spanning many orders of magnitude. The single dimensionless group classifies the propulsion regime of the entire animal kingdom.
 
@@ -472,7 +472,7 @@ Normalisation interacts with five other archetypes in particularly tight ways.
 
 - **Archetype 5 (Substitution).** Many normalisations are implemented *as* substitutions. The substitution $a = x/(\sum x_i)$ for inequalities, $\alpha = \theta/(\theta_0)$ for the pendulum amplitude, $\tilde x = (x - \mu)/\sigma$ for z-score normalisation — each is a substitution that fixes the normalisation. Substitution is the *operational mechanism*; Normalisation is the *strategic reason*.
 
-- **Archetype 6 (Linearization).** Linearisation and normalisation often combine: the pendulum problem (WE1) requires both. Linearisation produces the equation $\ddot\theta + \omega^2\theta = 0$; normalisation produces the dimensional form $T = c\sqrt{L/g}$; together they yield $T = 2\pi\sqrt{L/g}$. In perturbation theory generally, the dimensionless small parameter is identified by normalisation, and the expansion is the linearisation in that parameter.
+- **Archetype 6 (Linearisation).** Linearisation and normalisation often combine: the pendulum problem (WE1) requires both. Linearisation produces the equation $\ddot\theta + \omega^2\theta = 0$; normalisation produces the dimensional form $T = c\sqrt{L/g}$; together they yield $T = 2\pi\sqrt{L/g}$. In perturbation theory generally, the dimensionless small parameter is identified by normalisation, and the expansion is the linearisation in that parameter.
 
 - **Archetype 10 (Inequality Constraints).** Almost every homogeneous inequality in Chapter 10 will be approached by first normalising — fixing the scale, then applying Cauchy, AM-GM, Jensen, or rearrangement. The cross-archetype reuse of WE3 (the JEE 2001 cos-product problem) between Chapter 7 (here, framed as symmetric-diagonal normalisation) and Chapter 10 (where it will reappear framed as a Lagrange-AM-GM exercise) is a deliberate illustration of how the two archetypes overlap on the same concrete problem.
 

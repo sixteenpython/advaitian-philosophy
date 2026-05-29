@@ -15,7 +15,7 @@ key_gems: [A07b, C01, C02, C03, C04, C05, C06, C07, C08, C09, C16, G17]
   - "Bouton's Nim theorem: a Nim position $(a_1, \\ldots, a_k)$ is a *losing* (P-)position iff $a_1 \\oplus \\cdots \\oplus a_k = 0$"
   - "Chessboard parity: a Hamiltonian cycle on a 2-coloured grid (black/white alternating) alternates colours, forcing equal counts; an $m \\times n$ grid admits a Hamiltonian cycle iff $mn$ is even"
   - "Squarefree decomposition: every positive integer $m$ factors uniquely as $m = u^2 v$ with $v$ squarefree; the squarefree part is the mod-2 reduction of the prime exponents"
-canonical_takeaway: "Sometimes the remainder tells the whole story. Choosing the right modulus collapses an intractable problem into a finite, often trivial residue computation."
+canonical_takeaway: "Sometimes the remainder tells the whole story; the right modulus collapses the problem."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
@@ -345,7 +345,7 @@ The elegant pivot is the *high-bit construction*: identify the high bit of the X
 
 *Alternative solution archetypes.* Bouton's theorem also has a *parity-symmetric* proof: the XOR of pile sizes is invariant under the action of "removing the same number of stones from two different piles" (which is not a legal Nim move but illuminates the structure); the legal Nim moves change the XOR in specific ways that the high-bit construction captures. *Algebraic* proofs (via the $\mathbb F_2$-vector-space structure of $\bigoplus_i \mathbb F_2^{\log a_i}$) also exist.
 
-*Cross-domain manifestations.* XOR-based Nim has surprising applications: *cryptographic hash functions* (some hash functions use XOR-Nim-style reductions to mix bits); *error-correcting codes* (Hamming and Reed-Muller codes use XOR-parity structures); *quantum computing* (the *stabilizer formalism* for quantum error correction is built on XOR-parity invariants over $\mathbb F_2$). The general principle — *parity-of-parts invariant under structured operations* — recurs across discrete mathematics.
+*Cross-domain manifestations.* XOR-based Nim has surprising applications: *cryptographic hash functions* (some hash functions use XOR-Nim-style reductions to mix bits); *error-correcting codes* (Hamming and Reed-Muller codes use XOR-parity structures); *quantum computing* (the *stabiliser formalism* for quantum error correction is built on XOR-parity invariants over $\mathbb F_2$). The general principle — *parity-of-parts invariant under structured operations* — recurs across discrete mathematics.
 
 **TAKEAWAY.** *XOR / Nim winning move: find the high bit of the XOR sum; pick any pile with that bit set; replace it with its XOR with the sum. The new XOR is zero, and the new pile is smaller. This is the constructive proof of Bouton's theorem.*
 

@@ -15,7 +15,7 @@ key_gems: [A13, E01, E02, E03, E10, F11]
   - "Discrete Laplace equation (gambler's ruin): $P_k = (P_{k-1} + P_{k+1})/2$ on $0 < k < N$ with $P_0 = 1, P_N = 0$ has linear solution $P_k = 1 - k/N$; the characteristic polynomial $(r - 1)^2 = 0$ has a double root, yielding linear solutions"
   - "Strong-induction shift-coefficient technique: $S(n + 1) = a S(n) + (\\text{multiple of modulus})$, the canonical inductive-step pattern for divisibility proofs like $25 \\mid 7^{2n} + 2^{3n - 3} \\cdot 3^{n - 1}$"
   - "Binary-string Fibonacci bijection: the number of binary strings of length $n$ with no two consecutive 1's satisfies $a_n = a_{n - 1} + a_{n - 2}$ with $a_1 = 2, a_2 = 3$, giving $a_n = F_{n + 2}$ — a combinatorial-Fibonacci recurrence"
-canonical_takeaway: "Solve for one step; repeat to infinity. A problem on $n$ becomes tractable by relating it to the same problem on $n - 1$ (induction) or by expressing the answer as a sequence satisfying a recurrence; the trick is identifying the right inductive parameter or recursion variable, and the inductive step is the engine that propagates a single solved case to the whole infinite family."
+canonical_takeaway: "Solve one step, then propagate to infinity — find the right inductive parameter."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29

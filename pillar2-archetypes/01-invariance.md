@@ -27,7 +27,7 @@ This is *Invariance*.
 
 Now consider an entirely different scene. A student is computing the determinant of a $3 \times 3$ matrix and is told that a friend has been simplifying the rows. Row 2 has been replaced by Row 2 minus three times Row 1. Row 3 has been swapped with Row 1, multiplied by four, and then had Row 2 added to it twice. The numerical entries of the matrix are now nothing like what they were a moment ago. Surely, the student thinks, the determinant has changed beyond recognition.
 
-The determinant has not changed beyond recognition. Under one of these row operations — adding a multiple of one row to another — it has not changed at all. Under the row swap, it has changed only its sign. Under multiplying a row by a constant, it has scaled by exactly that constant. The wild surface activity is governed by a small handful of laws: the determinant transforms in a strictly predictable way under each operation, and is *conserved* under the most common one. The student who recognizes this stops calculating the new determinant from scratch. They calculate the old one — by Gaussian elimination, perhaps — and read off the answer.
+The determinant has not changed beyond recognition. Under one of these row operations — adding a multiple of one row to another — it has not changed at all. Under the row swap, it has changed only its sign. Under multiplying a row by a constant, it has scaled by exactly that constant. The wild surface activity is governed by a small handful of laws: the determinant transforms in a strictly predictable way under each operation, and is *conserved* under the most common one. The student who recognises this stops calculating the new determinant from scratch. They calculate the old one — by Gaussian elimination, perhaps — and read off the answer.
 
 These two scenes look unrelated. A circus, a textbook. They share a deep architecture. In each, a system contains many moving parts, and an inexperienced observer is tempted to track every motion. Yet hidden in each system is a quantity that *does not move* — or moves only in the simplest possible way under the operations being performed. Anchor on that quantity, express everything else in terms of it, and the difficulty often dissolves.
 
@@ -74,7 +74,7 @@ The principle of invariance, stripped to its essence, is small enough to fit on 
 
 This sentence inverts a deeply ingrained cognitive tendency. When a beginner encounters a problem, the instinct is to focus on what is varying. If angles vary, write angle equations; if positions shift, track positions; if values increase, write increase formulas. The approach is not wrong, but it tends, for problems of even moderate complexity, to generate more equations than are strictly needed. The invariant offers a different first move — anchor on what does not change, and express everything else relative to that anchor. The problem typically loses one or more degrees of freedom in a single step.
 
-To see this in miniature, consider three positive real numbers whose sum is fifteen, and ask for the maximum of their product. Direct optimization in three unknowns is a Lagrange-multiplier exercise — manageable but heavy. The invariant — the fixed sum — collapses the problem in one move. By symmetry (an archetype we shall meet in Chapter 2), the maximum must occur at $x = y = z = 5$, giving a product of $125$. We did not invoke Lagrange. We invoked a constant. The invariant did not merely simplify the calculation; it *revealed the structure that made the answer obvious*.
+To see this in miniature, consider three positive real numbers whose sum is fifteen, and ask for the maximum of their product. Direct optimisation in three unknowns is a Lagrange-multiplier exercise — manageable but heavy. The invariant — the fixed sum — collapses the problem in one move. By symmetry (an archetype we shall meet in Chapter 2), the maximum must occur at $x = y = z = 5$, giving a product of $125$. We did not invoke Lagrange. We invoked a constant. The invariant did not merely simplify the calculation; it *revealed the structure that made the answer obvious*.
 
 ### 1.3 The Cognitive Shift
 
@@ -82,7 +82,7 @@ Understanding invariance intellectually is one matter; using it in real time is 
 
 The cognitive shift required by Invariance is small in form and large in consequence. Most students, on encountering a problem, immediately ask: *What am I solving for?* The invariant-trained thinker asks instead: *What does not change here?* This reordering — reconnaissance before engagement — is innocuous in appearance and transformative in effect.
 
-Consider how the shift plays out concretely on a problem we will treat in detail in §4.1. The problem asks for the number of five-digit numbers, divisible by three, that can be formed using each of the digits $0, 1, 2, 3, 4, 5$ exactly once. The natural student, having read the problem, writes: *Let me list cases. The first digit can be any of $1$–$5$. The remaining four positions can hold any of the leftover five digits in some order. I need to filter out the ones not divisible by three.* They begin enumerating, then pause, recognizing that filtering $5! \cdot 5 = 600$ candidates by divisibility one at a time is hopeless.
+Consider how the shift plays out concretely on a problem we will treat in detail in §4.1. The problem asks for the number of five-digit numbers, divisible by three, that can be formed using each of the digits $0, 1, 2, 3, 4, 5$ exactly once. The natural student, having read the problem, writes: *Let me list cases. The first digit can be any of $1$–$5$. The remaining four positions can hold any of the leftover five digits in some order. I need to filter out the ones not divisible by three.* They begin enumerating, then pause, recognising that filtering $5! \cdot 5 = 600$ candidates by divisibility one at a time is hopeless.
 
 The invariant-trained thinker reads the same problem and pauses. *Divisibility by three — there is an invariant here. A number is divisible by three if and only if the sum of its digits is divisible by three. That is my anchor. The sum $0 + 1 + 2 + 3 + 4 + 5 = 15$ is itself divisible by three; so a five-digit number using five of these six digits is divisible by three if and only if the* excluded *digit is one of $0$ or $3$. That single observation collapses the problem into two clean cases.* The two thinkers differ not in skill, but in *first move*. The second has identified the strategic constraint that will crack the problem before any enumeration has begun.
 
@@ -124,7 +124,7 @@ A clean illustration of Klein's principle, drawn from elementary topology, is th
 
 \[ V - E + F = 2 \]
 
-holds, where $V, E, F$ count vertices, edges, and faces. The remarkable feature is the quantity's stability under continuous deformation. Push the cube into a sphere and the formula still holds. Twist the tetrahedron into something unrecognizable and the formula still holds. Glue a handle onto the surface, however, and the value drops to zero. The Euler characteristic *measures the surface's topological type* — it is a structural invariant in the strict sense of §1.1, the function $X \to \mathbb{Z}$ that descends to the quotient $X / \text{Homeo}^+$.
+holds, where $V, E, F$ count vertices, edges, and faces. The remarkable feature is the quantity's stability under continuous deformation. Push the cube into a sphere and the formula still holds. Twist the tetrahedron into something unrecognisable and the formula still holds. Glue a handle onto the surface, however, and the value drops to zero. The Euler characteristic *measures the surface's topological type* — it is a structural invariant in the strict sense of §1.1, the function $X \to \mathbb{Z}$ that descends to the quotient $X / \text{Homeo}^+$.
 
 We will see in Chapter 2 that Klein's perspective gives the relationship between invariance and symmetry its sharpest form. For now, the lesson of §2.1 is that the structures we use most casually in mathematics — geometric, algebraic, topological — are themselves *defined* by their invariants.
 
@@ -216,7 +216,7 @@ These appear most often in *prove that...* problems and in solving by relational
 - The parity of a permutation is invariant under further decomposition into transpositions.
 - The chromatic number, the connectivity, and the planarity of a graph are each invariants under vertex relabeling.
 
-These require the highest level of abstraction — recognizing that a property of the *configuration*, not of any specific element, is what is preserved.
+These require the highest level of abstraction — recognising that a property of the *configuration*, not of any specific element, is what is preserved.
 
 ### 3.3 Common Pitfalls
 
@@ -226,7 +226,7 @@ Even practiced solvers fall into a small number of recurring errors when applyin
 
 **Pitfall 2. The False Invariant.** Assuming a quantity is invariant when the conditions of the problem violate the standard hypotheses. The horizontal velocity of a projectile is invariant in a vacuum and not invariant in air. *Remedy:* state the conditions under which the invariant holds, then verify those conditions are present. If in doubt, test the invariant on two specific configurations and check.
 
-**Pitfall 3. Ignoring the Invariant's Redundancy.** Correctly identifying an invariant but failing to recognize that it eliminates a degree of freedom. The student then writes more equations than are needed; the resulting system, though solvable, is far heavier than necessary. *Remedy:* after identifying the invariant, count the remaining degrees of freedom explicitly. If the invariant collapses two unknowns into one, do not retain the second.
+**Pitfall 3. Ignoring the Invariant's Redundancy.** Correctly identifying an invariant but failing to recognise that it eliminates a degree of freedom. The student then writes more equations than are needed; the resulting system, though solvable, is far heavier than necessary. *Remedy:* after identifying the invariant, count the remaining degrees of freedom explicitly. If the invariant collapses two unknowns into one, do not retain the second.
 
 **Pitfall 4. Over-Reliance on the Invariant.** Assuming that identifying the invariant suffices to solve the problem. Most invariant-based solutions require a second archetype to finish — typically Domain Constraints (Archetype #9) to filter the candidates the invariant has produced. The five-digit-divisibility problem of §4.1 will illustrate exactly this two-step pattern: the divisibility invariant produces two candidate cases, and a leading-zero constraint filters within one of them. *Remedy:* frame the solution explicitly in two stages: (1) the invariant generates candidates; (2) the auxiliary archetype filters them.
 
@@ -383,9 +383,9 @@ There are exactly $\boxed{6}$ such integers.
 
 > *Choose the right representation, and the invariant is already there.*
 
-This is the lesson Joshi makes central in his Chapter 4. It is also the cognitive substrate of *Hidden Structure* (Archetype #4) — recognizing that an unfamiliar problem is usually a familiar one in disguise, and that the disguise is almost always a poorly chosen representation.
+This is the lesson Joshi makes central in his Chapter 4. It is also the cognitive substrate of *Hidden Structure* (Archetype #4) — recognising that an unfamiliar problem is usually a familiar one in disguise, and that the disguise is almost always a poorly chosen representation.
 
-**A note on Vieta jumping and IMO 1988 P6.** Readers familiar with olympiad culture will recognize that the "invariance lives on an orbit, not a point" pattern reaches its most celebrated form in the *Vieta jumping* proof of IMO 1988, Problem 6 — the classical result that if $ab + 1 \mid a^2 + b^2$ then $(a^2 + b^2)/(ab + 1)$ is a perfect square. That problem is the canonical case study of **Central Elegant Point (CEP)** design — a problem engineered around a specific elegant target — and is therefore treated in full in **Pillar 4** (The Art of CEP-Based Problem Design), not here. Pillar 2 is the conceptual-clarity tier; its problem bank is Joshi's *EJM*. The orbit-level analysis of Vieta jumping belongs to the problem-design tier, and we reserve it for that pillar.
+**A note on Vieta jumping and IMO 1988 P6.** Readers familiar with olympiad culture will recognise that the "invariance lives on an orbit, not a point" pattern reaches its most celebrated form in the *Vieta jumping* proof of IMO 1988, Problem 6 — the classical result that if $ab + 1 \mid a^2 + b^2$ then $(a^2 + b^2)/(ab + 1)$ is a perfect square. That problem is the canonical case study of **Central Elegant Point (CEP)** design — a problem engineered around a specific elegant target — and is therefore treated in full in **Pillar 4** (The Art of CEP-Based Problem Design), not here. Pillar 2 is the conceptual-clarity tier; its problem bank is Joshi's *EJM*. The orbit-level analysis of Vieta jumping belongs to the problem-design tier, and we reserve it for that pillar.
 
 ---
 
@@ -442,15 +442,15 @@ Find all functions $f : \mathbb{R} \to \mathbb{R}$ satisfying
 
 ## 6. The Connections Web
 
-The Invariance archetype is one of the few in mathematics whose reach is genuinely unifying — it appears, in recognizable form, in nearly every domain that admits structured reasoning. We sketch the major instances.
+The Invariance archetype is one of the few in mathematics whose reach is genuinely unifying — it appears, in recognisable form, in nearly every domain that admits structured reasoning. We sketch the major instances.
 
 ### 6.1 Invariance Across Mathematical Domains
 
 **Algebra.** The symmetric functions of the roots of a polynomial — sum, product, and intermediate elementary symmetric functions — are invariants of the action of the symmetric group on the root set, computable from the coefficients alone (Vieta). The determinant of a square matrix is a similarity invariant; the characteristic polynomial is a similarity invariant; the Jordan canonical form classifies linear endomorphisms by their similarity invariants.
 
-**Geometry.** Klein's *Erlangen Program* organizes geometry by its invariants. Lengths and angles are Euclidean invariants. Length ratios on parallel lines are affine invariants. Cross-ratios are projective invariants. The Euler characteristic is a topological invariant. Each geometry, on Klein's view, is the study of a particular invariant theory.
+**Geometry.** Klein's *Erlangen Program* organises geometry by its invariants. Lengths and angles are Euclidean invariants. Length ratios on parallel lines are affine invariants. Cross-ratios are projective invariants. The Euler characteristic is a topological invariant. Each geometry, on Klein's view, is the study of a particular invariant theory.
 
-**Analysis and Calculus.** Integration is invariant under reparametrization, which is the abstract justification for the change-of-variables formula. Energy is conserved along the trajectories of a conservative system, by direct calculation or by Noether's theorem. The $L^2$ norm is invariant under the Fourier transform — Parseval's theorem.
+**Analysis and Calculus.** Integration is invariant under reparametrisation, which is the abstract justification for the change-of-variables formula. Energy is conserved along the trajectories of a conservative system, by direct calculation or by Noether's theorem. The $L^2$ norm is invariant under the Fourier transform — Parseval's theorem.
 
 **Number Theory.** The greatest common divisor is invariant under the Euclidean step, the engine of the Euclidean algorithm. Modular invariants — the residue $n \bmod p$ for prime $p$ — survive arithmetic operations subject to the modular rule. The class number of an imaginary quadratic field is an invariant of the field structure.
 
@@ -466,7 +466,7 @@ The Invariance archetype is one of the few in mathematics whose reach is genuine
 
 **Data structure invariants.** A binary search tree's ordering property; a heap's parent-child inequality; a balanced tree's height bound. Each is an invariant maintained by the operations defined on the data structure.
 
-**Equilibrium in economics.** A market in equilibrium is a fixed point of supply-and-demand dynamics — an invariant under the trading mechanism. Budget constraints in optimization are invariants of the choice set.
+**Equilibrium in economics.** A market in equilibrium is a fixed point of supply-and-demand dynamics — an invariant under the trading mechanism. Budget constraints in optimisation are invariants of the choice set.
 
 **Conservation in biology and chemistry.** Mass balance in chemical reactions; stoichiometric ratios; the Hardy–Weinberg principle that allele frequencies in an isolated random-mating population are invariant across generations.
 
@@ -488,7 +488,7 @@ Four archetypes stand in close relation to Invariance and deserve explicit note:
 
 - **Archetype #9 (Domain Constraints).** Invariance generates candidates; Domain Constraints filter them. The five-digit-divisibility problem of §4.1 is the canonical illustration: the divisibility invariant produces two candidate digit-sets, and the leading-zero constraint deletes $24$ candidates within one of them. The two archetypes are not in competition — they form the standard two-step pattern of bidirectional thinking, which Pillar 3 will treat in detail.
 
-- **Archetype #12 (Extremal Principles).** Optimization subject to invariant constraints — the Lagrange multiplier setup — is the formal embodiment of "invariance plus extremization." Many physics problems and most calculus-of-variations problems have this structure.
+- **Archetype #12 (Extremal Principles).** Optimisation subject to invariant constraints — the Lagrange multiplier setup — is the formal embodiment of "invariance plus extremisation." Many physics problems and most calculus-of-variations problems have this structure.
 
 - **Archetype #17 (Degrees of Freedom Analysis).** Each invariant constraint reduces the dimension of the solution space by one. Counting invariants against unknowns before solving is a standard reconnaissance move; if the count comes out negative, the system is overdetermined and rejection of some candidates is structurally guaranteed.
 
@@ -528,7 +528,7 @@ You may claim mastery of this chapter when each of the following is unhesitating
 - [ ] I can identify invariants in problems across at least three different domains (geometry, algebra, number theory, combinatorics).
 - [ ] I can apply the Three Questions Method as a deliberate procedural unit, not a ritual.
 - [ ] I can distinguish among the four forms of invariants — summative, multiplicative, relational, structural — and produce two examples of each.
-- [ ] I can recognize when an apparent "invariant" is actually conditional and check the conditions explicitly.
+- [ ] I can recognise when an apparent "invariant" is actually conditional and check the conditions explicitly.
 - [ ] After identifying an invariant, I check domain constraints (Archetype #9) before reporting an answer.
 - [ ] I can explain why invariants reduce degrees of freedom, in terms of the orbit space $X / G$.
 - [ ] I can state Noether's theorem in plain English.
@@ -544,9 +544,9 @@ Where Invariance focuses on quantities that *persist*, Symmetry focuses on equiv
 
 In Chapter 2 we will:
 
-- Recognize the principal types of symmetry — reflective, rotational, permutational, gauge — and the groups that generate them.
+- Recognise the principal types of symmetry — reflective, rotational, permutational, gauge — and the groups that generate them.
 - Use symmetry to reduce degrees of freedom, often dramatically: a problem with three indistinguishable variables collapses to a problem in one.
-- Solve one representative case and generalize to all equivalent cases by the symmetry argument.
+- Solve one representative case and generalise to all equivalent cases by the symmetry argument.
 - Connect symmetry to invariance through Noether-type reasoning, completing the circle that this chapter has begun.
 
 The journey from Invariance to Symmetry is natural. Both archetypes ask the solver to see beyond surface variation to underlying structure. Where Invariance finds *what persists*, Symmetry finds *what is equivalent*. Together, they form the foundation of *Structure Recognition* — the first of the five archetype categories, and the cognitive substrate on which the remaining four rest.
@@ -722,7 +722,7 @@ Direct verification of $f \equiv -1$: $f(x+y) = -1$ and $f(x)f(y)f(xy) = (-1)(-1
 
 **Anand verification flag.** The argument above proves the three constants are solutions and that they are the *only* constant solutions; it gestures at — but does not fully close — the proof that no non-constant solution exists. The full INMO solution typically completes this gap by combining $(\star)$ with the multiplicative identity at $y = x$ and a regularity (or rationality-density) argument. Please confirm or expand as needed for the printed solution.
 
-**Key lesson.** Functional equations of this shape are governed by *substitution invariants*: each choice of $(x, y)$ in the original equation produces a derived identity that, accumulated across many substitutions, pins down the function. The strategic skill is recognizing which substitutions extract maximally informative invariants — typically $y = 0, y = 1, y = -1$, and $y = x$ in some order. Once the integer values are pinned, the constant solutions are forced.
+**Key lesson.** Functional equations of this shape are governed by *substitution invariants*: each choice of $(x, y)$ in the original equation produces a derived identity that, accumulated across many substitutions, pins down the function. The strategic skill is recognising which substitutions extract maximally informative invariants — typically $y = 0, y = 1, y = -1$, and $y = x$ in some order. Once the integer values are pinned, the constant solutions are forced.
 
 ---
 

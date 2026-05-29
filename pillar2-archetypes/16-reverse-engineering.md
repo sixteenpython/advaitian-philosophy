@@ -15,7 +15,7 @@ key_gems: [A01, A08, A16, D20]
   - "Five-points-determine-a-conic: a general conic $A x^2 + B xy + C y^2 + D x + E y + F = 0$ has 5 projective parameters; 5 points in general position determine the conic uniquely up to scaling"
   - "Bound-then-enumerate (Diophantine reverse engineering): for digit-constrained equations like $N = 2(a^2 + b^2 + c^2)$, derive size bounds on the digits, then enumerate the bounded range exhaustively"
   - "Inverse-area: the area between a parametric curve $y = f(x; a)$ and the $x$-axis is a function $A(a)$; inverting $A(a)$ recovers the parameter $a$ from the area, illustrating the area-as-data reverse-engineering pattern"
-canonical_takeaway: "When the answer is given, the problem is to find the question. Reverse the natural direction of computation — from output to input, from invariant to structure, from solution-set to defining-equation."
+canonical_takeaway: "When the answer is given, the problem is to find the question."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
@@ -290,7 +290,7 @@ The elegant pivot is the *reverse-engineering of the polynomial structure*: by t
 
 *Primary archetype applications.* The *parameter-promotion* technique generalises to:
 - *Higher-degree polynomials*: when a polynomial-in-$x$ contains the parameter $a$ in a low-degree form (linear or quadratic), the polynomial-in-$a$ often has a perfect-square discriminant or a clean factorisation.
-- *Multivariable optimization*: when an objective function $f(x, a)$ is being optimised over $x$ for fixed $a$, the dual problem of optimising over $a$ for fixed $x$ often has a cleaner structure.
+- *Multivariable optimisation*: when an objective function $f(x, a)$ is being optimised over $x$ for fixed $a$, the dual problem of optimising over $a$ for fixed $x$ often has a cleaner structure.
 - *Implicit equations*: $F(x, y) = 0$ defines a curve in the $(x, y)$-plane; choosing whether to treat $x$ as the dependent variable (and $y$ as the parameter) or vice versa can dramatically simplify the curve's parametrisation.
 
 *Alternative solution archetypes.* The quartic-with-all-real-roots problem has at least two other solution routes:
@@ -554,7 +554,7 @@ Reverse engineering connects to virtually every later archetype in this volume a
 
 *Machine learning.* *Generative models* (GANs, VAEs, diffusion models) reverse-engineer data distributions. *Backpropagation* in neural networks is reverse-mode automatic differentiation — a structural reverse engineering of the chain rule. *Bayesian inference* and *variational inference* reverse-engineer posterior distributions from observed data.
 
-*Engineering.* *Inverse design* in aerodynamics, optics, and structural engineering: specify the desired performance (lift coefficient, focal length, load capacity) and reverse-engineer the design parameters. *Topology optimization* in mechanical engineering iteratively reverse-engineers material distributions to achieve target performance.
+*Engineering.* *Inverse design* in aerodynamics, optics, and structural engineering: specify the desired performance (lift coefficient, focal length, load capacity) and reverse-engineer the design parameters. *Topology optimisation* in mechanical engineering iteratively reverse-engineers material distributions to achieve target performance.
 
 *Chemistry.* *Retrosynthetic analysis* (E. J. Corey, 1990 Nobel Prize): given a target molecule, plan a synthesis by working backward through retrosynthetic disconnections. *Crystal structure determination* from X-ray diffraction data: invert the diffraction pattern to recover the unit-cell atomic positions.
 
@@ -590,7 +590,7 @@ Reverse engineering interacts with five other archetypes in particularly tight w
 
 Seven sentences. Each one is a complete operational principle.
 
-1. *When the answer is given, the problem is to find the question. Reverse the natural direction of computation — from output to input, from invariant to structure, from solution-set to defining-equation.* (The canonical takeaway.)
+1. *When the answer is given, the problem is to find the question. Reverse the natural direction of computation — from output to input, from invariant to structure, from solution-set to defining-equation.* (Expands the canonical takeaway.)
 
 2. *Polynomial-with-parameter problems: try promoting the parameter to the unknown. If the resulting polynomial-in-the-parameter has a perfect-square discriminant, a clean factorisation emerges and the original problem collapses into independent discriminant conditions on the factors.* (WE1 takeaway; Form I via parameter promotion.)
 

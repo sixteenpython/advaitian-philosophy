@@ -51,7 +51,7 @@ Her advisor, Professor Sengupta, walks past her office at 4:30 p.m. He glances a
 
 Priyanka does not need to ask what he means. The advisor and the student communicate *through the diagram* — the diagram has compressed twelve days of work into a half-page representation that a fellow expert can read in ten seconds. The advisor's suggestion is a *fourth archetype* to add to the diagram, with its own intermediate result that should converge with the existing three. Priyanka pencils in the new box.
 
-This is the **MVC — the Mental Visualization Canvas** — used in its most developed form: as the *primary record* of how a problem is being thought about, more important to the researcher than the eventual proof. In its olympiad form (which is what this chapter develops), the MVC is smaller and faster, but it is the same cognitive object. The MVC is the externalised, drawn version of the First-Minute Protocol. Where the Protocol is silent and internal, the MVC is visible and shareable. Where the Protocol lives in 60 seconds of working memory, the MVC lives in a half-page diagram that persists across days or weeks of work.
+This is the **MVC — the Mental Visualisation Canvas** — used in its most developed form: as the *primary record* of how a problem is being thought about, more important to the researcher than the eventual proof. In its olympiad form (which is what this chapter develops), the MVC is smaller and faster, but it is the same cognitive object. The MVC is the externalised, drawn version of the First-Minute Protocol. Where the Protocol is silent and internal, the MVC is visible and shareable. Where the Protocol lives in 60 seconds of working memory, the MVC lives in a half-page diagram that persists across days or weeks of work.
 
 **This is the chapter that makes the multidirectional thesis drawable.**
 
@@ -61,7 +61,7 @@ This is the **MVC — the Mental Visualization Canvas** — used in its most dev
 
 ### §1.1 What the MVC is, and what it is not
 
-The **Mental Visualization Canvas (MVC)** is a single drawn diagram — typically half a page, occasionally a full page for very hard problems — that contains four classes of element:
+The **Mental Visualisation Canvas (MVC)** is a single drawn diagram — typically half a page, occasionally a full page for very hard problems — that contains four classes of element:
 
 1. **The problem-statement box** (top of the diagram): a one-sentence compression of the problem's Given and Find. This is the same content as the Protocol's Steps 1–2, but drawn rather than listed.
 
@@ -338,7 +338,7 @@ Four problems on which the reader is asked to produce an MVC *first*, then attem
 
 ## §5 Bridge to Chapter 6
 
-This chapter introduced the **Mental Visualization Canvas (MVC)** as the externalised, drawn complement to the First-Minute Protocol. We presented the MVC's four-element grammar (problem-statement box, archetype-application nodes, convergence nodes, answer node), the Stage 1 / Stage 2 division of cognitive labour, the threshold rule for when the MVC is worth drawing (≥ 3 archetypes mandates drawing), and three worked examples — a 2-archetype mental MVC, a 3-archetype drawn MVC, and an MVC revision case. We named the over-detailing trap and prescribed the half-page-budget recovery. We mapped the MVC onto Zeitz's three-layer model: the MVC is a *strategic tool*, complementing the *tactical* archetypes (Pillar 2) and the *computational* gems (Pillar 5).
+This chapter introduced the **Mental Visualisation Canvas (MVC)** as the externalised, drawn complement to the First-Minute Protocol. We presented the MVC's four-element grammar (problem-statement box, archetype-application nodes, convergence nodes, answer node), the Stage 1 / Stage 2 division of cognitive labour, the threshold rule for when the MVC is worth drawing (≥ 3 archetypes mandates drawing), and three worked examples — a 2-archetype mental MVC, a 3-archetype drawn MVC, and an MVC revision case. We named the over-detailing trap and prescribed the half-page-budget recovery. We mapped the MVC onto Zeitz's three-layer model: the MVC is a *strategic tool*, complementing the *tactical* archetypes (Pillar 2) and the *computational* gems (Pillar 5).
 
 Chapters 1–5 have now supplied the full conceptual machinery of multidirectional solving: the multidirectional thesis (Ch. 1), the 2-archetype atom (Ch. 2), the 3-archetype molecule (Ch. 3), the First-Minute Protocol (Ch. 4), and the MVC (this chapter). Chapter 6 is the **demonstration**: five fully-developed multidirectional solutions, each running end-to-end through Protocol → MVC → Solution → Verification → Connections. The case studies are drawn from the locked §7.9 slate (with the two open-item cases self-selected per Q5(a) of the build specification). Chapter 6 is the pillar's centre of gravity by design; it is where the conceptual machinery becomes concrete and where the reader sees the full multidirectional discipline operating at olympiad scale.
 

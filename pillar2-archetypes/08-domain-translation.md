@@ -15,7 +15,7 @@ key_gems: [A10, A15, D06, D08, D19, E03]
   - "Generating function $\\sum_n a_n z^n$ — turning a discrete sequence into a continuous (formal) series so that combinatorial identities become algebraic identities"
   - "Möbius transformation $z \\mapsto (az + b)/(cz + d)$ — translation between algebraic action on $\\mathbb{C}$ and conformal action on the Riemann sphere"
   - "Time domain $\\leftrightarrow$ frequency domain via Fourier transform — differential equations become algebraic in the frequency variable"
-canonical_takeaway: "Mathematics is not one language but many; the same structure looks different — and is easier or harder — depending on which language you read it in."
+canonical_takeaway: "The same structure looks different in each language; read it in the easiest one."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
@@ -539,7 +539,7 @@ Chapter 8 completes the *Method Selection* sub-pillar — the four archetypes (S
 
 Chapter 9 opens the third sub-pillar — *Constraint Exploitation* — and shifts attention from *representation* to *restriction*. In the previous four chapters, the moves were about reframing the problem so that its structure became visible. In the next four chapters (9 through 12), the moves are about *using* the structure once visible. The first of these is *Domain Constraints / Bounds*: many problems generate candidate solutions by algebra, but most candidates are eliminated by *the domain on which the variables are defined* — the natural numbers, the positive reals, the inside of a triangle, the unit circle. Chapter 9 makes the candidate-then-filter pattern an archetype in its own right, and the worked examples will show how often a correct algebraic answer to a JEE problem is actually *wrong* because the candidates fail a domain check that the solver did not perform.
 
-With Chapter 9 in hand, the reader will have seen the first eight archetypes — half of Pillar 2's twenty — and will be positioned to take on the *Counting and Extremization* sub-pillar (Chs. 13–15) and the *Meta-Reasoning* sub-pillar (Chs. 16–20) that complete the structural toolkit.
+With Chapter 9 in hand, the reader will have seen the first eight archetypes — half of Pillar 2's twenty — and will be positioned to take on the *Counting and Extremisation* sub-pillar (Chs. 13–15) and the *Meta-Reasoning* sub-pillar (Chs. 16–20) that complete the structural toolkit.
 
 ---
 

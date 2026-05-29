@@ -15,7 +15,7 @@ key_gems: [A05, A12, A14, G01, G02, G03, G04, G05, G06, G14]
   - "Bijective principle: $|A| = |B|$ if and only if there exists a bijection $A \\leftrightarrow B$; cross-archetype with Ch. 15 (Bijection)"
   - "Symmetry-then-divide (Burnside's lemma in baby form): if you count ordered configurations and the configuration has an automorphism group of order $k$, divide by $k$ to get the unordered count"
   - "Binomial distribution: number of successes in $n$ independent Bernoulli($p$) trials is $\\binom{n}{k}p^k(1-p)^{n-k}$; the basis of finitistic probability"
-canonical_takeaway: "Structure first, then count. The structure of the count — symmetries, inclusion-exclusion decomposition, bijective correspondence, recursive identity — is identified before any enumeration begins."
+canonical_takeaway: "Structure first, then count: find the symmetry or bijection before you enumerate."
 status: locked
 last_revised: 2026-05-29
 locked_on: 2026-05-29
