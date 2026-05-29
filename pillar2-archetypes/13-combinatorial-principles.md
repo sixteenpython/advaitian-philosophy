@@ -4,7 +4,7 @@ archetype: Combinatorial Principles
 subtitle: "If You Cannot Enumerate, Structure the Count"
 category: Structural Reasoning (Archetypes 13–16) — first chapter; sub-pillar opens
 related_archetypes: [1, 2, 14, 15, 18]
-key_gems:
+key_gems: [A05, A12, A14, G01, G02, G03, G04, G05, G06, G14]
   - "Multiplication principle: if a process has independent stages with $n_1, n_2, \\ldots, n_k$ choices respectively, the total number of outcomes is $\\prod_i n_i$"
   - "Addition principle: if a set is partitioned into disjoint cases of sizes $|A_1|, |A_2|, \\ldots$, the total size is $\\sum_i |A_i|$"
   - "Inclusion-exclusion: $|A_1 \\cup \\cdots \\cup A_n| = \\sum_i |A_i| - \\sum_{i < j} |A_i \\cap A_j| + \\cdots + (-1)^{n+1} |A_1 \\cap \\cdots \\cap A_n|$"
@@ -16,8 +16,9 @@ key_gems:
   - "Symmetry-then-divide (Burnside's lemma in baby form): if you count ordered configurations and the configuration has an automorphism group of order $k$, divide by $k$ to get the unordered count"
   - "Binomial distribution: number of successes in $n$ independent Bernoulli($p$) trials is $\\binom{n}{k}p^k(1-p)^{n-k}$; the basis of finitistic probability"
 canonical_takeaway: "Structure first, then count. The structure of the count — symmetries, inclusion-exclusion decomposition, bijective correspondence, recursive identity — is identified before any enumeration begins."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO / Putnam examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 13 for the locked slate. **Verification audit for this chapter discovered two slate errors**: (a) PP3(b) (Tournament pairing, JEE 1997, Joshi Ex. 24.53) listed the probability that exactly one of $S_1, S_2$ wins as $\\frac{8}{15} \\cdot \\frac{1}{2} = \\frac{4}{15}$, but the correct value is $\\frac{8}{15}$, obtained by conditioning on whether $S_1, S_2$ are paired ($\\frac{1}{15} \\cdot 1 + \\frac{14}{15} \\cdot \\frac{1}{2} = \\frac{8}{15}$, matching the JEE 1997 answer key). (b) PP5 (Box with three colours, Joshi Ex. 24.86) gave an incoherent formula; the correct answer via the *symmetry trick* on the last position of a random permutation is $\\dfrac{k}{m + n + k}$, verified at $m = n = k = 1$ by direct enumeration (gives $1/3$, matching $1/(1+1+1)$). Both errors patched in slate v0.2.10; see PP3 and PP5 in the appendix for the corrected derivations."
 ---
 

@@ -4,7 +4,7 @@ archetype: Existence / Uniqueness Conditions
 subtitle: "Existence Precedes Computation"
 category: Constraint Exploitation (Archetypes 9–12) — third chapter
 related_archetypes: [1, 9, 10, 12, 18]
-key_gems:
+key_gems: [A08, F01, F02, F06, G01, G16]
   - "Intermediate Value Theorem (IVT): if $f$ is continuous on $[a, b]$ and $f(a) \\cdot f(b) < 0$, then $\\exists\\, c \\in (a, b)$ with $f(c) = 0$"
   - "Mean Value Theorem (MVT): if $f$ is continuous on $[a, b]$ and differentiable on $(a, b)$, then $\\exists\\, c \\in (a, b)$ with $f'(c) = \\dfrac{f(b) - f(a)}{b - a}$"
   - "Rolle's Theorem: MVT special case for $f(a) = f(b)$, giving $f'(c) = 0$ for some $c \\in (a, b)$"
@@ -16,8 +16,9 @@ key_gems:
   - "Odd-degree-polynomial existence: every polynomial of odd degree with real coefficients has at least one real root (IVT applied at $\\pm\\infty$)"
   - "Existence-then-uniqueness pattern: many problems split into a separate existence proof (constructive or non-constructive) and a separate uniqueness proof (typically by contradiction or by a contraction / convexity argument)"
 canonical_takeaway: "Prove it exists before you find it. Existence and uniqueness are separable questions; many problems ask only one of the two."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 11 for the locked slate. **Verification audit for this chapter discovered one slate error**: PP1 (JEE 2001 non-differentiability of $\\max\\{x, x^3\\}$) listed two non-differentiability points ($x = -1, 0$), but the correct count is **three** — the curves cross at $x = -1, 0, 1$ and at every crossing the active-branch slopes differ. Patched in slate v0.2.8; see PP1 in the appendix for the corrected derivation. **Terminology note for WE3**: the locked slate names the 1-dim Brouwer fixed-point theorem (every continuous $f : [a, b] \\to [a, b]$ has a fixed point, proved by IVT) as 'Banach', but Banach's contraction-mapping theorem is a strictly stronger statement requiring contraction (not just continuity); the chapter uses the correct names — Brouwer / IVT-route for WE3, Banach / contraction-route for PP7."
 ---
 

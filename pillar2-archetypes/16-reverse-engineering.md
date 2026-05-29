@@ -4,7 +4,7 @@ archetype: Reverse Engineering
 subtitle: "When the Answer Is Given, the Problem Is to Find the Question"
 category: Structural Reasoning (Archetypes 13–16) — fourth/closing chapter
 related_archetypes: [3, 4, 15, 17, 19]
-key_gems:
+key_gems: [A01, A08, A16, D20]
   - "Vieta's formulas: roots $\\leftrightarrow$ elementary symmetric polynomials $\\leftrightarrow$ coefficients; reverse-engineer a polynomial from its roots by multiplying the linear factors $(x - r_i)$ or, equivalently, by reading off the elementary symmetric polynomials $e_k(r_1, \\ldots, r_n)$ as the signed coefficients of $x^{n-k}$"
   - "Newton's identities: power sums $p_k = \\sum r_i^k$ are related recursively to elementary symmetric polynomials $e_k$ via $p_k = e_1 p_{k-1} - e_2 p_{k-2} + \\cdots + (-1)^{k-1} k e_k$, enabling polynomial reconstruction from power-sum data"
   - "Real-coefficient root-pairing: a polynomial with real coefficients has complex roots in conjugate pairs $\\{z, \\bar z\\}$; the minimum-degree real polynomial with prescribed complex roots is the product of the conjugate-pair quadratic factors $(x - z)(x - \\bar z) = x^2 - 2\\Re(z)\\,x + |z|^2$"
@@ -16,8 +16,9 @@ key_gems:
   - "Bound-then-enumerate (Diophantine reverse engineering): for digit-constrained equations like $N = 2(a^2 + b^2 + c^2)$, derive size bounds on the digits, then enumerate the bounded range exhaustively"
   - "Inverse-area: the area between a parametric curve $y = f(x; a)$ and the $x$-axis is a function $A(a)$; inverting $A(a)$ recovers the parameter $a$ from the area, illustrating the area-as-data reverse-engineering pattern"
 canonical_takeaway: "When the answer is given, the problem is to find the question. Reverse the natural direction of computation — from output to input, from invariant to structure, from solution-set to defining-equation."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 16 for the locked slate. **Verification audit for this chapter caught one slate error**: PP1 (three-digit number = twice the sum of digit-squares, Joshi Ex. 24.99(a)) listed the answer as $N = 166$; verification reveals $166$ does not satisfy the equation ($2 \\cdot (1 + 36 + 36) = 146 \\ne 166$). Exhaustive search of $a \\in \\{1, 2, 3, 4\\}$ (bound: $N = 100a + 10b + c \\le 2 \\cdot 3 \\cdot 81 = 486$) yields the unique solution $N = 298$ (digits $2, 9, 8$: $2(4 + 81 + 64) = 2 \\cdot 149 = 298$ ✓). Slate patched in v0.2.13. **Cross-archetype note**: PP1 is also cross-archetype with Ch. 4 WE2 (Hidden Structure), where the same digit-Diophantine problem is framed as 'find the hidden algebraic structure'; here in Ch. 16 it is framed as 'reverse-engineer the digits from the arithmetic relation'. This chapter **CLOSES the Structural Reasoning sub-pillar (Chs. 13–16)** and bridges to the Meta-Reasoning sub-pillar (Chs. 17–20) opening with Ch. 17 Degrees of Freedom Analysis."
 ---
 

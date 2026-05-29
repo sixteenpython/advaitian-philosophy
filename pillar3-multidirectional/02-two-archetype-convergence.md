@@ -5,8 +5,9 @@ title: "Two-Archetype Convergence"
 subtitle: "*The atom of multidirectional solving.*"
 length_target_words: 7500
 canonical_takeaway: "Half of multidirectional solving is identifying which two archetypes converge; the other half is recognising which one drives and which one enables."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Engel-ch-1, Engel-ch-3, Engel-ch-8, Zeitz-ch-3, Zeitz-ch-4, Joshi-ch-1]
 canonical_constructs_used: [convergence-diagram, escape-hatch]
 ---

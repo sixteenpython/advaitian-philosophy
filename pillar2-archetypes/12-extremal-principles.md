@@ -4,7 +4,7 @@ archetype: Extremal Principles
 subtitle: "Nature Optimizes; So Should Your Solution"
 category: Constraint Exploitation (Archetypes 9–12) — fourth and closing chapter
 related_archetypes: [1, 2, 10, 11, 13]
-key_gems:
+key_gems: [B01, B05, B07, F07, F12, G07]
   - "Weierstrass extreme-value theorem: a continuous real-valued function on a compact set attains its maximum and minimum"
   - "First-order necessary condition: at an interior extremum of a differentiable function, the gradient vanishes ($f'(x) = 0$ in 1-dim; $\\nabla f(\\mathbf x) = \\mathbf 0$ in $n$-dim)"
   - "Second-order sufficient condition (1-dim): $f''(x_0) > 0$ at $f'(x_0) = 0$ implies local minimum (and $< 0$ implies local maximum)"
@@ -16,8 +16,9 @@ key_gems:
   - "Josephus survivor formula: in a circular elimination process with stride $2$, the survivor for $n$ contestants is at position $J(n) = 2r + 1$ where $n = 2^k + r$ with $0 \\le r < 2^k$"
   - "Erdős-Mordell inequality: for $P$ inside $\\triangle ABC$ with vertex-distances $p_a, p_b, p_c$ and pedal-distances $d_a, d_b, d_c$, $p_a + p_b + p_c \\ge 2(d_a + d_b + d_c)$, equality iff $\\triangle ABC$ is equilateral and $P$ is its centre"
 canonical_takeaway: "The extremum is where the structure becomes sharp. Whether it lives at a vertex, on a boundary, or at an interior critical point is the first question — and often the most consequential one."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO / Putnam examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 12 for the locked slate. **Verification audit for this chapter discovered two slate errors**: (a) WE3 (Joshi Ch. 13, Comment 6, closest point on parabola) listed the source point as $(2, -1/2)$ with distance $\\sqrt{13}/2$, but the answer $(1, 1)$ requires source $(2, 1/2)$ with distance $\\sqrt 5/2$ — the slate had a sign error in the source $y$-coordinate that propagated to a wrong distance; the answer point $(1, 1)$ is correct given the corrected source. (b) PP3(ii) (Joshi Ex. 24.91, quadratic form $x^2 + 2xy + 3y^2 - 6x - 2y$) listed the minimum as $-13/2$ at $(7/2, -1/2)$, but the correct critical point is $(4, -1)$ with value $-11$ — verified by gradient-zero analysis, Hessian-positivity test, and an independent completing-the-square argument. Both errors patched in slate v0.2.9; see WE3 and PP3 in the appendix for the corrected derivations."
 ---
 

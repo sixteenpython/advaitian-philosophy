@@ -6,8 +6,9 @@ title: "Anatomy of a Well-Designed Problem"
 subtitle: "Open the back of the watch."
 length_target_words: 5800
 canonical_takeaway: "Every well-designed mathematical problem has four nameable parts: a Central Elegant Point at its centre, an archetype convergence that reaches it, traps that protect it from cheap alternatives, and a statement that conceals it."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Tao-Ch-1, Tao-Preface, Polya-Part-I, Engel-Ch-1, IMO-1959-P1]
 voice_register: tao-warm
 pillar3_cross_references: [pillar3-ch-1-§1]

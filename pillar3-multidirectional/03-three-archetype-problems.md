@@ -5,8 +5,9 @@ title: "Three-Archetype Problems"
 subtitle: "*When two archetypes are not enough, and the cognitive cost of holding three.*"
 length_target_words: 8750
 canonical_takeaway: "Three-archetype problems exceed unaided working memory; the convergence diagram is not a teaching aid but a structural necessity."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Engel-ch-8, Engel-ch-14, Zeitz-ex-4.1.1, IMO-1988-P6, Putnam, USAMO-1986]
 canonical_constructs_used: [convergence-diagram, escape-hatch]
 ---

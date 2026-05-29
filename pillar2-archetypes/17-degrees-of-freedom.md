@@ -4,7 +4,7 @@ archetype: Degrees of Freedom Analysis
 subtitle: "Count Constraints Before Solving"
 category: Meta-Reasoning (Archetypes 17–20) — first/opening chapter
 related_archetypes: [3, 11, 15, 16, 18]
-key_gems:
+key_gems: [A04, A08, A14, F12]
   - "Degrees-of-freedom definition: the DOF of a system is the dimension of its space of admissible configurations; equivalently, the minimum number of independent parameters required to specify a state"
   - "Constraint-counting equation: DOF = (number of free parameters in the ambient space) − (number of independent constraints); under-, exactly-, or over-determined according to whether DOF is positive, zero, or negative"
   - "Rank-nullity theorem: for a linear map $A: V \\to W$ with $V = \\mathbb{R}^n$, $\\dim\\ker A = n - \\mathrm{rank}(A)$, so a $5 \\times 7$ system of rank 4 has $7 - 4 = 3$ free parameters"
@@ -16,8 +16,9 @@ key_gems:
   - "Inflection-point constraint: at a point $P$, requiring a plane curve $F = 0$ to pass through $P$ and have an inflection there imposes *two* conditions ($F(P) = 0$ and the Hessian condition $H_F(P) = 0$); inflection costs 2 DOF, not 1"
   - "Rank argument over $\\mathbb{F}_p$: reducing an integer matrix mod a prime $p$ can only *decrease* rank, so $\\mathrm{rank}_{\\mathbb{F}_p}(\\bar A) \\le \\mathrm{rank}_{\\mathbb{Q}}(A)$; computing rank mod 2 gives a *lower bound* on the rational rank, the workhorse of the eleven-stones WE1 proof"
 canonical_takeaway: "Count constraints before solving. A problem's DOF — its parameter count minus its constraint count — tells you whether you are over-determined (generically no solution), exactly determined (unique solution), or under-determined (a family of solutions); this scoping is the first move, not the last."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 17 for the locked slate. **Verification audit for this chapter caught zero slate errors** — all ten problems (3 WE + 7 PP) verified on first pass. This chapter **OPENS the Meta-Reasoning sub-pillar (Chs. 17–20)** following the close of Structural Reasoning at Ch. 16 (Reverse Engineering). It bridges to Ch. 18 (Recursion / Induction), where the DOF perspective resurfaces as the *recursion variable* — the choice of which parameter to descend on. **Cross-archetype note**: WE2 (triangle from 3 invariants) is intentionally a *dual* of Ch. 16 WE2 (triangle from $(r, R, s)$): Ch. 16 reverse-engineers the triangle from a specific 3-tuple; Ch. 17 abstracts to the *moduli-space dimension* (3) underlying any such reconstruction. Together they illustrate the Structural↔Meta sub-pillar bridge."
 ---
 

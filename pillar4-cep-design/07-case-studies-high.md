@@ -6,8 +6,9 @@ title: "Case Studies 16–20: High CEP"
 subtitle: "The technique-discovery moment."
 length_target_words: 6900
 canonical_takeaway: "High CEPs require the solver to engineer not just a construction but a new piece of method — a functional substitution-iteration, a weighted invariant, a counting at exactly the right granularity, an exponent-vector pigeonhole."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [IMO-1986-P5, IMO-1993-P3, IMO-1976-P4, IMO-2001-P3, IMO-1985-P4, Engel-Ch-11-functional, Engel-Ch-5-coloring, Tao-Ch-1-strategy]
 voice_register: tao-warm
 pillar3_cross_references: []

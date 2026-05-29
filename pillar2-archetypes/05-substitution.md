@@ -4,7 +4,7 @@ archetype: Substitution / Change of Variables
 subtitle: "The Right Coordinate System Makes the Problem Transparent"
 category: Method Selection (Archetypes 5–8)
 related_archetypes: [4, 6, 10, 14, 19, 20]
-key_gems:
+key_gems: [A17, D07c, F04a, F09, F10]
   - "Weierstrass tangent half-angle substitution $t = \\tan(x/2)$"
   - "Ravi substitution for triangle sides $a = y + z,\\ b = z + x,\\ c = x + y$"
   - "Bernoulli substitution $v = y^{1-n}$ linearises $y' + P(x)y = Q(x)y^n$"
@@ -16,8 +16,9 @@ key_gems:
   - "Tschirnhaus shift $x \\mapsto x - a_{n-1}/(n a_n)$ to depress a polynomial"
   - "Polar–Cartesian transformation $(x, y) \\leftrightarrow (r, \\theta)$"
 canonical_takeaway: "The right change of variables turns a hard problem into a routine one; the work is choosing the variable."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 5 for the locked slate."
 ---
 

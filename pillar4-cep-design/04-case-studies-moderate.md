@@ -6,8 +6,9 @@ title: "Case Studies 1–5: Moderate CEP"
 subtitle: "The Polya Inventor's Paradox in five clean specimens."
 length_target_words: 6500
 canonical_takeaway: "Moderate-tier CEPs are not 'easy' — they are the clearest demonstration that elegant problem design is independent of difficulty tier."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [IMO-1959-P1, IMO-1969-P1, Putnam-1985-A1, IMO-1972-P1, Joshi-Ch-24-Comment-8, Polya-Inventor's-Paradox]
 voice_register: tao-warm
 pillar3_cross_references: []

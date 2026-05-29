@@ -4,7 +4,7 @@ archetype: Hidden Structure
 subtitle: "If It Looks Unfamiliar, It Is Probably Something Familiar in Disguise"
 category: Structure Recognition (Archetypes 1–4)
 related_archetypes: [1, 2, 3, 7, 15]
-key_gems:
+key_gems: [A02, A09, A15, C08, C09, D08, E03]
   - "Vandermonde's identity: $\\sum_k \\binom{m}{k}\\binom{n}{r-k} = \\binom{m+n}{r}$"
   - "Pascal's identity as the lattice-path recursion $\\binom{n}{r} = \\binom{n-1}{r-1} + \\binom{n-1}{r}$"
   - "Hockey-stick identity: $\\sum_{i=r}^{n}\\binom{i}{r} = \\binom{n+1}{r+1}$"
@@ -16,9 +16,10 @@ key_gems:
   - "Telescoping via partial fractions: a sum is a difference of consecutive values"
   - "Inclusion-exclusion for surjections (with Stirling numbers of the second kind)"
 canonical_takeaway: "Strip the surface notation; the problem is almost always a familiar structure you have already learned to solve."
-status: approved
-last_revised: 2026-05-26
+status: locked
+last_revised: 2026-05-29
 approved_on: 2026-05-26
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 4 for the locked slate."
 ---
 

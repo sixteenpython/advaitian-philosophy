@@ -5,8 +5,9 @@ title: "Worked Case Studies"
 subtitle: "*Five Multidirectional Solutions, Walked End-to-End.*"
 length_target_words: 8000
 canonical_takeaway: "The case studies are templates for the Protocol-and-MVC discipline, not recipes for specific problem classes."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Engel-ch-4, Engel-ch-11, Zeitz-ch-4, IMO-shortlist-1996, Helly-1923]
 canonical_constructs_used: [first-minute-protocol, mvc-sketch, convergence-diagram]
 ---

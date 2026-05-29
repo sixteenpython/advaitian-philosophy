@@ -4,7 +4,7 @@ archetype: Parity / Modular Reasoning
 subtitle: "Sometimes the Remainder Tells the Whole Story"
 category: Structural Reasoning (Archetypes 13–16) — second chapter
 related_archetypes: [1, 4, 13, 15, 18]
-key_gems:
+key_gems: [A07b, C01, C02, C03, C04, C05, C06, C07, C08, C09, C16, G17]
   - "Wilson's theorem: $(p - 1)! \\equiv -1 \\pmod p$ for prime $p$, and the converse holds (it is a primality criterion)"
   - "Fermat's little theorem: $a^p \\equiv a \\pmod p$ for prime $p$ and integer $a$; equivalently $a^{p-1} \\equiv 1 \\pmod p$ when $\\gcd(a, p) = 1$"
   - "Euler's theorem: $a^{\\varphi(n)} \\equiv 1 \\pmod n$ for $\\gcd(a, n) = 1$, generalising Fermat to composite moduli"
@@ -16,8 +16,9 @@ key_gems:
   - "Chessboard parity: a Hamiltonian cycle on a 2-coloured grid (black/white alternating) alternates colours, forcing equal counts; an $m \\times n$ grid admits a Hamiltonian cycle iff $mn$ is even"
   - "Squarefree decomposition: every positive integer $m$ factors uniquely as $m = u^2 v$ with $v$ squarefree; the squarefree part is the mod-2 reduction of the prime exponents"
 canonical_takeaway: "Sometimes the remainder tells the whole story. Choosing the right modulus collapses an intractable problem into a finite, often trivial residue computation."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 14 for the locked slate. **Verification audit for this chapter discovered one slate error**: WE3 (Joshi Ex. 24.89, cubic $f(x) = x^3 + bx^2 + cx + d$ with $f(0), f(-1)$ odd integers) listed the parity consequence as '$b - c$ even', but the correct parity is '$b - c$ odd' — since $d$ odd and $-1$ odd give $-1 + d$ even, $f(-1) = (\\text{even}) + (b - c)$ is odd iff $b - c$ is odd. The chapter solution uses the correct parity (which is essential for the integer-root contradiction: $r$ odd ⇒ $b + c$ even ⇒ $b \\equiv c$, contradicting $b - c$ odd). Slate patched in v0.2.11. Cross-archetype: **PP6 reuses the JEE 1983 problem from Ch. 1 PP3** ($24 \\mid n(n^2 - 1)$ for odd $n$), reframed here through the explicit mod-2 + mod-3 lens of Ch. 14 (in Ch. 1 the same problem was framed as an *invariance* problem via the consecutive-integers identity)."
 ---
 

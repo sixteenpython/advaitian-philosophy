@@ -6,8 +6,9 @@ title: "Case Studies 21–25: Extreme CEP"
 subtitle: "Four archetypes, one capstone, and the most consequential designed problem of the past half-century."
 length_target_words: 7800
 canonical_takeaway: "Extreme CEPs are not just hard problems; they are problems whose design solves a pedagogical problem of its own — what technique must enter the cultural canon, and what problem will introduce it?"
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [IMO-1992-P3, IMO-2003-P6, IMO-1990-P3, IMO-2001-P6, IMO-1988-P6-CAPSTONE, Pillar-3-Ch-3-§2-WE1]
 voice_register: tao-warm
 pillar3_cross_references: [pillar3-ch-3-§2-WE1]

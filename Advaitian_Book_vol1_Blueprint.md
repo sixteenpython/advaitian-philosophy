@@ -4,9 +4,27 @@
 
 **Author:** Anand Venkat  
 **Working title:** *The Advaitian Philosophy of Problem Solving — Volume 1*  
-**Status:** v2.5 — Pre-flight for May 29 (Pillar 5 + Pillar 1 same-day push); §15 refreshed, §5.6 & §9.2 flipped to "Ready to Draft." Previous: v2.4 (Pillar 4 closure, May 28); v2.3 (Pillar 3 closure); v2.2 (Pillar 4 sourcing in workspace); v2.0 (Production-mode setup, May 26).  
+**Status:** **v3.0 — VOLUME 1 BUILD COMPLETE (May 29, 2026).** All five pillars locked. Previous: v2.5 (pre-flight May 29); v2.4 (Pillar 4 closure, May 28); v2.3 (Pillar 3 closure); v2.2 (Pillar 4 sourcing in workspace); v2.0 (Production-mode setup, May 26).  
 **Format:** Markdown canonical → LaTeX (Pandoc) → Overleaf-friendly `.txt`  
 **Repository root:** `advaitian-philosophy/`
+
+---
+
+> ## 🌑 VOLUME 1 — BUILD COMPLETE (v3.0, May 29, 2026)
+>
+> **All five pillars are locked.** The first-draft build of *The Advaitian Philosophy of Problem Solving — Volume 1* is complete.
+>
+> | Pillar | Scope | State |
+> |---|---|---|
+> | **1 — The Six-Point Framework** | 1 chapter (~6,200 words) | **LOCKED** |
+> | **2 — The 20 Universal Archetypes** | 20 chapters | **LOCKED** (Chs. 1–4 Anand-approved; 5–20 locked as-is) |
+> | **3 — Multidirectional Solving** | 8 chapters + problems-locked | **LOCKED** |
+> | **4 — CEP-Based Problem Design** | 9 chapters + 25-case slate v0.2.0 + 31-problem record | **LOCKED** |
+> | **5 — Mathematical Gems** | 17 prerequisites + 115 gems + cross-ref tables | **LOCKED** (cross-refs provisional) |
+>
+> **"Build complete" means:** every pillar has a locked draft. It does **not** mean every verification item is closed — those are tracked as a post-build punch-list (§16.5) and do not block the milestone, per Anand's May 29 sign-off (ship-now).
+>
+> **Remaining (post-build, non-blocking):** the §16.3 verification punch-list, plus editorial polish, build pipeline (Pandoc→LaTeX→Overleaf), and front matter + closing essays + Appendix A.
 
 ---
 
@@ -284,7 +302,7 @@ A self-administered checklist: 12 questions, each pointing at a specific point i
 
 ### 5.6 Write Status
 
-**READY TO DRAFT (May 29, 2026).** The pre-condition (Pillars 2, 3, 4 substantially complete) is now satisfied: Pillar 2 is 20/20 chapters first-drafted; Pillar 3 is signed off; Pillar 4 closed at Phase E.1 (slate v0.2.0 LOCKED). When Pillar 1 enters draft, begin with a full re-read of `ThinkMath_Blueprint_v3.md` and the locked running example (§5.7) as the chapter's spine. **Drafting order for May 29:** Pillar 5 first (gem inventory informs Pillar 1's worked-example economy), then Pillar 1. Per Blueprint Phase ordering (§14.1), this matches the as-planned sequence.
+**LOCKED (May 29, 2026).** Content, structure, and prose approved by Anand after a full back-test against all `knowledge_base/` + `my_references/` docs (three corrections accepted). Length ~6,200 words accepted as final. Drafted as `pillar1-framework/01-six-point-framework.md` — a single multi-section chapter covering all seven sub-sections per §5.5.1–§5.5.7: §1 The Problem with Problem-Solving Books (Lockhart-polemic "I" voice); §2 What a Commentary Is — the bhāṣya grammar + the six points' forced order; §3 a full six-point walking tour of the locked running example (polygon-with-AP-angles, §5.7); §4 the MVC Protocol walked on the same problem; §5 the Developmental Tiers 0–4 with a Tier-1-vs-Tier-4 density demonstration on the polygon; §6 Reading the Masters (Pólya's inscribed-square + Joshi's JEE 1989 five-digit problem, both decomposed through the grammar); §7 a 12-question self-diagnosis keyed to the six points + MVC, bridging into the rest of the book. Built from a full read of `ThinkMath_Blueprint_v3.md` (canonical source, §5.2) and the locked running example. **Back-tested May 29, 2026** against all `knowledge_base/` docs (Master Framework, Masterclass, Philosophy Framework, White Paper, Seed-Elegance, Chapter-1-Invariance, Advaitian.md) and the `my_references/` docs (positioning via `why_this_book.txt`; voice via `lockhart-lament.txt`): polygon six-point treatment verified verbatim against the gold-standard commentary; corrected the Pólya inscribed-square locus (passes through a triangle vertex, not the apex) and aligned the polygon takeaway to the canonical "Algebra generates candidates; Geometry selects the winner"; enriched §1 positioning from a binary to the canonical trichotomy (technique / philosophy / culture books → empty quadrant) with the headline "first to treat problem-solving as having a grammar" claim. Now ~6,200 words. Status: **draft** — awaiting Anand's line review.
 
 ### 5.7 The Running Example — Locked
 
@@ -972,7 +990,13 @@ Pillar 5 is the operational execution toolkit — the collection of specific ide
 
 ### 9.2 Write Status
 
-**READY TO DRAFT (May 29, 2026).** Pre-condition satisfied: Pillars 2 (20/20), 3 (8/8 signed off), and 4 (9/9 closed at Phase E.1) are all first-draft complete. The right gems to include can now be determined by which pivots actually appeared in the solved problems across the other pillars — exactly the conditions §9.2 originally required.
+**LOCKED (May 29, 2026).** Content, structure, and prose approved by Anand. Sole open carve-out: the Pillar 2–4 cross-references remain *(provisional)* pending a dedicated verification pass — this does **not** block the lock. Drafted as two files under `pillar5-gems/`:
+- `prerequisites.md` — **Part I, Foundations**: 17 prerequisite blocks (PR01–PR17), Foundation tier, each with orientation + concept list + fluency check, spanning Class 11–12 NCERT (Complex Numbers → Probability). The "pickable-up right after Class 10" on-ramp.
+- `gems.md` — **Part II, The Gems**: 115 named gems across Clusters A–G (70 Core / 45 Stretch), each with the seven-field entry (Statement · What it says · The move · When it fires/trigger · Micro-example · Watch for · Used in/Neighbours), plus **Part III** cross-reference tables (Archetype→Gems, Chapter/Case→Gems reverse-lookup, Prerequisite→Gems).
+
+Entry template extends §9.6 with two added fields — **"The move"** and **"When it fires (trigger)"** — to keep entries conceptual rather than appendix-like (approved May 29). Tiering is **Foundation → Core → Stretch**. All Pillar 2–4 cross-references are marked *(provisional)* pending a verification pass against the locked chapters.
+
+Pre-condition had been satisfied: Pillars 2 (20/20), 3 (8/8 signed off), and 4 (9/9 closed at Phase E.1) were all first-draft complete, so the gem set was determined by which pivots actually appeared in the solved problems across the other pillars.
 
 **Pillar-5-to-Pillars-2/3/4 reverse-lookup needed at drafting start.** Before drafting begins, scan the as-drafted chapters for explicit gem invocations (e.g., AM-GM in Pillar 2 Ch. 10 + Pillar 4 Case 5; Vieta jumping in Pillar 4 Case 25; CRT in Pillar 4 Case 15; Sophie Germain in Pillar 4 Case 2; Fibonacci in Pillar 4 Case 12; the golden ratio in Pillar 4 Ch. 9 Ex. 2; the order-modulo-p argument in Pillar 4 Cases 22, 23; etc.) and reconcile against the §9.7 working list. The 4 archetypes deliberately uncovered in Pillar 4 (#3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting — see `pillar4-problems-locked.md` v0.2.0 Coverage Matrix) must each surface in Pillar 5 through gem-coverage of their canonical instances.
 
@@ -985,6 +1009,8 @@ Pillar 5 will contain **108 named gems**, expanding the current working inventor
 3. **Practical limit** — beyond ~120 gems the catalog becomes encyclopedic and stops being usable as a study tool.
 
 The final number may drift by ±10 depending on what Pillars 2–4 expose; the *target* is locked at 108.
+
+> **Reconciliation (May 29, 2026).** After a MECE re-audit against the as-drafted Pillars 2–4, the count settled at **115** (within the stated ±10 band): every named tool became its own entry (splits at A07, D04, D07, F04), three used-but-unlisted gems were added (A16, A17, G17), two cited-but-not-applied results were removed (Dirichlet, Hensel), and one pair was merged (generating functions). 70 Core + 45 Stretch. Part I's 17 Foundation blocks sit below the gem tier and are not counted among the 115.
 
 ### 9.4 Cluster Targets (locked)
 
@@ -1369,27 +1395,23 @@ Phase 7:              Draft Chapter 20 (Analogy / Transfer) — Pillar 2 capston
 Phase 8 (Complete):   Complete Pillar 3 (all 8 chapters) — DONE May 28, 2026
 Phase 9 (Complete):   Draft Pillar 4 (all 9 chapters + 25 case studies + 3 design exercises) — DONE May 28, 2026
                       (Phase E.1 closure: slate v0.2.0 LOCKED + problems-locked v0.2.0 + Blueprint v2.4)
-Phase 10 (Current):   Draft Pillar 5 (gem catalog, expand to 108)
-Phase 11:             Draft Pillar 1 (meta-grammar) — written last
+Phase 10 (Complete):  Draft Pillar 5 (gem catalog) — LOCKED May 29, 2026 (115 gems + 17 prerequisite blocks; cross-refs provisional)
+Phase 11 (Complete):  Draft Pillar 1 (meta-grammar) — LOCKED May 29, 2026 (single chapter, ~6,200 words, all 7 sub-sections; back-tested)
 Phase 12:             Draft front matter and closing essays
 Phase 13:             Full editorial pass — voice consistency, citation audit, length trim
 Phase 14:             Build pipeline final — Pandoc LaTeX generation, Overleaf validation
 ```
 
-### 14.2 Current Status by File (May 28, 2026 — post-Pillar-4 closure)
+### 14.2 Current Status by File (May 29, 2026 — v3.0, Volume 1 build complete)
 
 | File | Status | Notes |
 |------|--------|-------|
-| `pillar2-archetypes/01-invariance.md` | **Drafted, Joshi-re-instrumented** | All WE / PP / appendix solutions are Joshi-sourced. Two Anand-verification flags remain (PP4 solution argument, PP7 functional-equation closure). |
+| `pillar2-archetypes/` (all 20 chapters) | **LOCKED (May 29, 2026)** | Chs. 1–4 Anand-approved (May 26); Chs. 5–20 locked as-is May 29. Ch. 1 carries two tracked Anand-verification flags (PP4 argument, PP7 functional-equation closure) — see §16.5 punch-list. |
 | `pillar2-archetypes/_template/chapter-template.md` | Complete | Canonical scaffold; do not modify without a version bump |
 | `pillar2-archetypes/_template/01-invariance-outline.md` | Complete | Approved outline; historical reference |
 | `pillar2-archetypes/_template/02-symmetry-outline.md` | Stable | Outline approved-pending; 7 decisions flagged for Anand |
 | `pillar2-archetypes/_template/joshi-archetype-map.md` | Stable | v0.1 working map; full archetype-to-chapter routing |
-| `pillar2-archetypes/12-extremal-principles.md` | **Drafted** | Pillar 2 Ch. 12 |
-| `pillar2-archetypes/15-bijection-correspondence.md` | **Drafted** | Pillar 2 Ch. 15 |
-| `pillar2-archetypes/16-reverse-engineering.md` | **Drafted** | Pillar 2 Ch. 16 |
-| `pillar2-archetypes/17-degrees-of-freedom.md` | **Drafted** | Pillar 2 Ch. 17 |
-| `pillar3-multidirectional/` | **Pillar 3 COMPLETE (8 chapters, signed off)** | All 8 chapters drafted + `pillar3-problems-locked.md` + slate locked |
+| `pillar3-multidirectional/` (all 8 chapters) | **LOCKED (May 29, 2026)** | All 8 chapters + `pillar3-problems-locked.md` + slate locked (prior "signed off" May 28, relabelled to locked for consistency) |
 | `pillar4-cep-design/01-problem-as-art-object.md` | **Drafted (5,111 words)** | Lockhart polemic + Tao warmth register |
 | `pillar4-cep-design/02-anatomy-of-designed-problem.md` | **Drafted (5,050 words)** | Tao register; 4-axis anatomy + IMO 1959 P1 demo |
 | `pillar4-cep-design/03-cep-design-framework.md` | **Drafted (6,030 words)** | Polya-inverted 5-step framework; author-designed demo |
@@ -1402,6 +1424,9 @@ Phase 14:             Build pipeline final — Pandoc LaTeX generation, Overleaf
 | `pillar4-cep-design/pillar4-case-study-slate-v0.1.0.md` | **v0.2.0 LOCKED** | 25 cases locked May 28 |
 | `pillar4-cep-design/pillar4-problems-locked.md` | **v0.2.0 LOCKED** | 31 distinct problems verified |
 | `pillar4-cep-design/_template/chapter-template.md` | Complete | Pillar 4 canonical scaffold (3 chassis types) |
+| `pillar5-gems/prerequisites.md` | **LOCKED (May 29, 2026)** | Part I, Foundations: 17 blocks PR01–PR17 (Class 11–12 NCERT on-ramp) |
+| `pillar5-gems/gems.md` | **LOCKED (May 29, 2026)** | Part II, The Gems: 115 gems (70 Core / 45 Stretch), 7 clusters, 7-field entries + Part III cross-ref tables. Cross-refs *(provisional)* — sole carve-out |
+| `pillar1-framework/01-six-point-framework.md` | **LOCKED (May 29, 2026)** | Single multi-section chapter (~6,200 words); all 7 sub-sections (§5.5.1–§5.5.7); running example = polygon-with-AP-angles. Back-tested against all knowledge_base + my_references docs; prose approved |
 | `advaitian-philosophy/Cursor-Joshi.md` | Stable | Joshi consolidated memory file |
 | `advaitian-philosophy/Cursor-Engel.md` | Stable | Engel consolidated memory file |
 | `advaitian-philosophy/Cursor-Zeitz.md` | Stable | Zeitz consolidated memory file |
@@ -1411,7 +1436,7 @@ Phase 14:             Build pipeline final — Pandoc LaTeX generation, Overleaf
 | `advaitian-philosophy/Cursor-Tao.md` | Stable | Tao memory file |
 | `knowledge_base/ThinkMath_Blueprint_v3.md` | Stable (read-only reference) | Primary source for Pillar 1 |
 | `knowledge_base/Advaitian_Master_Framework.txt` | Stable (read-only reference) | The 20 archetypes + Six-Point Framework canonical definition |
-| `Advaitian_Book_vol1_Blueprint.md` | **This file** | v2.4 — source of truth (post-Pillar-4 closure) |
+| `Advaitian_Book_vol1_Blueprint.md` | **This file** | v3.0 — source of truth (Volume 1 build complete, May 29) |
 
 ---
 
@@ -1427,25 +1452,15 @@ These are the concrete deliverables for the immediate work sessions, updated to 
 4. ✅ **Reference corpus expanded** — 7 Cursor memory files (Joshi + Engel + Zeitz + Polya + IMO + Lockhart + Tao), totalling ~52K words of consolidated reference doctrine. All copyrighted source PDFs in workspace but untracked per Part C precedent.
 5. ✅ **Blueprint v2.0 → v2.5** — sources-in-hand, status table, repository map, write-status flips for Pillar 1 + Pillar 5, immediate commitments all refreshed.
 6. ✅ **Commits pushed to GitHub** — `565677c` (Pillar 2 Chs. 1–4 + supporting framework), `5fd4efa` (Pillars 2 completion + 3 + 4 + Cursor memory files + Blueprint v2.4).
+7. ✅ **Pillar 5 — Mathematical Gems** (May 29, 2026) — **LOCKED.** `prerequisites.md` (17 Foundation blocks PR01–PR17) + `gems.md` (115 gems = 70 Core / 45 Stretch across 7 clusters, seven-field entries incl. "The move" / "When it fires" / "Micro-example" / "Named proof", + Part III cross-ref tables). `key_gems` metadata populated in all 20 Pillar 2 chapters. Sole open carve-out: Pillar 2–4 cross-references remain *(provisional)*, deferred to a dedicated verification pass.
+8. ✅ **Pillar 1 — Six-Point Framework** (May 29, 2026) — **LOCKED.** `pillar1-framework/01-six-point-framework.md`, single multi-section chapter (~6,200 words), all 7 sub-sections per §5.5.1–§5.5.7, locked running example (polygon-with-AP-angles), Pólya + Joshi master-readings, 12-question self-diagnosis. Back-tested against all `knowledge_base/` + `my_references/` docs (three corrections accepted: Pólya locus, gold-standard takeaway, §1 trichotomy positioning); prose approved. Length ~6,200 words accepted as final.
 
-### 15.2 Tomorrow's work — May 29, 2026 (planned same-day push)
+### 15.2 With Pillars 1 + 5 drafted, Volume 1 is first-draft complete
 
-7. **Pillar 5 — Mathematical Gems** drafting:
-   - Pre-flight: scan as-drafted Pillars 2, 3, 4 for gem invocations; reconcile against §9.7 working list.
-   - Expand current 45-gem inventory to 108 target across the 7 clusters (§9.4: A Algebraic / B Inequalities / C Number Theory / D Geometry / E Sequences & Series / F Calculus / G Combinatorics).
-   - Each gem follows the §9.6 per-gem template (300–600 words).
-   - Especially ensure coverage of the 4 archetypes uncovered in Pillar 4 (#3 Reduction, #6 Linearisation, #7 Normalisation, #19 Pivoting).
-8. **Pillar 1 — Six-Point Framework** drafting (immediately after Pillar 5):
-   - Single multi-section chapter, ~7,000 words target (§5.5).
-   - Re-read `ThinkMath_Blueprint_v3.md` as canonical source.
-   - Running example locked: the polygon-with-AP-angles problem (§5.7).
-   - 7 sub-sections per §5.5.1–§5.5.7.
-9. **End-of-day deliverables on May 29:**
-   - Pillar 5 first-draft (108 ± 10 gems) + Cluster-by-Cluster locked index
-   - Pillar 1 first-draft (single chapter, ~7K words)
-   - Blueprint v2.6 reflecting Pillar 5 + Pillar 1 first-draft complete
-   - `Thinkmath_04May.md` Part E appended
-   - Commit + push (final session of the Volume-1 first-draft sprint)
+All five pillars now have a first draft. The remaining work is no longer drafting but consolidation:
+- **Anand line review of Pillar 1** (and the line-review-pending Pillar 2 Chs. 5–20).
+- **Deferred Pillar 5 cross-ref verification pass** — promote the *(provisional)* tags to verified against the locked chapters.
+- **End-of-session deliverables (May 29):** Blueprint **v3.0 — Volume 1 build complete** (all 5 pillars locked; banner at top; §16.5 punch-list); `Thinkmath_04May.md` Parts E + F + G appended; commit + push (final session of the Volume-1 first-draft sprint).
 
 ### 15.3 Post-Volume-1-first-draft (after May 29)
 
@@ -1522,6 +1537,20 @@ Chapter 2 (Symmetry, outline only):
 13. Outline §4.2 WE2 — JEE 1997 integral, depth of full evaluation. Stop at "symmetric half vanishes" or push to closed-form?
 14. Outline §4.3 WE3 — RMO Ex. 24.67 (symmetric matrix involution). Confirm; or substitute with Ex. 24.60 / 24.61.
 15. Outline §5 — four practice problems (5.1, 5.3, 5.4, 5.5) proposed by category, not by locked problem statement. Anand may pre-lock.
+
+### 16.5 Post-Build Verification Punch-List (tracked; non-blocking for the v3.0 build milestone)
+
+Per Anand's May 29 sign-off, Volume 1 is **build-complete** with the following items deliberately deferred to a verification/editorial pass. None of these block the v3.0 milestone; all five pillars are locked as-is.
+
+| # | Item | Pillar | Scope |
+|---|------|--------|-------|
+| V1 | **Pillar 5 cross-reference verification** | 5 | Promote the *(provisional)* Archetype→Gems / Chapter→Gems / Prerequisite→Gems references in `gems.md` to verified against the locked chapters. |
+| V2 | **Pillar 4 ☼ Compendium-detail items** | 4 | Cases 19, 21, 22 — verify against the IMO Compendium; on completion, promote `pillar4-problems-locked.md` to v0.2.1. |
+| V3 | **Pillar 2 Ch. 1 Anand flags** | 2 | PP4 (RMO 2001 divisibility) elegance choice; PP7 (INMO functional equation) analytic-gap closure (see §16.4 items 11–12). |
+| V4 | **Pillar 2 Chs. 5–20 line review** | 2 | Locked as-is at the build milestone; Anand prose line-review still desirable (Chs. 1–4 already approved). |
+| V5 | **Pillar 2 Ch. 2+ outline-stage decisions** | 2 | §16.4 items 13–15 (WE/practice-problem locks) where any chapter retains outline-stage choices. |
+
+**Post-build, beyond verification:** editorial pass (voice consistency across all 5 pillars; length-trim), build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays, and the 8-commentary Appendix A.
 
 ---
 

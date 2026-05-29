@@ -5,8 +5,9 @@ title: "Practice Set + Diagnostic"
 subtitle: "*The diagnostic that tells you whether the toolkit has become reflex.*"
 length_target_words: 5500
 canonical_takeaway: "The score on the diagnostic is the least interesting output; the per-problem diagnostic profile is what tells you what to train next."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Engel-ch-1, Engel-ch-4, Engel-ch-5, Engel-ch-8, Engel-ch-11, Engel-ch-14, Zeitz-ch-3, Zeitz-ch-4, IMO-1972, Joshi-ch-1, Joshi-ch-6]
 canonical_constructs_used: [first-minute-protocol, mvc-sketch, convergence-diagram, escape-hatch]
 ---

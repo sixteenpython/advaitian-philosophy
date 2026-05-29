@@ -4,7 +4,7 @@ archetype: Domain Constraints / Bounds
 subtitle: "Algebra Generates Candidates; Domain Selects the Winner"
 category: Constraint Exploitation (Archetypes 9–12) — opening chapter
 related_archetypes: [1, 10, 11, 14, 17]
-key_gems:
+key_gems: [A16, A17, C16]
   - "Triangle inequality $|x - y| < z$, $|y - z| < x$, $|x - z| < y$ for sides of a non-degenerate triangle"
   - "Heron's formula $K = \\sqrt{s(s-a)(s-b)(s-c)}$ with $s = (a+b+c)/2$"
   - "$r = K/s$ (inradius) and $R = abc / (4K)$ (circumradius)"
@@ -16,8 +16,9 @@ key_gems:
   - "Discriminant condition $b^2 - 4ac \\ge 0$ for real roots of $ax^2 + bx + c$, generalising to $\\Delta \\ge 0$ for higher-order reality conditions"
   - "Algebraic identity $x^2(y-z) + y^2(z-x) + z^2(x-y) = (x-y)(y-z)(x-z)$"
 canonical_takeaway: "Algebra generates candidates; the domain selects the winner."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 9 for the locked slate. **Verification audit for this chapter discovered one slate-listing typo**: PP1 (integer-$m$ count) listed the two valid $m$-values as $\\{-1, 2\\}$, but the correct pair is $\\{-1, -2\\}$. The *count* of $2$ values is correct; only the second-listed value was a copy-typo. Patched in slate v0.2.6; see PP1 solution in the appendix for the corrected derivation."
 ---
 

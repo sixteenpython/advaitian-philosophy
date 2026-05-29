@@ -5,8 +5,9 @@ title: "The Multidirectional Thesis"
 subtitle: "*Why single-archetype thinking hits a wall, and what replaces it.*"
 length_target_words: 7500
 canonical_takeaway: "Hard problems are not hard because the archetype is exotic; they are hard because two or three archetypes must operate simultaneously."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Joshi-ch-1, Engel-ch-4, Zeitz-ex-6.1.1, Polya-1945]
 canonical_constructs_used: [convergence-diagram]
 ---

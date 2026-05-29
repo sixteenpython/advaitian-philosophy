@@ -6,8 +6,9 @@ title: "The 5-Step CEP Design Framework"
 subtitle: "Polya, inverted."
 length_target_words: 6300
 canonical_takeaway: "The designer's procedure is Polya's solver-procedure run backwards — five steps that begin from the chosen insight and engineer the problem outward."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Polya-Part-I-four-phase, Polya-Part-III-Inventor's-Paradox, Polya-Part-IV-solutions, Tao-Ch-1-nine-strategies, Lockhart-Part-II-Exultation]
 voice_register: polya-systematic
 pillar3_cross_references: [pillar3-ch-4-§1-FMP]

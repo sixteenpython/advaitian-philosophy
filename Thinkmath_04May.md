@@ -1147,3 +1147,124 @@ Build Pillar 5. Then Pillar 1. Then editorial. Then ship Volume 1.
 
 🌑
 
+---
+
+# PART E — PILLAR 5 LOCKED (May 29, 2026)
+
+## E.1 What was built
+
+**Pillar 5 — Mathematical Gems is LOCKED.** Two files under `advaitian-philosophy/pillar5-gems/`:
+
+- **`prerequisites.md` — Part I, Foundations.** 17 prerequisite blocks (PR01–PR17), Foundation tier, spanning Class 11–12 NCERT/JEE from Complex Numbers → Probability. Each block = orientation + concept list + Fluency check. This is the "pickable-up right after Class 10" on-ramp Anand requested.
+- **`gems.md` — Part II, The Gems.** **115 gems** (70 Core / 45 Stretch) across the 7 clusters A–G. Each gem uses a seven-field entry: **Statement · What it says · The move · When it fires (trigger) · Micro-example · Watch for · Used in / Neighbours · Named proof.** Plus **Part III** cross-reference tables (Archetype→Gems, Chapter/Case→Gems reverse-lookup, Prerequisite→Gems).
+
+## E.2 Decisions sealed at lock (Anand, May 29)
+
+- **Bar:** Fully **locked** — content, structure, and prose approved.
+- **Prose/voice:** Reviewed, no changes needed.
+- **Status stamp:** `locked` in both file YAMLs + Blueprint §9.2 banner + §14 status table + §14.1 work order (Phase 10 Complete) + §15.1 item 7.
+- **`key_gems` metadata:** Kept (populated in all 20 Pillar 2 archetype chapters).
+- **Sole carve-out:** Pillar 2–4 cross-references remain *(provisional)*. Verification deferred to a dedicated later pass — **does not block the lock**.
+
+## E.3 Count reconciliation
+
+Blueprint §9.3 target was 108 ±10. Settled at **115** after a MECE re-audit: per-tool splits (A07, D04, D07, F04), three used-but-unlisted additions (A16, A17, G17), two removals (Dirichlet, Hensel — cited but not applied), one merge (generating functions). The 17 Foundation blocks sit below the gem tier and are not counted among the 115.
+
+## E.4 What remains for Volume 1
+
+1. **Pillar 1 — Six-Point Framework** (the one remaining pillar; Blueprint §5 spec). Single multi-section chapter, ~7K words, source `ThinkMath_Blueprint_v3.md`, running example = polygon-with-AP-angles.
+2. **Deferred verification pass** — promote the Pillar 5 *(provisional)* cross-refs to verified against the locked chapters.
+3. Editorial polish (Pillar 2 Chs. 5–20 line review), build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays.
+
+Pillar 1 is next. Then editorial. Then ship Volume 1.
+
+🌑
+
+---
+
+# PART F — PILLAR 1 LOCKED (May 29, 2026)
+
+## F.1 What was built
+
+**Pillar 1 — The Six-Point Framework is LOCKED.** One file: `advaitian-philosophy/pillar1-framework/01-six-point-framework.md`, a single multi-section chapter (~6,200 words) built exactly to Blueprint §5.5.1–§5.5.7 from the canonical source `knowledge_base/ThinkMath_Blueprint_v3.md`, then back-tested against the full reference corpus and locked.
+
+Seven sections:
+- **§1 The Problem with Problem-Solving Books** — Lockhart-polemic "I" voice; the false choice between recipe-manuals and philosophy-books; the commentary-with-a-grammar as the way out.
+- **§2 What a Commentary Is, and Why You Need a Grammar** — the bhāṣya tradition; solution-as-sūtra vs commentary-as-bhāṣya; the six points listed; the *forced order* (each point depends on the prior).
+- **§3 The Six Points: A Walking Tour** — the locked running example (polygon-with-AP-angles) carried through SEED → BRUTE PATH → ELEGANT PIVOT → PITFALLS → CONNECTIONS → TAKEAWAY in full, with the $n^2-25n+144=0 \Rightarrow n=9$ (reject $16$ by convexity) resolution.
+- **§4 The MVC Protocol** — the four-sentence Minimum Viable Commentary walked on the same problem; "figure-it-out-as-you-go" contrast.
+- **§5 The Developmental Tiers 0–4** — density-not-structure scaling, with a concrete Tier-1-paragraph vs Tier-4-page commentary on the polygon.
+- **§6 Reading the Masters** — Pólya's inscribed-square-in-a-triangle and Joshi's JEE 1989 five-digit problem, both decomposed cleanly through the six points (evidence the grammar is descriptive, not imposed).
+- **§7 Self-Diagnosis** — a 12-question checklist keyed to the six points + MVC, routing the reader to the pillar that fixes their weakest move.
+
+## F.2 Back-test (May 29) — all reference docs
+
+Checked every `knowledge_base/` doc (Master Framework, Masterclass, Philosophy Framework, White Paper, Seed-Elegance, Chapter-1-Invariance, Advaitian.md, ThinkMath v3) and the `my_references/` docs (positioning via `why_this_book.txt`; voice via `lockhart-lament.txt`; `extracted_text.txt` re-confirms the doctrine). The four large competition extracts (Joshi, Engel, Zeitz, IMO Compendium) + Tao were correctly scoped out as problem/gem sources, not Pillar-1 meta-grammar.
+
+**Three corrections accepted at lock:**
+1. **Pólya locus fixed** — the freed inscribed-square vertex traces a line through a *triangle vertex*, not the apex (verified by direct derivation).
+2. **Gold-standard takeaway** — polygon takeaway aligned to the verbatim canon "Algebra generates candidates; Geometry selects the winner."
+3. **§1 positioning enriched** — from a binary to the canonical trichotomy (technique / philosophy / culture books → empty quadrant) + the headline "first to treat problem-solving as having a grammar" claim (per `why_this_book.txt`).
+
+## F.3 Decisions sealed at lock (Anand, May 29)
+
+- **Bar:** Fully **locked**.
+- **Back-test changes:** all three kept.
+- **Length:** ~6,200 words accepted as final (under the 7K target by choice — quality over number).
+- **Prose/voice:** Reviewed, no changes needed.
+- **Big reference extracts:** left out of scope (correct).
+- **Records:** updated (this file + Blueprint §5.6 / §14 / §15). **No commit** this session — deferred.
+
+## F.4 Volume-1 status — first draft COMPLETE
+
+**All five pillars locked.** Pillars 2 (20/20, Chs. 1–4 approved + 5–20 line-review-pending), 3 (signed off), 4 (locked), 5 (locked May 29), 1 (locked May 29).
+
+Remaining for Volume 1:
+- Deferred **Pillar 5 cross-ref verification pass** (promote *(provisional)* tags).
+- Pillar 2 Chs. 5–20 line review.
+- Editorial polish, build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays.
+- **Uncommitted:** the Pillar 5 + Pillar 1 lock work is on disk but not yet committed/pushed.
+
+The architecture is fully drafted and locked. Verify cross-refs, polish, then ship Volume 1.
+
+🌑
+
+---
+
+# PART G — VOLUME 1 BUILD COMPLETE (v3.0, May 29, 2026)
+
+## G.1 The milestone
+
+**All five pillars are locked. The first-draft build of Volume 1 is complete.** Blueprint promoted to **v3.0** with a build-complete banner at the top.
+
+| Pillar | State |
+|---|---|
+| 1 — The Six-Point Framework | **LOCKED** (1 chapter, ~6,200 words) |
+| 2 — The 20 Universal Archetypes | **LOCKED** (20 chapters; Chs. 1–4 approved, 5–20 locked as-is) |
+| 3 — Multidirectional Solving | **LOCKED** (8 chapters; prior "signed off" relabelled) |
+| 4 — CEP-Based Problem Design | **LOCKED** (9 chapters + slate v0.2.0 + 31-problem record) |
+| 5 — Mathematical Gems | **LOCKED** (17 prerequisites + 115 gems; cross-refs provisional) |
+
+## G.2 What "build complete" means (Anand sign-off, May 29 — ship-now)
+
+Build-complete = **every pillar has a locked draft.** It is *not* a claim that every verification item is closed. The open items are tracked as a non-blocking punch-list and explicitly do not gate the v3.0 milestone.
+
+Status edits this session: flipped 37 chapter files to `status: locked` (Pillar 2 ×20, Pillar 3 ×8, Pillar 4 ×9) + Pillar 1 + Pillar 5 (already locked). Pillar 3 relabelled from "signed off" → "locked" for consistency.
+
+## G.3 Tracked post-build punch-list (Blueprint §16.5)
+
+- **V1** — Pillar 5 cross-reference verification (promote *(provisional)* tags).
+- **V2** — Pillar 4 ☼ Cases 19/21/22 vs IMO Compendium → promote problems-locked to v0.2.1.
+- **V3** — Pillar 2 Ch. 1 flags (PP4 elegance, PP7 analytic gap).
+- **V4** — Pillar 2 Chs. 5–20 prose line review (locked as-is; review still desirable).
+- **V5** — Pillar 2 outline-stage WE/practice locks (§16.4 items 13–15).
+- **Beyond verification:** editorial pass, build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays + Appendix A.
+
+## G.4 This session's commit
+
+Decisions sealed: ship-now; lock all 5 pillars as-is; track the punch-list; bump version + banner; **commit + push**. The Volume-1 build (Pillar 5 + Pillar 1 locks, all chapter-status flips, Blueprint v3.0, Thinkmath Parts E/F/G) is committed and pushed this session.
+
+Volume 1 is built. Next: work the §16.5 punch-list, then editorial + build pipeline, then ship.
+
+🌑
+

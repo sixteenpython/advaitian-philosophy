@@ -5,8 +5,9 @@ title: "The Escape-Hatch Architecture"
 subtitle: "*What to do when the discipline doesn't work.*"
 length_target_words: 6000
 canonical_takeaway: "The escape-hatch is not a desperation move; it is a protocol move. Trigger it on the clock, not on the feeling."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Engel-ch-14, Zeitz-ch-2, Polya-1945]
 canonical_constructs_used: [escape-hatch, first-minute-protocol, mvc-sketch, convergence-diagram]
 ---

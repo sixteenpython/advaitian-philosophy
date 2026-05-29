@@ -4,7 +4,7 @@ archetype: Duality
 subtitle: "If Stuck in One Language, Speak the Dual"
 category: Structure Recognition (Archetypes 1–4)
 related_archetypes: [2, 12, 15, 19]
-key_gems:
+key_gems: [D04a, D04b, D11, D15, G02]
   - "Pole–polar duality (point ↔ polar line w.r.t. a non-degenerate conic)"
   - "Reciprocal basis in $\\mathbb{R}^3$: $\\vec p_i \\cdot \\vec a_j = \\delta_{ij}$"
   - "LP weak duality: $b \\cdot y \\le c \\cdot x$ for any feasible primal $x$ and dual $y$"
@@ -16,9 +16,10 @@ key_gems:
   - "Cross-ratio: the projective invariant fixed by the duality"
   - "Descartes' circle theorem as a self-dual identity in four curvatures"
 canonical_takeaway: "Two viewpoints, primal and dual, describe the same structure with reversed roles. Choose the easier."
-status: approved
-last_revised: 2026-05-26
+status: locked
+last_revised: 2026-05-29
 approved_on: 2026-05-26
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 3 for the locked slate."
 ---
 

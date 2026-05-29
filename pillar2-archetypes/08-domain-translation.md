@@ -4,7 +4,7 @@ archetype: Domain Translation
 subtitle: "If the Language is Wrong, Speak a Different One"
 category: Method Selection (Archetypes 5–8) — final chapter of the sub-pillar
 related_archetypes: [3, 5, 7, 15, 19]
-key_gems:
+key_gems: [A10, A15, D06, D08, D19, E03]
   - "Argand correspondence $\\mathbb{C} \\leftrightarrow \\mathbb{R}^2$: every complex number is a point in the plane, every plane point a complex number"
   - "De Moivre's theorem $(\\cos\\theta + i\\sin\\theta)^n = \\cos n\\theta + i\\sin n\\theta$ — multiplication in $\\mathbb{C}$ as rotation-and-scaling on the plane"
   - "Ratio of complex differences $(z_1 - z_3)/(z_2 - z_3) = r\\,e^{i\\phi}$ — modulus is the ratio of two sides at $z_3$; argument is the included angle"
@@ -16,8 +16,9 @@ key_gems:
   - "Möbius transformation $z \\mapsto (az + b)/(cz + d)$ — translation between algebraic action on $\\mathbb{C}$ and conformal action on the Riemann sphere"
   - "Time domain $\\leftrightarrow$ frequency domain via Fourier transform — differential equations become algebraic in the frequency variable"
 canonical_takeaway: "Mathematics is not one language but many; the same structure looks different — and is easier or harder — depending on which language you read it in."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 8 for the locked slate. **Verification audit for this chapter discovered one slate-answer error**: PP3 (3-roots right-angle reformulation of JEE 2001 / Joshi Ex. 24.24) was listed as $n = 4k$, but the correct answer for the reformulated problem is $n$ even with $n \\ge 4$. Patched in slate v0.2.5; see the chapter's PP3 solution for the corrected derivation, which uses Thales' theorem (converse of the inscribed angle theorem in a semicircle)."
 ---
 

@@ -5,8 +5,9 @@ title: "The First-Minute Protocol"
 subtitle: "*The 60-second diagnostic that prevents the 2.5-hour mistake.*"
 length_target_words: 7500
 canonical_takeaway: "Externalise the archetype profile in the first 60 seconds; the working-memory you preserve is the working-memory the convergence needs."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Engel-ch-3, Engel-ch-4, Zeitz-ex-6.1.1, Joshi-ch-13, Polya-1945]
 canonical_constructs_used: [first-minute-protocol, convergence-diagram, escape-hatch]
 ---

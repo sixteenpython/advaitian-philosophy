@@ -4,7 +4,7 @@ archetype: Inequality Constraints
 subtitle: "Sometimes the Bounds Tell the Whole Story"
 category: Constraint Exploitation (Archetypes 9–12) — second chapter
 related_archetypes: [2, 7, 9, 12, 17]
-key_gems:
+key_gems: [B01, B02, B03, B04, B05, B06, B07, B08, B09, B10, B11, B13, B14, B15, F12]
   - "AM-GM: $\\dfrac{a_1 + \\cdots + a_n}{n} \\ge \\sqrt[n]{a_1 \\cdots a_n}$ for non-negative reals, equality iff $a_1 = \\cdots = a_n$"
   - "Cauchy-Schwarz: $\\left(\\sum a_i b_i\\right)^2 \\le \\left(\\sum a_i^2\\right)\\left(\\sum b_i^2\\right)$, equality iff $(a_i)$ and $(b_i)$ are proportional"
   - "Jensen's inequality: for convex $f$ on an interval $I$ and $\\lambda_i \\ge 0$ with $\\sum\\lambda_i = 1$, $f\\left(\\sum\\lambda_i x_i\\right) \\le \\sum\\lambda_i f(x_i)$ (reverse for concave)"
@@ -16,8 +16,9 @@ key_gems:
   - "SOS (Sum-of-Squares) decomposition: every symmetric inequality $P(a, b, c) \\ge 0$ that is true and *sharp* admits, after suitable manipulation, an expression as a sum of squares of polynomials in $a - b, b - c, c - a$"
   - "Equality-case principle: the equality case of a tight inequality often *characterises* the extremum, turning a maximisation problem into an algebraic equation"
 canonical_takeaway: "Inequalities are not obstacles; they are constraints that determine the answer. The equality case is the answer."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO / IMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 10 for the locked slate. **Two explicit cross-archetype reuses are flagged in the front matter:** (a) WE1 (RMO triangle-inequality bound, Joshi Ex. 24.65) was previously drafted as Ch. 9 WE3 under the *domain-constraint* framing; here it is reframed as an *inequality-constraint* problem via the Ravi substitution. (b) WE3 (INMO + IMO 2000, Joshi Ex. 24.66) was previously drafted as Ch. 2 PP7 under the *symmetry* framing; here it is reframed via Jensen + Vasile-Cirtoaje substitution. (c) PP3 (JEE 2001 cos-product, Joshi Ex. 24.27) was previously drafted as Ch. 7 WE3 under the *normalisation* framing; here it appears as a practice problem with a cross-reference. All three cross-reuses are documented in slate v0.2.7 and conform to Blueprint §6.4 (cross-archetype reuse is permitted with explicit cross-referencing when the cognitive framing differs)."
 ---
 

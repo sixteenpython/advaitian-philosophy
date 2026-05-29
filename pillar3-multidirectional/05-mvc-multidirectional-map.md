@@ -5,8 +5,9 @@ title: "The MVC as a Multidirectional Map"
 subtitle: "*Drawing the Solution Before You Write It.*"
 length_target_words: 6000
 canonical_takeaway: "The First-Minute Protocol is silent; the MVC is visible. The protocol lives in working memory; the MVC lives on paper. The Pillar 3 solver uses both."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Zeitz-ch-1, Engel-ch-4, Engel-ch-8, IMO-1988-P6, Polya-1945]
 canonical_constructs_used: [first-minute-protocol, convergence-diagram, mvc-sketch]
 ---

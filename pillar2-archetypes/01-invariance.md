@@ -4,11 +4,12 @@ archetype: Invariance
 subtitle: "If Something Stays Constant, Make It Your Anchor"
 category: Structure Recognition (Archetypes 1–4)
 related_archetypes: [2, 9, 12, 17]
-key_gems: []
+key_gems: [A01, A04, A09, C16, D05, D18, G17]
 canonical_takeaway: "Track the invariant; let everything else move."
-status: approved
-last_revised: 2026-05-26
+status: locked
+last_revised: 2026-05-29
 approved_on: 2026-05-26
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule."
 ---
 

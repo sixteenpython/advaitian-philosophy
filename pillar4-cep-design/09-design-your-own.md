@@ -6,8 +6,9 @@ title: "Design Your Own + The Ethics of Difficulty"
 subtitle: "From reader to maker, and what the maker owes the reader."
 length_target_words: 6700
 canonical_takeaway: "The reader who completes Pillar 4 has been handed the designer's toolkit; the ethics chapter closes with the moral responsibility the toolkit imposes on whoever takes it up."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Lockhart-Part-II-Exultation, Polya-Inventor's-Paradox, Tao-Ch-1-strategy, IMO-1988-P6-capstone-reference, Pillar-2-archetypes]
 voice_register: mixed-lockhart-constructive-tao-reflective
 pillar3_cross_references: [pillar3-ch-8-§5]

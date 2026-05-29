@@ -6,8 +6,9 @@ title: "The Problem as Art Object"
 subtitle: "A solved problem is consumed once. A designed problem teaches forever."
 length_target_words: 5800
 canonical_takeaway: "A mathematical problem is not a riddle the universe poses; it is a designed object, made by a human author for a human reader, and the act of design is itself a discipline."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [Lockhart-Part-I, Lockhart-Part-II, Tao-Preface, Polya-Part-III-Inventor's-Paradox, Engel-Ch-1, IMO-1988-P6, Pillar-3-Ch-3]
 voice_register: lockhart-polemic
 pillar3_cross_references: [pillar3-ch-3-§2-WE1]

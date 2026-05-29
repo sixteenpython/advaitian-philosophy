@@ -4,7 +4,7 @@ archetype: Symmetry
 subtitle: "If the Problem Has Symmetry, the Solution Inherits It"
 category: Structure Recognition (Archetypes 1–4)
 related_archetypes: [1, 3, 5, 15]
-key_gems:
+key_gems: [A09, B08, B09, B10, B11, C10, D03, D13, G06]
   - "Orbit-Stabiliser Theorem"
   - "Burnside's Lemma"
   - "Klein's Erlangen Program (1872) — geometry by invariance group"
@@ -16,9 +16,10 @@ key_gems:
   - "Involution-on-odd-cardinality forces a fixed point"
   - "Tschirnhaus shift to expose hidden symmetry"
 canonical_takeaway: "What is symmetric in the problem must be symmetric in the answer."
-status: approved
-last_revised: 2026-05-26
+status: locked
+last_revised: 2026-05-29
 approved_on: 2026-05-26
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule. Problem slate locked in `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 2."
 ---
 

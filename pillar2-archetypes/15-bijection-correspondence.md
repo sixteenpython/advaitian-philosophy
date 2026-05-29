@@ -4,7 +4,7 @@ archetype: Bijection / Correspondence
 subtitle: "If Two Problems Are Isomorphic, Solve the Simpler One"
 category: Structural Reasoning (Archetypes 13–16) — third chapter
 related_archetypes: [4, 8, 13, 14, 18]
-key_gems:
+key_gems: [A12, E05, G03, G05, G10, G11]
   - "The bijective principle: two finite sets satisfy $|A| = |B|$ if and only if there exists a bijection $\\varphi: A \\to B$; constructing the bijection is the proof"
   - "Vandermonde's identity by bijection: $\\binom{m + n}{r} = \\sum_{k = 0}^{r} \\binom{m}{k}\\binom{n}{r - k}$, with the bijection being subset-restriction to two complementary blocks"
   - "Stars and bars (Joshi Ch. 1, Comment 7): the number of non-negative integer solutions of $x_1 + \\cdots + x_k = n$ equals $\\binom{n + k - 1}{k - 1}$ via the binary-string bijection (stars = units, bars = separators)"
@@ -15,8 +15,9 @@ key_gems:
   - "Block-merging for adjacency probability: treating $k$ adjacent objects as a single block reduces the position-counting problem from $n!$ arrangements to $(n - k + 1) \\cdot k!\\cdot (n - k)!$ favourable outcomes"
   - "Lindström-Gessel-Viennot lemma: the number of non-intersecting tuples of lattice paths between source-target pairs equals the determinant of a path-count matrix, generalising the reflection bijection to higher-dimensional counting"
 canonical_takeaway: "If two problems are isomorphic, solve the simpler one. The bijection is the proof — exhibit a one-to-one correspondence and the equality is automatic."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 15 for the locked slate. **Verification audit for this chapter found zero slate errors** — all 10 answers (3 WEs + 7 PPs) verified clean. The locked slate is patched to v0.2.12 to mark Chapter 15 as USED (no answer corrections needed). **Cross-archetype reuses documented**: WE1 (surjections via compositions) is the bijective dual of Ch. 13 WE2 (surjections via inclusion-exclusion) — same count, different lenses; PP4 (distinguishable balls into distinguishable boxes with no box empty) reuses the same surjection count under a re-framing as a balls-and-boxes problem; PP6 (lattice path through waypoint) builds on the WE3 (Dyck path) framework but generalises to arbitrary rectangular grids."
 ---
 

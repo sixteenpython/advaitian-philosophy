@@ -6,8 +6,9 @@ title: "Case Studies 6–10: Mid-difficulty CEP"
 subtitle: "The monovariant, the radical axis, the fixed point, the right pigeonhole."
 length_target_words: 6700
 canonical_takeaway: "Mid-difficulty CEPs are characterised by a single non-trivial intermediate construction — a monovariant, a hidden symmetry, a tight pigeonhole — that the solver must discover before the convergence becomes visible."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [IMO-1986-P3, IMO-1995-P1, Putnam-1992-B2, IMO-1979-P3, IMO-2003-P1, Engel-Ch-2-monovariants]
 voice_register: tao-warm
 pillar3_cross_references: []

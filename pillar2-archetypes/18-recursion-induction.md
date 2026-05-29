@@ -4,7 +4,7 @@ archetype: Recursion / Induction
 subtitle: "Solve for One Step; Repeat to Infinity"
 category: Meta-Reasoning (Archetypes 17–20) — second chapter
 related_archetypes: [11, 13, 15, 17, 19]
-key_gems:
+key_gems: [A13, E01, E02, E03, E10, F11]
   - "Principle of mathematical induction: to prove $P(n)$ for all $n \\ge n_0$, it suffices to prove (i) the base case $P(n_0)$ and (ii) the inductive step $P(n) \\Rightarrow P(n + 1)$; equivalently for strong induction, $P(n_0), P(n_0 + 1), \\ldots, P(n) \\Rightarrow P(n + 1)$"
   - "Linear-recurrence closed form: a recurrence $T_n = c_1 T_{n-1} + c_2 T_{n-2} + \\cdots + c_k T_{n-k}$ has characteristic polynomial $\\chi(r) = r^k - c_1 r^{k-1} - \\cdots - c_k$; for distinct roots $r_1, \\ldots, r_k$, the general solution is $T_n = \\sum_i A_i r_i^n$ with $A_i$ determined by initial conditions"
   - "Fibonacci closed form (Binet): $F_n = (\\varphi^n - \\psi^n)/\\sqrt 5$ where $\\varphi = (1 + \\sqrt 5)/2$ and $\\psi = (1 - \\sqrt 5)/2$ are roots of $r^2 - r - 1 = 0$; matrix form $\\begin{pmatrix}1 & 1\\\\1 & 0\\end{pmatrix}^n = \\begin{pmatrix}F_{n+1} & F_n\\\\F_n & F_{n-1}\\end{pmatrix}$"
@@ -16,8 +16,9 @@ key_gems:
   - "Strong-induction shift-coefficient technique: $S(n + 1) = a S(n) + (\\text{multiple of modulus})$, the canonical inductive-step pattern for divisibility proofs like $25 \\mid 7^{2n} + 2^{3n - 3} \\cdot 3^{n - 1}$"
   - "Binary-string Fibonacci bijection: the number of binary strings of length $n$ with no two consecutive 1's satisfies $a_n = a_{n - 1} + a_{n - 2}$ with $a_1 = 2, a_2 = 3$, giving $a_n = F_{n + 2}$ — a combinatorial-Fibonacci recurrence"
 canonical_takeaway: "Solve for one step; repeat to infinity. A problem on $n$ becomes tractable by relating it to the same problem on $n - 1$ (induction) or by expressing the answer as a sequence satisfying a recurrence; the trick is identifying the right inductive parameter or recursion variable, and the inductive step is the engine that propagates a single solved case to the whole infinite family."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 18 for the locked slate. **Verification audit for this chapter caught zero slate errors** — all 10 answers (3 WE + 7 PP) verified clean on first pass (third clean-slate audit of Pillar 2 after Ch. 15 and Ch. 17). The chapter is the **second** of the Meta-Reasoning sub-pillar (Chs. 17–20), following Ch. 17 (Degrees of Freedom Analysis) and bridging to Ch. 19 (Pivoting / Elimination). **Cross-archetype notes**: WE2 ($25 \\mid 7^{2n} + 2^{3n-3} \\cdot 3^{n-1}$, JEE 1982) is the modular-induction archetype's flagship problem and connects to Ch. 14 (Parity / Modularity) where divisibility *recognition* is the move; here in Ch. 18 the move is divisibility *propagation* by induction. PP4 (Tower of Hanoi) and PP7 (binary strings without consecutive 1's) are both classical recursion-with-Fibonacci-flavour, with PP7's $a_n = F_{n+2}$ a direct combinatorial-Fibonacci bijection of the kind catalogued in Ch. 15 (Bijection / Correspondence). PP6 (gambler's ruin) is the discrete-Laplace recurrence whose continuous limit is the boundary-value problem $-\\Delta u = 0$ — bridging probabilistic recursion to PDE theory."
 ---
 

@@ -4,7 +4,7 @@ archetype: Normalization / Scaling
 subtitle: "Remove the Clutter; Keep Only the Structure"
 category: Method Selection (Archetypes 5–8)
 related_archetypes: [2, 5, 6, 10, 12, 17]
-key_gems:
+key_gems: [A17, B13, B14, D07d]
   - "Buckingham's $\\pi$ theorem: $n$ variables and $k$ independent dimensions yield $n - k$ dimensionless groups"
   - "Constraint normalisation: for an inequality homogeneous of any degree in $a, b, c$, WLOG $a + b + c = 1$ (or any other scale-fixing constraint)"
   - "Dimensional reduction of the pendulum period: $T = 2\\pi\\sqrt{L/g}$, with the $2\\pi$ supplied by linearisation"
@@ -16,8 +16,9 @@ key_gems:
   - "z-score normalisation: $(x - \\mu)/\\sigma$ as the canonical statistical rescaling that fixes mean $0$, variance $1$"
   - "Natural units in physics: setting $c = \\hbar = G = k_B = 1$ to expose the dimensionless skeleton of a theory"
 canonical_takeaway: "Normalisation strips a problem of every degree of freedom that does not matter; what remains is the structure that does."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text, **with one named exception**: Worked Example 1 (Buckingham-$\\pi$ Pendulum) is a standard physics-pedagogy result that illustrates dimensional normalisation more cleanly than any single Joshi problem can. The exception is permitted under Blueprint §6.10.07 (Normalization scope), which explicitly anticipates the dimensional-analysis framing as the natural carrier of normalisation as a cognitive move. See Blueprint §6.2 for the general sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 7 for the locked slate and the framing-decision change-log."
 ---
 

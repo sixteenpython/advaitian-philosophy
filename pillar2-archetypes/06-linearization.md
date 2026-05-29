@@ -4,7 +4,7 @@ archetype: Linearization
 subtitle: "If Nonlinear, Find the Linear Core Underneath"
 category: Method Selection (Archetypes 5–8)
 related_archetypes: [5, 11, 17, 18, 20]
-key_gems:
+key_gems: [B12, E10, F03, F05, F08]
   - "Linearization $L_a(x) = f(a) + f'(a)(x - a)$ as the best linear approximation"
   - "Mean Value Theorem (Lagrange): $f(b) - f(a) = f'(c)(b - a)$ for some $c \\in (a, b)$"
   - "Rolle's Theorem as the special case $f(a) = f(b) \\Rightarrow f'(c) = 0$"
@@ -16,8 +16,9 @@ key_gems:
   - "Euler–Mascheroni constant $\\gamma = \\lim_n (H_{n-1} - \\ln n)$"
   - "Differentiability: $f(x) = f(a) + f'(a)(x - a) + o(x - a)$ as $x \\to a$"
 canonical_takeaway: "Calculus is the systematic study of one move: replace a nonlinear object by its best linear approximation, work in the linear setting, and bound the error."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 sourcing_note: "All worked examples and practice problems in this chapter are drawn from K.D. Joshi, *Educative JEE Mathematics* (2nd ed.), or from JEE / RMO / INMO examinations commented on in that text. See Blueprint §6.2 for the sourcing rule and `pillar2-archetypes/_template/joshi-problems-locked.md` §Ch. 6 for the locked slate."
 ---
 

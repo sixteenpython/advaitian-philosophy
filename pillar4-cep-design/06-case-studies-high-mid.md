@@ -6,8 +6,9 @@ title: "Case Studies 11–15: High-mid CEP"
 subtitle: "The construction itself becomes the problem."
 length_target_words: 6700
 canonical_takeaway: "High-mid CEPs require the solver to engineer a mathematical object whose existence is not obvious from the surface — a tangent-length identity, a Fibonacci descent, a Hermite identity, an exponent-class structure, a CRT system."
-status: draft
-last_revised: 2026-05-28
+status: locked
+last_revised: 2026-05-29
+locked_on: 2026-05-29
 references_invoked: [IMO-1959-P6, IMO-1981-P3, IMO-1968-P6, Putnam-1995-A5, IMO-1989-P5, Engel-Ch-2-Fibonacci, Joshi-Ch-6-NT]
 voice_register: tao-warm
 pillar3_cross_references: [pillar3-ch-3-§1]
