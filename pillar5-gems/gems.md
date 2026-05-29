@@ -623,7 +623,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Both sides must be symmetric sums of the **same degree**; majorisation requires equal totals and the dominance condition; not a substitute for cited rigor at IMO (prove via AM–GM if asked).
 
-**Used in.** Blueprint §9.7 seed; P2 Ch. 10 symmetric-polynomial inequalities *(provisional)*. **Neighbours.** → B01, B08, B09.
+**Used in.** P2 Ch. 10 symmetric-polynomial inequalities *(provisional)*. **Neighbours.** → B01, B08, B09.
 
 **Named proof.** Repeated AM–GM along the majorisation (Robin Hood) steps — Hardy, Littlewood & Pólya, *Inequalities*, §2.18.
 
@@ -663,7 +663,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** The hypothesis $x>-1$; the inequality reverses for $0<n<1$.
 
-**Used in.** Blueprint §9.7; P2 Ch. 5 PP5 (Bernoulli ODE context) *(provisional)*. **Neighbours.** → F08 (analytic linearisation $e^x\ge1+x$), B01.
+**Used in.** P2 Ch. 5 PP5 (Bernoulli ODE context) *(provisional)*. **Neighbours.** → F08 (analytic linearisation $e^x\ge1+x$), B01.
 
 **Named proof.** Induction on $n$, or convexity of $x\mapsto(1+x)^n$ — standard.
 
@@ -809,7 +809,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** The $p=2$ case has a different formula; needs $p\mid a-b$ and $p\nmid ab$.
 
-**Used in.** Blueprint §9.7 seed; olympiad divisibility chains *(provisional)*. **Neighbours.** → A03 (factoring it refines), C05, C01.
+**Used in.** Olympiad divisibility chains *(provisional)*. **Neighbours.** → A03 (factoring it refines), C05, C01.
 
 **Named proof.** Induction on $v_p(n)$ via the factorisation A03 — standard LTE references (e.g. Sriram, *Lifting the Exponent*).
 
@@ -849,7 +849,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Inverse exists *only* when $\gcd(a,n)=1$; the Bézout coefficients are not unique.
 
-**Used in.** Blueprint §9.7; P4 NT background *(provisional)*. **Neighbours.** → C01, C03, A03 (Euclidean step is gcd-invariant).
+**Used in.** P4 NT background *(provisional)*. **Neighbours.** → C01, C03, A03 (Euclidean step is gcd-invariant).
 
 **Named proof.** The extended Euclidean algorithm, run backwards — standard.
 
@@ -929,7 +929,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Supplementary laws for $\left(\tfrac{-1}{p}\right)$ and $\left(\tfrac{2}{p}\right)$ are needed alongside; both primes odd.
 
-**Used in.** Blueprint §9.7; P2 Ch. 2 outline (QR as symmetry of Legendre symbols) *(provisional)*. **Neighbours.** → C15 (Euler's criterion computes the symbol), C07.
+**Used in.** P2 Ch. 2 outline (QR as symmetry of Legendre symbols) *(provisional)*. **Neighbours.** → C15 (Euler's criterion computes the symbol), C07.
 
 **Named proof.** Gauss's lemma plus the Eisenstein lattice-point count — Ireland & Rosen, Ch. 5.
 
@@ -969,7 +969,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Primitive roots exist mod $1,2,4,p^k,2p^k$ only — *not* every modulus.
 
-**Used in.** Blueprint §9.7 (unifies C01, C02, C11) *(provisional)*. **Neighbours.** → C11, C01, C02, A15.
+**Used in.** Foundation identity unifying C01, C02, C11 *(provisional)*. **Neighbours.** → C11, C01, C02, A15.
 
 **Named proof.** Count elements of each order via $\sum_{d\mid n}\varphi(d)=n$ — Ireland & Rosen, Ch. 4.
 
@@ -989,7 +989,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Memorise the exceptions ($a=2,b=1,n=6$; $n=1,2$ cases; $2^1+1$ analogue for sums); coprimality required.
 
-**Used in.** Blueprint §9.7 (primitive prime divisors) *(provisional)*. **Neighbours.** → A03, C04, C14.
+**Used in.** Foundation NT tool (primitive prime divisors) *(provisional)*. **Neighbours.** → A03, C04, C14.
 
 **Named proof.** Cyclotomic-polynomial valuation argument — Zsygmondy (1892); see Roitman's survey.
 
@@ -1075,7 +1075,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Sign/length convention (use unsigned lengths for the basic JEE form); tangent case uses $PT^2$.
 
-**Used in.** Blueprint §9.7 seed; P2 Ch. 2, 3 geometry connections *(provisional)*. **Neighbours.** → D11 (radical axis is the equal-power locus), D02.
+**Used in.** P2 Ch. 2, 3 geometry connections *(provisional)*. **Neighbours.** → D11 (radical axis is the equal-power locus), D02.
 
 **Named proof.** Similar triangles from the inscribed-angle theorem — Coxeter & Greitzer, *Geometry Revisited*, §2.1.
 
@@ -1095,7 +1095,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Equality requires concyclicity *in order* $A,B,C,D$; the inequality holds always.
 
-**Used in.** Blueprint §9.7 seed; P4 cyclic-quadrilateral case studies *(provisional)*. **Neighbours.** → D14 (Brahmagupta area), D01, D07a.
+**Used in.** P4 cyclic-quadrilateral case studies *(provisional)*. **Neighbours.** → D14 (Brahmagupta area), D01, D07a.
 
 **Named proof.** Construct a point making similar triangles, or use the trig/complex form — Coxeter & Greitzer, §2.6.
 
@@ -1115,7 +1115,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Internal vs. external bisector sign; the incenter divides each bisector in a known ratio too.
 
-**Used in.** Blueprint §9.7 seed; P2 Ch. 2 symmetry geometry *(provisional)*. **Neighbours.** → D04b (Ceva), D13 (trig Ceva), D18.
+**Used in.** P2 Ch. 2 symmetry geometry *(provisional)*. **Neighbours.** → D04b (Ceva), D13 (trig Ceva), D18.
 
 **Named proof.** Law of Sines in the two sub-triangles sharing the bisector — standard.
 
@@ -1135,7 +1135,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** **Signed** ratios (the $-1$); contrast Ceva's $+1$ for concurrency.
 
-**Used in.** Blueprint §9.7 seed; olympiad synthetic geometry *(provisional)*. **Neighbours.** → D04b (concurrency dual), D13, D12.
+**Used in.** Olympiad synthetic geometry *(provisional)*. **Neighbours.** → D04b (concurrency dual), D13, D12.
 
 **Named proof.** Signed ratios via perpendiculars dropped to the transversal — Coxeter & Greitzer, §3.4.
 
@@ -1155,7 +1155,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Product is $+1$ (unsigned form for internal cevians); use the trig form (D13) when angles are natural.
 
-**Used in.** Blueprint §9.7 seed; P4 geometry *(provisional)*. **Neighbours.** → D04a, D03, D13, D12.
+**Used in.** P4 geometry *(provisional)*. **Neighbours.** → D04a, D03, D13, D12.
 
 **Named proof.** Ratios of sub-triangle areas, or apply Menelaus twice — Coxeter & Greitzer, §3.1.
 
@@ -1175,7 +1175,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Requires connectivity / sphere-topology (genus $0$); for a torus the constant is $0$.
 
-**Used in.** Blueprint §9.7 seed; P2 Ch. 1 (invariance) *(provisional)*. **Neighbours.** → G17 (handshaking), G01.
+**Used in.** P2 Ch. 1 (invariance) *(provisional)*. **Neighbours.** → G17 (handshaking), G01.
 
 **Named proof.** Induction on edges (remove one at a time), or a planar-graph argument — Aigner & Ziegler, *Proofs from THE BOOK*.
 
@@ -1195,7 +1195,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Choosing the centre well is the whole art; track where each object goes and back.
 
-**Used in.** Blueprint §9.7 seed; P2 Ch. 15 slate *(provisional)*. **Neighbours.** → D19 (Möbius), D01, D17.
+**Used in.** P2 Ch. 15 slate *(provisional)*. **Neighbours.** → D19 (Möbius), D01, D17.
 
 **Named proof.** Coordinate/complex computation $z\mapsto r^2/\bar z$ — Coxeter & Greitzer, §5.3.
 
@@ -1561,7 +1561,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** $S_\infty$ needs $|r|<1$; index conventions (first term $a$ vs. $a_0$).
 
-**Used in.** Blueprint §9.7; P2 Ch. 18, 6 *(provisional)*. **Neighbours.** → E10, A06 (telescoping), PR07.
+**Used in.** P2 Ch. 18, 6 *(provisional)*. **Neighbours.** → E10, A06 (telescoping), PR07.
 
 **Named proof.** Pair-and-add (Gauss) for the AP sum; multiply-by-$r$-and-subtract for the GP sum — standard.
 
@@ -1581,7 +1581,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** $\psi^n\to0$ so $F_n\approx\varphi^n/\sqrt5$ (round to nearest integer); Binet needs $\sqrt5$ irrational arithmetic.
 
-**Used in.** Blueprint §9.7; P3 PP3.1 (IMO 1981) *(provisional)*. **Neighbours.** → A13 (Cassini), E10 (characteristic equation), PR07.
+**Used in.** P3 PP3.1 (IMO 1981) *(provisional)*. **Neighbours.** → A13 (Cassini), E10 (characteristic equation), PR07.
 
 **Named proof.** Solve the characteristic equation $r^2=r+1$ and fit initial values — Vajda, *Fibonacci & Lucas Numbers*.
 
@@ -1621,7 +1621,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Two kinds with different recurrences; signed vs. unsigned first-kind.
 
-**Used in.** Blueprint §9.7; P2 Ch. 13 (surjection counting) *(provisional)*. **Neighbours.** → E11 (Bell), G02 (inclusion–exclusion), G14.
+**Used in.** P2 Ch. 13 (surjection counting) *(provisional)*. **Neighbours.** → E11 (Bell), G02 (inclusion–exclusion), G14.
 
 **Named proof.** Recurrence $S(n,k)=kS(n-1,k)+S(n-1,k-1)$ by last-element placement — Stanley, *Enumerative Combinatorics*, Vol. 1.
 
@@ -1787,7 +1787,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Needs continuity on $[a,b]$ *and* differentiability on $(a,b)$; gives existence, not the value of $c$.
 
-**Used in.** Blueprint §9.7; P2 Ch. 11 (existence/uniqueness) *(provisional)*. **Neighbours.** → F02, F05 (Taylor remainder), PR13.
+**Used in.** P2 Ch. 11 (existence/uniqueness) *(provisional)*. **Neighbours.** → F02, F05 (Taylor remainder), PR13.
 
 **Named proof.** Rolle from the extreme-value theorem; MVT by tilting to a chord — Rudin, *Principles of Mathematical Analysis*, Ch. 5.
 
@@ -1807,7 +1807,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Continuity is essential; gives existence, not uniqueness or location.
 
-**Used in.** Blueprint §9.7; P2 Ch. 11 WE3 (1-D Brouwer via IVT) *(provisional)*. **Neighbours.** → F06 (fixed points), F01.
+**Used in.** P2 Ch. 11 WE3 (1-D Brouwer via IVT) *(provisional)*. **Neighbours.** → F06 (fixed points), F01.
 
 **Named proof.** Completeness: take the supremum of $\{x:f(x)<y\}$ — Rudin, *Principles*, Ch. 4.
 
@@ -1847,7 +1847,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Change the limits when the integral is definite; the $du$ must match up to a constant.
 
-**Used in.** Blueprint §9.7; Ch. 5 WE3 (Weierstrass is a named special case) *(provisional)*. **Neighbours.** → F09 (Weierstrass), F04b, F04c.
+**Used in.** Ch. 5 WE3 (Weierstrass is a named special case) *(provisional)*. **Neighbours.** → F09 (Weierstrass), F04b, F04c.
 
 **Named proof.** The chain rule read backwards, with the Fundamental Theorem of Calculus — Apostol, *Calculus*, Vol. 1.
 
@@ -1907,7 +1907,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Convergence radius; the remainder must be controlled for rigorous bounds.
 
-**Used in.** Blueprint §9.7; P2 Ch. 6 (Linearisation = first Taylor term) *(provisional)*. **Neighbours.** → F03, F08, E08.
+**Used in.** P2 Ch. 6 (Linearisation = first Taylor term) *(provisional)*. **Neighbours.** → F03, F08, E08.
 
 **Named proof.** Repeated integration by parts, or the Cauchy form of the remainder — Rudin, *Principles*, Ch. 5.
 
@@ -2073,7 +2073,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Designing the right boxes is the whole problem; the generalised form for $\ge k+1$.
 
-**Used in.** Blueprint §9.7; P3 Ch. 5 PP5.1, PP5.4; Ch. 6 CS#1 (Erdős–Szekeres) *(provisional)*. **Neighbours.** → G09 (Ramsey), G16, G17.
+**Used in.** P3 Ch. 5 PP5.1, PP5.4; Ch. 6 CS#1 (Erdős–Szekeres) *(provisional)*. **Neighbours.** → G09 (Ramsey), G16, G17.
 
 **Named proof.** Contradiction: if every box held $\le k$, the total would be $\le kn$ — Aigner & Ziegler, *Proofs from THE BOOK*.
 
@@ -2093,7 +2093,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** The alternating signs; intersections must be genuinely easier to count.
 
-**Used in.** Blueprint §9.7; P2 Ch. 13 WE2 (surjections), Ch. 14 *(provisional)*. **Neighbours.** → G14 (derangements), E04 (Stirling), A05.
+**Used in.** P2 Ch. 13 WE2 (surjections), Ch. 14 *(provisional)*. **Neighbours.** → G14 (derangements), E04 (Stirling), A05.
 
 **Named proof.** Indicator-function expansion / binomial sign sum — Stanley, *Enumerative Combinatorics*, Vol. 1.
 
@@ -2113,7 +2113,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** The bijection must be genuinely well-defined and invertible; "obvious" maps can miss elements.
 
-**Used in.** Blueprint §9.7; P2 Ch. 13, 15 throughout *(provisional)*. **Neighbours.** → G17, A12 (Vandermonde), E05 (Catalan).
+**Used in.** P2 Ch. 13, 15 throughout *(provisional)*. **Neighbours.** → G17, A12 (Vandermonde), E05 (Catalan).
 
 **Named proof.** Count a chosen set two ways, or give an explicit bijection and its inverse — Aigner & Ziegler.
 
@@ -2133,7 +2133,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Independence is *not* needed (its great strength); variance does *not* share this property.
 
-**Used in.** Blueprint §9.7; P2 Ch. 13 PP3(b) *(provisional)*. **Neighbours.** → G16 (probabilistic method), PR17, G14.
+**Used in.** P2 Ch. 13 PP3(b) *(provisional)*. **Neighbours.** → G16 (probabilistic method), PR17, G14.
 
 **Named proof.** Linearity of the sum/integral defining expectation — Alon & Spencer, *The Probabilistic Method*, Ch. 2.
 
@@ -2153,7 +2153,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Positive vs. nonnegative changes the formula; upper bounds need inclusion–exclusion on top.
 
-**Used in.** Blueprint §9.7; P2 Ch. 15 (Joshi Ch. 1 Comment 7) *(provisional)*. **Neighbours.** → A14 (multinomial), G02, A12.
+**Used in.** P2 Ch. 15 (Joshi Ch. 1 Comment 7) *(provisional)*. **Neighbours.** → A14 (multinomial), G02, A12.
 
 **Named proof.** Bijection with binary strings of $n$ stars and $k-1$ bars — Stanley, *Enumerative Combinatorics*, Vol. 1.
 
@@ -2313,7 +2313,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 **Watch for.** Needs $n\ge2k$ (else all $k$-sets intersect trivially); equality is the star.
 
-**Used in.** Blueprint §9.7 seed *(provisional)*. **Neighbours.** → G08, G07, G01.
+**Used in.** Foundation gem (no single chapter home yet) *(provisional)*. **Neighbours.** → G08, G07, G01.
 
 **Named proof.** Katona's cyclic-permutation argument — Aigner & Ziegler, *Proofs from THE BOOK*.
 
