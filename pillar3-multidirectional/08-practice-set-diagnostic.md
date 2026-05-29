@@ -219,7 +219,7 @@ The 10 problems below are calibrated as **4 Easy (T2, 2-archetype) + 4 Medium (T
 
 **Diagnostic Problem 8.3.** *(Source: Joshi Ch. 1 Exercise. Archetypes: #15 Bijection + #13 Combinatorial.)* How many ways can 5 boys and 5 girls be seated in a row such that no two girls are adjacent?
 
-**Diagnostic Problem 8.4.** *(Source: Engel Ch. 4 E5 variant. Archetypes: #13 Pigeonhole + #14 Parity/Modularity.)* Show that from any 7 distinct positive integers, one can choose two whose sum or difference is divisible by 11.
+**Diagnostic Problem 8.4.** *(Source: Engel Ch. 4 E5 variant. Archetypes: #13 Combinatorial + #14 Parity/Modularity.)* Show that from any 7 distinct positive integers, one can choose two whose sum or difference is divisible by 11.
 
 ### MEDIUM Tier (T3, 2-to-3 borderline, 20-minute benchmark)
 

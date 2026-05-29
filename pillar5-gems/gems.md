@@ -33,7 +33,7 @@ This is deliberately not an appendix of formulae. Every entry foregrounds *the m
 
 ## How to read an entry
 
-Each gem is laid out in the same seven fields. Read the first three to *use* the gem; read all seven to *understand* it.
+Each gem is laid out in the same eight fields. Read the first three to *use* the gem; read all eight to *understand* it.
 
 - **Statement** *(boxed)* — the exact mathematical claim. This is the lookup layer.
 - **What it says** — the statement in one plain-English sentence.
@@ -42,6 +42,7 @@ Each gem is laid out in the same seven fields. Read the first three to *use* the
 - **Micro-example** — one or two lines showing the gem in flight. Not a full worked solution (those live in Pillars 2–4); just enough to see the mechanism.
 - **Watch for** — the one or two ways students misapply it.
 - **Used in / Neighbours** — where the gem fires in the rest of the book *(cross-references are provisional pending a verification pass against the locked chapters)*, and the adjacent gems it connects to.
+- **Named proof** — a one-line pointer to a standard proof or source, for the reader who wants to see *why* the gem is true.
 
 ### The tier key
 
@@ -58,7 +59,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster A — Algebraic Identities & Techniques
 
-*The algebra of polynomials, symmetric expressions, and named factorisations. These gems convert structure that is hidden in an expression into structure you can read off — the workhorses behind the* Hidden Structure *and* Reverse-Engineering *archetypes.*
+*The algebra of polynomials, symmetric expressions, and named factorisations. These gems convert structure that is hidden in an expression into structure you can read off — the workhorses behind the* Hidden Structure *and* Reverse Engineering *archetypes.*
 
 ---
 
@@ -424,7 +425,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster B — Inequalities
 
-*The art of bounding one quantity by another. These gems are the executable core of the* Inequality-Constraints *and* Extremal *archetypes: each one converts a hard optimisation into a one-line comparison, and most pin the extremum at a symmetric point.*
+*The art of bounding one quantity by another. These gems are the executable core of the* Inequality Constraints *and* Extremal *archetypes: each one converts a hard optimisation into a one-line comparison, and most pin the extremum at a symmetric point.*
 
 ---
 
@@ -730,7 +731,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster C — Number Theory
 
-*The arithmetic of integers modulo $n$, divisibility, and primes. These gems power the* Parity & Modularity *and* Hidden Structure *archetypes — they let you replace a problem about all integers with a problem about finitely many residues.*
+*The arithmetic of integers modulo $n$, divisibility, and primes. These gems power the* Parity / Modularity *and* Hidden Structure *archetypes — they let you replace a problem about all integers with a problem about finitely many residues.*
 
 ---
 
@@ -1056,7 +1057,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster D — Geometry
 
-*Synthetic, trigonometric, coordinate, and complex-number geometry. These gems supply the* Domain-Translation *archetype its richest playground: each lets you re-express a geometric configuration in the language where it becomes computable.*
+*Synthetic, trigonometric, coordinate, and complex-number geometry. These gems supply the* Domain Translation *archetype its richest playground: each lets you re-express a geometric configuration in the language where it becomes computable.*
 
 ---
 
@@ -1542,7 +1543,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster E — Sequences & Series
 
-*Discrete and limiting processes: progressions, recurrences, generating functions, and convergence. These gems implement the* Recursion–Induction *and* Linearisation *archetypes — they let you describe an infinite process by a finite rule.*
+*Discrete and limiting processes: progressions, recurrences, generating functions, and convergence. These gems implement the* Recursion / Induction *and* Linearisation *archetypes — they let you describe an infinite process by a finite rule.*
 
 ---
 
@@ -1768,7 +1769,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster F — Calculus
 
-*The analysis of change, accumulation, and limits. These gems carry the* Linearisation *and* Existence–Uniqueness *archetypes — they turn local information (a derivative, a continuity) into global conclusions (an extremum, a root, a fixed point).*
+*The analysis of change, accumulation, and limits. These gems carry the* Linearisation *and* Existence / Uniqueness *archetypes — they turn local information (a derivative, a continuity) into global conclusions (an extremum, a root, a fixed point).*
 
 ---
 
@@ -2054,7 +2055,7 @@ Every gem carries one of two badges, so you always know how far you are reaching
 
 # Cluster G — Combinatorics
 
-*Counting, existence, and structure in finite sets and graphs. These gems are the executable core of the* Counting *and* Extremal *archetypes — and the home of the deepest "exists without constructing" arguments in the book.*
+*Counting, existence, and structure in finite sets and graphs. These gems are the executable core of the* Combinatorial Principles *and* Extremal *archetypes — and the home of the deepest "exists without constructing" arguments in the book.*
 
 ---
 
@@ -2422,16 +2423,16 @@ Every gem carries one of two badges, so you always know how far you are reaching
 | 8 | Domain Translation | A10, A15, D06, D08, D19, E03 |
 | 9 | Domain Constraints | A16, A17, C16, PR05-built bounds |
 | 10 | Inequality Constraints | B01–B15, F12 |
-| 11 | Existence & Uniqueness | A08, F01, F02, F06, G01, G16 |
+| 11 | Existence / Uniqueness | A08, F01, F02, F06, G01, G16 |
 | 12 | Extremal Principles | B01, B05, B07, F07, F12, G07 |
 | 13 | Combinatorial Principles | A05, A12, A14, G01–G06, G14 |
-| 14 | Parity & Modularity | A07b, C01–C09, C16, G17 |
-| 15 | Bijection & Correspondence | A12, E05, G03, G05, G10, G11 |
+| 14 | Parity / Modularity | A07b, C01–C09, C16, G17 |
+| 15 | Bijection / Correspondence | A12, E05, G03, G05, G10, G11 |
 | 16 | Reverse Engineering | A01, A08, A16, D20 |
 | 17 | Degrees of Freedom | A04, A08, A14, F12 |
-| 18 | Recursion & Induction | A13, E01, E02, E03, E10, F11 |
-| 19 | Pivoting & Elimination | A01, A06, A11, B-cluster pivots |
-| 20 | Analogy & Transfer | A10, D09, D14, A15 |
+| 18 | Recursion / Induction | A13, E01, E02, E03, E10, F11 |
+| 19 | Pivoting / Elimination | A01, A06, A11, B-cluster pivots |
+| 20 | Analogy / Transfer | A10, D09, D14, A15 |
 
 ---
 
@@ -2452,15 +2453,15 @@ Every gem carries one of two badges, so you always know how far you are reaching
 | Ch. 8 Domain Translation | A10, A15, B06, D07b, D08, D15, D17, D19, D20, E03 |
 | Ch. 9 Domain Constraints | A03, A09, A16, B04, B06, B07, C16, D07a, D09, D12, D18 |
 | Ch. 10 Inequality Constraints | B01, B02, B03, B04, B07, B08, B10, B11, D07d |
-| Ch. 11 Existence & Uniqueness | F01, F02, F06 |
+| Ch. 11 Existence / Uniqueness | F01, F02, F06 |
 | Ch. 12 Extremal Principles | F07, F12 |
 | Ch. 13 Combinatorial Principles | A05, E04, G02, G03, G04, G06, G14 |
-| Ch. 14 Parity & Modularity | A07b, A16, C01, C02, C05, C07, C08, C09, G02 |
-| Ch. 15 Bijection & Correspondence | A12, A14, D06, E05, G03, G05, G10, G11 |
+| Ch. 14 Parity / Modularity | A07b, A16, C01, C02, C05, C07, C08, C09, G02 |
+| Ch. 15 Bijection / Correspondence | A12, A14, D06, E05, G03, G05, G10, G11 |
 | Ch. 16 Reverse Engineering | A07a, A01 |
 | Ch. 17 Degrees of Freedom | A04, A08 |
-| Ch. 18 Recursion & Induction | A05, A06, E01, E07, E10, F04b |
-| Ch. 20 Analogy & Transfer | A10, D14 |
+| Ch. 18 Recursion / Induction | A05, A06, E01, E07, E10, F04b |
+| Ch. 20 Analogy / Transfer | A10, D14 |
 
 ### Pillar 3 — Multidirectional
 

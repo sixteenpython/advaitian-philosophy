@@ -1128,6 +1128,16 @@ The three constants that hold across all voices (from `ThinkMath_Blueprint_v3.md
 | Pillar 1: Meta-Grammar Introduction | Advaitian (house) | I | Polya | The book talking about itself — should feel like arrival |
 | Pillar 5: Gem statements | Tao | impersonal | Engel | Each gem entry: spare, named, sourced |
 
+### 10.2.1 De-facto voice amendment (RATIFIED May 29, 2026 — §16.6 B1)
+
+The drafted volume converged on a consistent house style that **supersedes** the original "Sawyer-I opener / house-I takeaway" prescription in the table above:
+
+- **Chapter openers** are **third-person professional vignettes** ("A juggler tosses five balls…"; "A high-frequency trader in Mumbai monitors…"), not first-person "I". This is uniform across all 20 Pillar 2 chapters and Pillar 3, and is hereby the canonical opener style. (Pillar 1 §1 and Pillar 4 Ch. 1 retain the Lockhart-"I" polemic, which remains correct for those philosophical openings.)
+- **Takeaways** are short principle statements (italic/blockquote), not necessarily first-person.
+- **Bodies** use **"we" / instructional "you" / impersonal** per the section type, as in the table above (this part held up well).
+
+The three constants (warm, precise, uncompromising) and the worked-example / definition registers in §10.2 remain in force. Treat §10.2's "Person" column for *openers/takeaways* as superseded by this amendment.
+
 ### 10.3 Voice Checkpoints
 
 At each major drafting milestone, run a voice checkpoint: read the last 500 words aloud and ask:
@@ -1549,8 +1559,42 @@ Per Anand's May 29 sign-off, Volume 1 is **build-complete** with the following i
 | V3 | **Pillar 2 Ch. 1 Anand flags** | 2 | PP4 (RMO 2001 divisibility) elegance choice; PP7 (INMO functional equation) analytic-gap closure (see §16.4 items 11–12). |
 | V4 | **Pillar 2 Chs. 5–20 line review** | 2 | Locked as-is at the build milestone; Anand prose line-review still desirable (Chs. 1–4 already approved). |
 | V5 | **Pillar 2 Ch. 2+ outline-stage decisions** | 2 | §16.4 items 13–15 (WE/practice-problem locks) where any chapter retains outline-stage choices. |
+| V6 | **Pillar 4 Case 17** | 4 | IMO 1993 P3 — statement ambiguity / provisional re-solution (`07-case-studies-high.md:99,115`); a 4th provisional case beyond Cases 19/21/22. Surfaced by the May 29 coherence review. |
+| V7 | **Pillar 3 problem bank unsigned** | 3 | Ch. 8 diagnostic (10 problems), Ch. 6 CS#2–4, Ch. 4 WE4.3, the Czech & Slovak construction; and `pillar3-multidirectional/_template/pillar3-problems-locked.md` still marks Chs. 5–8 "TBD" though those chapters are locked. Reconcile the locked-index with the drafted chapters. |
+| V8 | **Pillar 5 foundation + cross-ref gaps** | 5 | No Number-Theory prerequisite block for Cluster C (C01–C16) in `prerequisites.md`; ~27 gems cite `Blueprint §9.7` placeholders instead of locked P2/P3/P4 locations; the per-Stretch-gem Zeitz motivation line promised in front matter is absent (45 Stretch gems). |
+| V9 | **Pillar 1 dual-role + tier note** | 1 | Add explicit capstone/spiral re-read language to §7 (Pillar 1 is read first for orientation, re-read last as capstone per §20.1); reconcile the "exactly six points" claim with the Tier-3 "compress to four or five" line. |
+| V10 | **Book-wide spelling convention** | all | Decide `-ise/-ize` (and `-isation/-ization`) globally. Prose is predominantly British (`recognise`, `summarised`); some archetype labels/filenames are American (`Linearization`, `Normalization`). One ruling, then a global normalize pass. (B3 deliberately left spelling untouched.) |
 
 **Post-build, beyond verification:** editorial pass (voice consistency across all 5 pillars; length-trim), build pipeline (Pandoc→LaTeX→Overleaf), front matter + closing essays, and the 8-commentary Appendix A.
+
+### 16.6 Editorial-Pass Rulings (May 29, 2026 — post whole-volume coherence review)
+
+A whole-volume coherence review (all 5 pillars read in reading order against the §4/§10/§20 spec) surfaced four hard errors (now fixed: Ch. 20 CEP definition + Ch. 1/2 names + an obsolete Pillar 3/4/5 bridge; Pillar 4 Case 2 diagram `4k^2`→`4k^4`; locked-index `n^2+5n+9`→`n^2+5n+5`; Pillar 5 "seven fields"→"eight"), plus five systemic consistency decisions. Anand's rulings:
+
+- **B1 — Voice: RATIFY the de-facto voice.** The book consistently uses **third-person professional-vignette chapter openers** and **we/impersonal bodies** (not the original §10.2 "Sawyer-I openers / house-I takeaways"). This is now the house style; **§10.2 is amended to match** (see the note appended to §10.2). No re-voicing of chapters required.
+- **B2 — Core motif chain: LIGHT FIX.** Standardize capitalization of **Seed / Brute Path / Elegant Pivot / CEP** where they appear, and add **one bridging callback per pillar** tying its local vocabulary back to the chain. Do **not** force the word "Seed" into Pillars 3–5 where specialized vocabulary (convergence, CEP, "the move") reads better.
+- **B3 — Archetype names: LOCK the canonical table** below and enforce it everywhere (fixes "Induction"→"Recursion / Induction", "Counting"→"Combinatorial Principles", "DOF Analysis"→"Degrees of Freedom", British/American spelling drift, etc.).
+- **B4 — Pillar 2 scaffold: SIGNPOST.** Keep the three families (Chs. 1–16 standard; 17–19 meta-reasoning; 20 capstone) but add a short editorial signpost (in Pillar 1 or a Pillar 2 front-page) explaining that the meta-reasoning cluster and capstone deliberately differ in structure.
+- **B5 — Takeaways: TIGHTEN.** A pass to bring every `canonical_takeaway` and in-text takeaway to the ≤~15-word house rule; replace Ch. 20's ~80-word "takeaway" paragraph with a true one-line takeaway; reconcile Ch. 1's YAML takeaway with its in-text quotable line.
+
+**Canonical 20-archetype name table (B3 — authoritative; spelling normalises to these forms):**
+
+| # | Canonical name | # | Canonical name |
+|---|---|---|---|
+| 1 | Invariance | 11 | Existence / Uniqueness |
+| 2 | Symmetry | 12 | Extremal Principles |
+| 3 | Duality | 13 | Combinatorial Principles |
+| 4 | Hidden Structure | 14 | Parity / Modularity |
+| 5 | Substitution / Change of Variables | 15 | Bijection / Correspondence |
+| 6 | Linearization | 16 | Reverse Engineering |
+| 7 | Normalization / Scaling | 17 | Degrees of Freedom |
+| 8 | Domain Translation | 18 | Recursion / Induction |
+| 9 | Domain Constraints | 19 | Pivoting / Elimination |
+| 10 | Inequality Constraints | 20 | Analogy / Transfer |
+
+*Separator convention: compound names use a spaced slash ` / ` (not `&` or en-dash). Spelling of #6/#7 (Linear**ize**/**ise**, Normal**ize**/**ise**) follows the book-wide spelling ruling pending in V10; the B3 pass normalized separators and wrong-word labels only, not `-ise/-ize` spelling.*
+
+These rulings govern the editorial pass; the pass itself (B2–B5 enforcement across chapters) is the next unit of work after this review.
 
 ---
 

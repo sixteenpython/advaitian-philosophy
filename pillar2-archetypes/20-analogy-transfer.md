@@ -175,8 +175,8 @@ Three or more affirmative answers signal that analogy / transfer is the right ar
 
 A second-order diagnostic is *archetype recognition*. Across the twenty Pillar 2 archetypes, the trained solver maintains a *mental index* that maps each archetype to its diagnostic signatures:
 
-- **Dimension Reduction (Ch. 1)**: ``too many variables, only a few independent.''
-- **Symmetry Exploitation (Ch. 2)**: ``the problem is invariant under some group action.''
+- **Invariance (Ch. 1)**: ``a quantity is preserved under the problem's operations.''
+- **Symmetry (Ch. 2)**: ``the problem is invariant under some group action.''
 - **Duality (Ch. 3)**: ``swap variables and constraints; the problem maps to itself.''
 - **Hidden Structure (Ch. 4)**: ``the surface presentation hides an algebraic / geometric pattern.''
 - **Substitution (Ch. 5)**: ``replace one variable with a function of another.''
@@ -538,9 +538,9 @@ The analogy: the *process structure* (Markov chain) determines all probabilistic
 
 Chapter 20 connects to *every* prior chapter of Pillar 2 — by design, since the chapter's purpose is to integrate the entire archetype catalogue. The connections are summarised below.
 
-- **Ch. 1 (Dimension Reduction)** — recognising that ``many variables, few independent'' is a *transferable pattern* applicable across all of mathematics is itself a Chapter 20 move; PP1 explicitly transfers the complementary principle from counting to integration.
+- **Ch. 1 (Invariance)** — recognising that ``a quantity preserved under the problem's operations'' is a *transferable pattern* applicable across all of mathematics is itself a Chapter 20 move; PP1 explicitly transfers the complementary principle from counting to integration.
 
-- **Ch. 2 (Symmetry Exploitation)** — symmetry recognition is the canonical analogical move: ``this problem is invariant under group $G$, so the technique I used for the last $G$-invariant problem will work here too.''
+- **Ch. 2 (Symmetry)** — symmetry recognition is the canonical analogical move: ``this problem is invariant under group $G$, so the technique I used for the last $G$-invariant problem will work here too.''
 
 - **Ch. 3 (Duality)** — duality is intrinsically about transfer: a result in the primal problem transfers to the dual problem via the duality map.
 
@@ -585,9 +585,9 @@ The cumulative effect of these nineteen connections is the Pillar 2 master-synth
 The capstone of Pillar 2 is not the introduction of a twenty-first archetype but the *integration* of the twenty into a coherent problem-solving repertoire. The master synthesis below summarises each archetype with its canonical diagnostic signature and its canonical technique.
 
 \begin{enumerate}
-\item \textbf{Dimension Reduction (Ch. 1)} — *Diagnostic:* the problem has many surface variables but few independent ones. *Canonical move:* identify the independent variables; the dependent ones are functions of them.
+\item \textbf{Invariance (Ch. 1)} — *Diagnostic:* some quantity is preserved under the problem's moves or transformations. *Canonical move:* identify the invariant; track it while everything else changes — the invariant classifies the reachable states.
 
-\item \textbf{Symmetry Exploitation (Ch. 2)} — *Diagnostic:* the problem is invariant under a group action. *Canonical move:* quotient the solution space by the group; solve on the quotient.
+\item \textbf{Symmetry (Ch. 2)} — *Diagnostic:* the problem is invariant under a group action. *Canonical move:* quotient the solution space by the group; solve on the quotient.
 
 \item \textbf{Duality (Ch. 3)} — *Diagnostic:* swapping variables and constraints produces a problem of the same type. *Canonical move:* solve whichever form (primal or dual) is easier; transfer back.
 
@@ -617,7 +617,7 @@ The capstone of Pillar 2 is not the introduction of a twenty-first archetype but
 
 \item \textbf{Reverse Engineering (Ch. 16)} — *Diagnostic:* the answer is given (or constrained); construct the problem. *Canonical move:* work backwards from the constraint to the original problem; the construction is the solution.
 
-\item \textbf{Degrees of Freedom Analysis (Ch. 17)} — *Diagnostic:* the problem involves an underconstrained or overdetermined system. *Canonical move:* count parameters, count constraints, compute DOF = parameters − constraints; the trichotomy DOF $>, =, <$ 0 determines the solution structure.
+\item \textbf{Degrees of Freedom (Ch. 17)} — *Diagnostic:* the problem involves an underconstrained or overdetermined system. *Canonical move:* count parameters, count constraints, compute DOF = parameters − constraints; the trichotomy DOF $>, =, <$ 0 determines the solution structure.
 
 \item \textbf{Recursion / Induction (Ch. 18)} — *Diagnostic:* the answer for $n$ follows from the answer for $n - 1$. *Canonical move:* set up the recurrence; solve the base case; verify the inductive step.
 
@@ -660,23 +660,11 @@ Pillar 2 is *catalogue-oriented*: it lists the twenty archetypes and trains the 
 
 The motivating observation for Pillar 3 is that hard problems rarely yield to a single archetype. The hardest problems — the JEE final tie-breaker, the RMO open-ended question, the INMO problem 6, the Putnam B6 — typically require *combining* two or more archetypes: a substitution (Ch. 5) combined with a DOF analysis (Ch. 17); a domain translation (Ch. 8) combined with an extremal principle (Ch. 12); a bijection (Ch. 15) combined with a parity argument (Ch. 14). The combinations are not arbitrary; they follow recurring meta-patterns that Pillar 3 names and trains.
 
-Pillar 3 has four sub-strategies:
+Pillar 3 does not add new techniques; it teaches *orchestration*. Its thesis is that hard problems are hard not because the archetype is exotic, but because two or three archetypes must operate *simultaneously*. Pillar 3 names the recurring convergence patterns, trains a **first-minute protocol** for externalising a problem's archetype profile before committing to a path, develops the **MVC** (minimum viable commentary) as a map the solver draws before writing a full solution, works full multi-archetype case studies, and builds an **escape-hatch architecture** for the moment when the first path stalls. The shift is from *recognition* — the work of this pillar — to *convergence*.
 
-\begin{enumerate}
-\item *Forward + Backward Synthesis.* Attack the problem from the given data forward and from the desired conclusion backward; meet in the middle.
+The final two pillars complete the arc. **Pillar 4 — The Art of CEP-Based Problem Design** inverts the solver's stance into the *designer's*: it shows how a well-made problem is built and dissected around its **Central Elegant Point (CEP)** — the single insight the entire problem is engineered to reward — across five graded tiers of difficulty. **Pillar 5 — The Gems** is the operational toolkit: a reference catalogue of named identities, inequalities, and theorems that *execute* the elegant pivots the earlier pillars teach the reader to recognise. Together, the five pillars constitute Volume 1's complete *Philosophy of Problem Solving*: the grammar (Pillar 1), the vocabulary (Pillar 2), the orchestration (Pillar 3), the designer's eye (Pillar 4), and the executable toolkit (Pillar 5).
 
-\item *Multiple-Representation Attack.* Translate the problem into 3–4 different representations (algebraic, geometric, complex, vector); attempt each; the easiest representation reveals the solution.
-
-\item *Generalise + Specialise.* If the problem is hard, *generalise* it (replace specific numbers with parameters); if the generalisation is easier, solve it and *specialise* back. If the problem is too abstract, *specialise* (pick concrete numbers); the solution structure often becomes visible, and can be re-generalised.
-
-\item *Solve a Simpler Problem First.* If the problem is too hard, solve a *simpler analogous* problem first (analogy / transfer, Ch. 20 archetype); the insight from the simpler case transfers to the harder one.
-\end{enumerate}
-
-These four sub-strategies are themselves *meta-archetypes* — the strategic-level analogues of the Pillar 2 archetypes. The reader who has internalised both pillars is now equipped with the *complete problem-solving toolkit*: twenty technical archetypes (Pillar 2) deployed via four strategic meta-archetypes (Pillar 3).
-
-The final two pillars of Volume 1 — *Pillar 4: CEP (Continuous Engagement Pedagogy) Design* and *Pillar 5: Mathematical Gems* — are also forecasted. Pillar 4 develops the *pedagogical scaffold* for how to teach the Pillar 1–3 material (lesson sequencing, worked-example density, spaced repetition, etc.), and Pillar 5 supplies a *curated anthology* of beautiful problems that exhibit the Pillar 1–3 techniques at their most elegant — the "gem cabinet" of the entire problem-solving tradition. Together, the five pillars constitute Volume 1's complete *Philosophy of Problem Solving*.
-
-The reader who has come this far — through twenty chapters of Pillar 2 archetypes, with several hundred worked examples and practice problems — has now internalised the technical archetype catalogue. The remaining pillars will train the orchestration, pedagogy, and aesthetic appreciation that complete the volume's pedagogical arc.
+The reader who has come this far — through twenty chapters of Pillar 2 archetypes, with several hundred worked examples and practice problems — has now internalised the technical archetype catalogue. The remaining pillars train the orchestration, the designer's perspective, and the operational toolkit that complete the volume.
 
 ---
 

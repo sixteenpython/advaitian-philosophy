@@ -212,7 +212,7 @@ For Anand's verification pass, here are line-anchor cross-references to the prim
 | `imo-compendium.txt` (verbatim problem statements) | 1959 P1 (~line 700), 1969 P1 (line 2784), 1972 P1 (~line 3400), 1976 P4 (line 5144+), 1979 P3 (~line 6400), 1981 P3 (~line 6800), 1985 P4 (~line 8400), 1986 P3 (~line 8950), 1986 P5 (~line 9050), 1988 P6 (line 9997), 1989 P5 (~line 10550), 1990 P3 (~line 11200), 1992 P3 (~line 12300), 1993 P3 (~line 12900), 1995 P1 (~line 14100), 2001 P3 (~line 17700), 2001 P6 (~line 17900), 2003 P1 (~line 18900), 2003 P6 (~line 19100) |
 | `Cursor-Engel.md` (Ch. 1, §IX Putnam archive) | Putnam 1985 A-1, Putnam 1992 B-2, Putnam 1995 A-5 |
 | `Cursor-Joshi.md` (Ch. 24 Inequalities) | Joshi Ch. 24 Comment 8 |
-| Chapter 3 itself (in-text construction) | Author-designed: $n^2 + 5n + 9 = \square$ |
+| Chapter 3 itself (in-text construction) | Author-designed: $n^2 + 5n + 5 = \square$ |
 | Chapter 9 itself (in-text walkthroughs) | $n^2 + n + 7 = \square$; $a_{n+1} = 1 + 1/a_n$; $x^3 + 2y^3 + 4z^3 = 0$ |
 
 ---

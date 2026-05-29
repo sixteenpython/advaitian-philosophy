@@ -116,7 +116,7 @@ The full four-axis analysis appears in Chapter 2 §2 and is not repeated in full
                 ┌──────────────────────────┐
                 │  Convergence: Sophie     │
                 │  Germain identity gives  │
-                │  a = 4k^2 for all k >= 2 │
+                │  a = 4k^4 for all k >= 2 │
                 └────────────┬─────────────┘
                              │
                              ▼
