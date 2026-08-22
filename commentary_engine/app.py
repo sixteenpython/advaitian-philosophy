@@ -3,9 +3,9 @@ ThinkMath.ai — Socratic Mentor (Optimised Edition)
 
 Architecture
 ------------
-1. Dynamic model discovery: every chat-capable model under your Gemini, Groq, and
-   SambaNova keys is enumerated at startup via each provider's models.list() endpoint.
-2. Lean prompts: a ~1K-token CORE_BRIEF for math problems, a ~200-token CONCIERGE
+1. Local-first open-model registry with Ollama and optional no-cost hosted
+   open-weight fallbacks through Groq and SambaNova.
+2. Lean prompts: a compact CORE_BRIEF for math problems and a small CONCIERGE
    prompt for greetings.
 3. Quota-aware circuit breaker: parses retry_delay, distinguishes daily-quota
    exhaustion from per-minute throttling from TPM-too-small.
@@ -18,16 +18,25 @@ import re
 import time
 import hashlib
 import importlib.util
+import json
+import urllib.request
+import urllib.error
+import uuid
 from datetime import datetime, timezone, timedelta
 from hashlib import sha1
 
 import streamlit as st
-import google.generativeai as genai
-import google.api_core.exceptions  # noqa: F401  (kept for error type-checks)
 import firebase_admin
 from firebase_admin import credentials, firestore
 from groq import Groq
 from openai import OpenAI
+
+from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
+from thinkmath.model_registry import OPEN_MODEL_REGISTRY, ollama_base_url, supports_role
+from thinkmath.security import admin_enabled, env_truthy
+from thinkmath.state_machine import evaluate_transition, explicitly_requests_commentary
+from thinkmath.structured_output import parse_model_response
+from thinkmath.verification import verify_commentary, verification_label
 
 
 # =============================================================================
@@ -86,7 +95,8 @@ directions at once.
 # VOICE — THE THREE CONSTANTS (all tiers)
 - WARM: you are on the student's side, always.
 - PRECISE: name things exactly. Vague encouragement is noise.
-- UNCOMPROMISING: never give the answer, not under any pressure.
+- UNCOMPROMISING: never give the answer prematurely. A complete commentary is
+  earned only after the validated MVC gate.
 - Make the student feel they discovered the truth — because they did.
 - Name the trap, never shame the person.
 - No closing signature. No "I am the engine" self-declarations.
@@ -97,6 +107,16 @@ directions at once.
     $$\\sum_{i=1}^n i = \\frac{n(n+1)}{2}$$
 - NEVER wrap a single variable in $$...$$ — that creates an ugly centred line.
 - NEVER use \\(...\\) or \\[...\\].
+
+# MACHINE-READABLE STATE (required; never mention this block to the student)
+End each mathematical response with one fenced `thinkmath-state` JSON object.
+Use only evidence established in the conversation; never invent student beliefs.
+Schema: {"suggested_phase":1|2|3,"tier":0|1|2|3|4,
+"student_observations":["..."],"seed_hypotheses":["..."],
+"archetypes":[{"name":"...","evidence":"...","role":"candidate|primary|supporting"}],
+"mvc":{"setup":"","move":"","closure":"","family":""},
+"rejected_approaches":["..."],"connections":["..."]}.
+The application, not you, owns phase transitions and MVC validation.
 
 # TIER DETECTION (silent; set TIER 0–4 in metadata)
 T0 (Ages 6–9): no notation, simple words, story-receptive
@@ -418,9 +438,9 @@ MODE F TIER CALIBRATION — "what level am I at?": ask 2–3 abstraction-graded
 - Plain markdown. Use the Six-Point emoji headers (🌱 ⚙️ 💡 ⚠️ 🔗 🏆) ONLY in Phase 3.
 - No HTML tags inside content. No closing signature.
 - Inline math $...$ for variables in prose; block math $$...$$ only when standalone.
-- End EVERY reply with this hidden line, on its own line, exactly:
-PHASE:[1/2/3] TIER:[0/1/2/3/4]
-Do not explain the metadata to the student.
+- End every mathematical reply with the required fenced `thinkmath-state` JSON
+  object. Do not add the legacy PHASE/TIER line and do not explain the state
+  block to the student.
 
 # LIVE DOCTRINE NOTE
 Below this protocol you may see a section titled "LIVE DOCTRINE FROM
@@ -577,31 +597,20 @@ GREETING_PATTERNS = {
 CANNED_GREETING = (
     "Namaste. I am the ThinkMath.ai Socratic Mentor.\n\n"
     "Share your problem and we will find its **Seed** together.\n\n"
-    "I will never give you the answer. I will give you something better — the "
-    "structural instinct to find it yourself, and to recognise it the next time it "
-    "appears in disguise.\n\n"
+    "I will not rush to hand you an answer. First, I will help you build the "
+    "structural instinct to discover it—and recognise the same seed when it "
+    "appears in disguise. Once your reasoning closes, we can compile the full commentary.\n\n"
     "*What problem are you working on today?*"
 )
 
-KNOWN_GEMINI_MODELS = [
-    "gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.5-pro",
-    "gemini-2.0-flash", "gemini-2.0-flash-lite",
-    "gemini-1.5-flash", "gemini-1.5-flash-8b",
-]
 KNOWN_GROQ_MODELS = [
-    "llama-3.3-70b-versatile", "llama-3.1-8b-instant",
-    "meta-llama/llama-4-scout-17b-16e-instruct",
-    "meta-llama/llama-4-maverick-17b-128e-instruct",
-    "deepseek-r1-distill-llama-70b", "qwen-qwq-32b",
-    "gemma2-9b-it", "mistral-saba-24b",
+    "qwen-qwq-32b",
 ]
 KNOWN_SAMBANOVA_MODELS = [
-    "Meta-Llama-3.3-70B-Instruct", "Meta-Llama-3.1-70B-Instruct",
-    "Meta-Llama-3.1-8B-Instruct", "DeepSeek-V3-0324", "DeepSeek-R1",
-    "Llama-4-Maverick-17B-128E-Instruct",
-    "Llama-3.3-Swallow-70B-Instruct-v0.4",
-    "Qwen3-32B", "Qwen2.5-Coder-32B-Instruct",
+    "DeepSeek-V3-0324", "DeepSeek-R1", "Qwen3-32B",
 ]
+
+OPEN_MODEL_NAME_MARKERS = ("qwen", "deepseek", "gpt-oss", "ministral")
 
 EXCLUDE_SUBSTRINGS = (
     "embedding", "embed", "whisper", "tts", "imagen", "image", "vision",
@@ -628,6 +637,12 @@ KB_FILE_EXTS = (".md", ".txt")
 
 # Files starting with these prefixes are considered "engine-internal" and skipped.
 KB_SKIP_PREFIXES = ("_", ".")
+KB_PRIORITY_FILES = (
+    "Advaitian_Master_Framework.txt",
+    "Advaitian_Philosophy_Framework.txt",
+    "Seed_Elegance_Connections.txt",
+    "ThinkMath_Blueprint_v3.md",
+)
 
 # Module-level cache (persists across Streamlit reruns within a process).
 _KB_CACHE: dict = {"signature": None, "data": None, "loaded_at": 0.0}
@@ -673,10 +688,12 @@ def _load_kb_doctrine(kb_dir: str) -> dict:
     files_skipped: list[str] = []
     used = 0
 
-    candidates = sorted(
+    discovered = sorted(
         f for f in os.listdir(kb_dir)
         if f.endswith(KB_FILE_EXTS) and not f.startswith(KB_SKIP_PREFIXES)
     )
+    candidates = [name for name in KB_PRIORITY_FILES if name in discovered]
+    candidates.extend(name for name in discovered if name not in candidates)
 
     for name in candidates:
         path = os.path.join(kb_dir, name)
@@ -785,7 +802,7 @@ def _try_load_keys_module(path: str) -> dict:
         spec.loader.exec_module(mod)  # type: ignore[union-attr]
         return {
             k: getattr(mod, k)
-            for k in ("GEMINI_API_KEY", "GROQ_API_KEY", "SAMBANOVA_API_KEY")
+            for k in ("GROQ_API_KEY", "SAMBANOVA_API_KEY")
             if hasattr(mod, k)
         }
     except Exception:
@@ -798,12 +815,11 @@ def _clean(val):
 
 @st.cache_resource
 def get_credentials():
-    api_k = groq_k = samba_k = None
+    groq_k = samba_k = None
     fb_cred = None
 
     try:
         if hasattr(st, "secrets") and st.secrets:
-            api_k = api_k or st.secrets.get("GEMINI_API_KEY")
             groq_k = groq_k or st.secrets.get("GROQ_API_KEY")
             samba_k = samba_k or st.secrets.get("SAMBANOVA_API_KEY")
             if "firebase" in st.secrets:
@@ -820,13 +836,13 @@ def get_credentials():
     ]
     for path in candidates:
         keys = _try_load_keys_module(path)
-        api_k = api_k or keys.get("GEMINI_API_KEY")
         groq_k = groq_k or keys.get("GROQ_API_KEY")
         samba_k = samba_k or keys.get("SAMBANOVA_API_KEY")
 
     search_paths = [here, os.path.dirname(here), os.getcwd()]
+    # Generic legacy filenames remain supported locally. Never encode a secret
+    # value into source code, even as a filename.
     plain_files = {
-        "GEMINI_API_KEY": ["AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt", "gemini_api_key.txt"],
         "GROQ_API_KEY": ["groq_api_key.txt", "groq_key.txt"],
         "SAMBANOVA_API_KEY": ["samba_api_key.txt", "samba_key.txt", "sambanova_api_key.txt"],
     }
@@ -838,16 +854,13 @@ def get_credentials():
                     try:
                         with open(fp, "r", encoding="utf-8") as f:
                             val = f.read()
-                        if key_name == "GEMINI_API_KEY" and not api_k:
-                            api_k = val
-                        elif key_name == "GROQ_API_KEY" and not groq_k:
+                        if key_name == "GROQ_API_KEY" and not groq_k:
                             groq_k = val
                         elif key_name == "SAMBANOVA_API_KEY" and not samba_k:
                             samba_k = val
                     except Exception:
                         pass
 
-    api_k = api_k or os.environ.get("GEMINI_API_KEY")
     groq_k = groq_k or os.environ.get("GROQ_API_KEY")
     samba_k = samba_k or os.environ.get("SAMBANOVA_API_KEY")
 
@@ -858,10 +871,10 @@ def get_credentials():
                 fb_cred = fp
                 break
 
-    return _clean(api_k), fb_cred, _clean(groq_k), _clean(samba_k)
+    return fb_cred, _clean(groq_k), _clean(samba_k)
 
 
-GEMINI_KEY, FIREBASE_CRED, GROQ_KEY, SAMBA_KEY = get_credentials()
+FIREBASE_CRED, GROQ_KEY, SAMBA_KEY = get_credentials()
 
 
 # =============================================================================
@@ -869,47 +882,47 @@ GEMINI_KEY, FIREBASE_CRED, GROQ_KEY, SAMBA_KEY = get_credentials()
 # =============================================================================
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def discover_models(gemini_key, groq_key, samba_key):
+def discover_models(groq_key, samba_key):
     models = []
+    dynamic_discovery = env_truthy("THINKMATH_DYNAMIC_MODEL_DISCOVERY", True)
 
-    gemini_names = []
-    if gemini_key:
+    # Local-first inference. Ollama is optional: the public Streamlit deployment
+    # may use hosted free-tier fallbacks, while a private deployment can keep
+    # every problem on the user's machine.
+    try:
+        with urllib.request.urlopen(f"{ollama_base_url()}/api/tags", timeout=1.5) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+        registered = {spec.model: spec for spec in OPEN_MODEL_REGISTRY}
+        for item in payload.get("models", []):
+            name = str(item.get("name", "")).strip()
+            if not name:
+                continue
+            spec = registered.get(name)
+            models.append({
+                "provider": "Ollama",
+                "model": name,
+                "score": spec.capability if spec else _score_model(name),
+                "context": spec.context if spec else 32768,
+            })
+    except (OSError, ValueError, urllib.error.URLError):
+        pass
+
+    groq_names = list(KNOWN_GROQ_MODELS) if groq_key else []
+    if groq_key and dynamic_discovery:
         try:
-            genai.configure(api_key=gemini_key)
-            for m in genai.list_models():
-                methods = getattr(m, "supported_generation_methods", []) or []
-                if "generateContent" not in methods:
-                    continue
-                name = m.name.replace("models/", "")
-                if any(x in name.lower() for x in EXCLUDE_SUBSTRINGS):
-                    continue
-                gemini_names.append(name)
-        except Exception:
-            gemini_names = []
-    if not gemini_names:
-        gemini_names = list(KNOWN_GEMINI_MODELS)
-    gemini_names = sorted(set(gemini_names))
-
-    for name in gemini_names:
-        models.append({
-            "provider": "Gemini", "model": name,
-            "score": _score_model(name), "context": _gemini_context(name),
-        })
-
-    groq_names = []
-    if groq_key:
-        try:
-            client = Groq(api_key=groq_key)
+            client = Groq(api_key=groq_key, timeout=4.0, max_retries=0)
             resp = client.models.list()
             for m in (resp.data or []):
                 if not getattr(m, "active", True):
                     continue
                 if any(x in m.id.lower() for x in EXCLUDE_SUBSTRINGS):
                     continue
+                if not any(x in m.id.lower() for x in OPEN_MODEL_NAME_MARKERS):
+                    continue
                 groq_names.append(m.id)
         except Exception:
             groq_names = []
-    if not groq_names:
+    if not groq_names and groq_key:
         groq_names = list(KNOWN_GROQ_MODELS)
     groq_names = sorted(set(groq_names))
 
@@ -919,18 +932,25 @@ def discover_models(gemini_key, groq_key, samba_key):
             "score": _score_model(name), "context": 8192,
         })
 
-    samba_names = []
-    if samba_key:
+    samba_names = list(KNOWN_SAMBANOVA_MODELS) if samba_key else []
+    if samba_key and dynamic_discovery:
         try:
-            client = OpenAI(api_key=samba_key, base_url="https://api.sambanova.ai/v1")
+            client = OpenAI(
+                api_key=samba_key,
+                base_url="https://api.sambanova.ai/v1",
+                timeout=4.0,
+                max_retries=0,
+            )
             resp = client.models.list()
             for m in (resp.data or []):
                 if any(x in m.id.lower() for x in EXCLUDE_SUBSTRINGS):
                     continue
+                if not any(x in m.id.lower() for x in OPEN_MODEL_NAME_MARKERS):
+                    continue
                 samba_names.append(m.id)
         except Exception:
             samba_names = []
-    if not samba_names:
+    if not samba_names and samba_key:
         samba_names = list(KNOWN_SAMBANOVA_MODELS)
     samba_names = sorted(set(samba_names))
 
@@ -963,14 +983,6 @@ def _score_model(name: str) -> int:
     if "preview" in n or "experimental" in n or "-exp" in n: score -= 5
     if "alpha" in n or "beta" in n: score -= 3
     return max(0, min(10, score))
-
-
-def _gemini_context(name: str) -> int:
-    n = name.lower()
-    if "1.5" in n: return 1_000_000
-    if "2.5-pro" in n or "2.0-pro" in n: return 2_000_000
-    if "2.5-flash" in n or "2.0-flash" in n: return 1_000_000
-    return 32_768
 
 
 # =============================================================================
@@ -1050,33 +1062,6 @@ class BaseWrapper:
         raise NotImplementedError
 
 
-class GeminiWrapper(BaseWrapper):
-    provider = "Gemini"
-
-    def __init__(self, model_name, system_instruction):
-        super().__init__(model_name, system_instruction)
-        genai.configure(api_key=GEMINI_KEY)
-        self._model = genai.GenerativeModel(
-            model_name=model_name,
-            system_instruction=system_instruction,
-            generation_config={"temperature": 0.3, "top_p": 0.95},
-        )
-
-    def send(self, user_message, history, max_output_tokens):
-        gemini_history = []
-        for m in history:
-            role = "user" if m["role"] == "user" else "model"
-            gemini_history.append({"role": role, "parts": [m["content"]]})
-        chat = self._model.start_chat(history=gemini_history)
-        resp = chat.send_message(
-            user_message,
-            generation_config={"max_output_tokens": max_output_tokens, "temperature": 0.3},
-        )
-        if not resp.candidates or not getattr(resp.candidates[0], "content", None):
-            raise RuntimeError("Empty response from Gemini")
-        return resp.text
-
-
 class GroqWrapper(BaseWrapper):
     provider = "Groq"
 
@@ -1121,7 +1106,33 @@ class SambaWrapper(BaseWrapper):
         return completion.choices[0].message.content or ""
 
 
-WRAPPER_CLASS = {"Gemini": GeminiWrapper, "Groq": GroqWrapper, "SambaNova": SambaWrapper}
+class OllamaWrapper(BaseWrapper):
+    provider = "Ollama"
+
+    def __init__(self, model_name, system_instruction):
+        super().__init__(model_name, system_instruction)
+        self._client = OpenAI(api_key="ollama-local", base_url=f"{ollama_base_url()}/v1")
+
+    def send(self, user_message, history, max_output_tokens):
+        msgs = [{"role": "system", "content": self.system_instruction}]
+        for m in history:
+            role = "user" if m["role"] == "user" else "assistant"
+            msgs.append({"role": role, "content": m["content"]})
+        msgs.append({"role": "user", "content": user_message})
+        completion = self._client.chat.completions.create(
+            model=self.model_name,
+            messages=msgs,
+            temperature=0.25,
+            max_tokens=max_output_tokens,
+        )
+        return completion.choices[0].message.content or ""
+
+
+WRAPPER_CLASS = {
+    "Groq": GroqWrapper,
+    "SambaNova": SambaWrapper,
+    "Ollama": OllamaWrapper,
+}
 
 
 def get_wrapper(provider: str, model: str, system_prompt: str) -> BaseWrapper:
@@ -1166,6 +1177,8 @@ PHASE3_FALLBACK_SCORE = 7     # acceptable degradation: 70B-class with critic ba
 
 def build_ladder(intent: str, all_models: list, phase: int = 1) -> list:
     available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
+    target_role = "commentary" if phase == 3 else "mentor"
+    available = [m for m in available if supports_role(m["provider"], m["model"], target_role)]
     if not available:
         return []
     if intent == "greeting":
@@ -1315,9 +1328,9 @@ def _parse_critic(text: str, model_label: str) -> dict:
     verdict_m = CRITIC_VERDICT_RE.search(text)
     rationale_m = CRITIC_RATIONALE_RE.search(text)
 
-    verdict = verdict_m.group(1).upper() if verdict_m else "SOLID"
+    verdict = verdict_m.group(1).upper() if verdict_m else "UNVERIFIED"
     if verdict not in ("SOLID", "NEEDS_NOTE", "UNSAFE"):
-        verdict = "SOLID"
+        verdict = "UNVERIFIED"
 
     rationale = rationale_m.group(1).strip() if rationale_m else ""
 
@@ -1354,7 +1367,11 @@ def run_critic(
     Returns a dict with keys: status, rationale, issues, model, raw.
     Status is one of SOLID / NEEDS_NOTE / UNSAFE / UNAVAILABLE / ERROR.
     """
-    available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
+    available = [
+        m for m in all_models
+        if not is_blocked(m["provider"], m["model"])
+        and supports_role(m["provider"], m["model"], "critic")
+    ]
     if not available:
         return {
             "status": "UNAVAILABLE",
@@ -1370,7 +1387,13 @@ def run_critic(
     # DIFFERENT provider from the generator for diversity of judgment.
     capable = [m for m in available if m["score"] >= PHASE3_FALLBACK_SCORE]
     if not capable:
-        capable = available  # last-resort fallback so the critic still runs
+        return {
+            "status": "UNAVAILABLE",
+            "rationale": "No sufficiently capable independent critic is available.",
+            "issues": [],
+            "model": None,
+            "raw": "",
+        }
 
     def _critic_priority(m):
         diff_provider = 0 if (generator_provider and m["provider"] == generator_provider) else 1
@@ -1429,10 +1452,12 @@ def annotate_with_critic(commentary: str, critic: dict) -> str:
     if status == "SOLID":
         return commentary
 
-    if status in ("UNAVAILABLE", "ERROR"):
-        # Critic itself failed — ship commentary unchanged but flag silently.
-        return commentary + (
-            f"\n\n---\n*({critic.get('rationale', 'Critic offline; commentary unchecked.')})*"
+    if status in ("UNAVAILABLE", "ERROR", "UNVERIFIED"):
+        return (
+            "⚠ **Commentary not released: independent verification is unavailable**\n\n"
+            f"{critic.get('rationale', 'The proof critic did not return a valid verdict.')}\n\n"
+            "Your draft has been retained in this session, but ThinkMath will not present it as a checked proof. "
+            "Please retry when a qualified critic is available or verify the argument step by step."
         )
 
     if status == "NEEDS_NOTE":
@@ -1511,28 +1536,49 @@ def init_firebase():
         return None
 
 
-def save_session_to_firebase(messages, phase, tier):
+def save_session_to_firebase(session_id, messages, phase, tier, knowledge_asset=None, enabled=False):
+    if not enabled:
+        return False
     try:
         db = init_firebase()
         if not db: return
-        db.collection("sessions").document().set({
+        db.collection("sessions").document(session_id).set({
             "messages": [{"role": m["role"], "content": m["content"]} for m in messages],
             "final_phase": phase, "detected_tier": tier,
             "timestamp": firestore.SERVER_TIMESTAMP,
             "message_count": len(messages),
+            "knowledge_asset": knowledge_asset or {},
+            "expires_at": datetime.now(timezone.utc) + timedelta(days=30),
         })
+        return True
     except Exception:
-        pass
+        return False
 
 
-def save_commentary_to_firebase(problem, commentary, tier):
+def save_commentary_to_firebase(session_id, problem, commentary, tier, enabled=False):
+    if not enabled:
+        return False
     try:
         db = init_firebase()
         if not db: return False
-        db.collection("commentaries").document().set({
+        db.collection("commentaries").document(f"{session_id}-commentary").set({
             "problem": problem, "commentary": commentary, "tier": tier,
             "timestamp": firestore.SERVER_TIMESTAMP, "status": "generated",
+            "expires_at": datetime.now(timezone.utc) + timedelta(days=30),
         })
+        return True
+    except Exception:
+        return False
+
+
+def delete_session_from_firebase(session_id):
+    """Delete the current session's persisted artifacts, if any."""
+    try:
+        db = init_firebase()
+        if not db:
+            return False
+        db.collection("sessions").document(session_id).delete()
+        db.collection("commentaries").document(f"{session_id}-commentary").delete()
         return True
     except Exception:
         return False
@@ -1550,26 +1596,27 @@ st.set_page_config(
 )
 
 # =============================================================================
-# ADMIN GATE — sidebar is visible only to the team via ?admin=<PIN>
-# Configure the PIN via Streamlit Secrets:  ADMIN_PIN = "your-secret"
-# Default fallback is "vriddhi-2026" (change before any public deploy).
+# ADMIN GATE — fail closed unless ADMIN_PIN is configured in secrets.
 # =============================================================================
 
-ADMIN_PIN_DEFAULT = "vriddhi-2026"
 try:
     ADMIN_PIN = (
-        st.secrets.get("ADMIN_PIN", ADMIN_PIN_DEFAULT)
-        if hasattr(st, "secrets") else ADMIN_PIN_DEFAULT
+        st.secrets.get("ADMIN_PIN")
+        if hasattr(st, "secrets") else None
     )
 except Exception:
-    ADMIN_PIN = ADMIN_PIN_DEFAULT
+    ADMIN_PIN = None
 
-try:
-    _qp_admin = st.query_params.get("admin")
-except Exception:
-    _qp_admin = None
-
-ADMIN_MODE = bool(_qp_admin) and _qp_admin == ADMIN_PIN
+ADMIN_MODE = bool(st.session_state.get("admin_authenticated", False))
+if ADMIN_PIN and not ADMIN_MODE:
+    with st.popover("Team access"):
+        supplied_admin_pin = st.text_input("Admin PIN", type="password", key="admin_pin_input")
+        if st.button("Sign in", key="admin_sign_in", use_container_width=True):
+            if admin_enabled(ADMIN_PIN, supplied_admin_pin):
+                st.session_state.admin_authenticated = True
+                st.rerun()
+            else:
+                st.error("Invalid credentials.")
 
 # When NOT in admin mode, hide the sidebar AND its toggle entirely.
 if not ADMIN_MODE:
@@ -1890,6 +1937,10 @@ def _init_state():
         "active_model": None,
         "quota_state": {},
         "wrapper_cache": {},
+        "knowledge_asset": AdvaitianSession().to_dict(),
+        "storage_consent": False,
+        "session_id": uuid.uuid4().hex,
+        "stored_session_ids": [],
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -1900,7 +1951,7 @@ _init_state()
 
 
 # Discover models (cached 1h)
-ALL_MODELS = discover_models(GEMINI_KEY, GROQ_KEY, SAMBA_KEY)
+ALL_MODELS = discover_models(GROQ_KEY, SAMBA_KEY)
 
 
 # ---------------------------------------------------------------------------
@@ -1917,11 +1968,6 @@ if ADMIN_MODE:
     )
 
     # Connection pills
-    if GEMINI_KEY:
-        st.sidebar.markdown("<div class='status-pill'>● Gemini Connected</div>", unsafe_allow_html=True)
-    else:
-        st.sidebar.markdown("<div class='status-pill warn'>○ Gemini Missing</div>", unsafe_allow_html=True)
-
     if FIREBASE_CRED:
         st.sidebar.markdown("<div class='status-pill'>● Firebase Connected</div>", unsafe_allow_html=True)
     else:
@@ -1991,7 +2037,7 @@ if ADMIN_MODE:
 
     st.sidebar.markdown("---")
     st.sidebar.caption(
-        "Public users see only the chat. Share the URL with `?admin=<PIN>` to unlock this panel."
+        "Public users see only the learning workspace. Team access is authenticated per browser session."
     )
 
 
@@ -2027,11 +2073,16 @@ with hdr_new:
         )
         if st.button("🆕 New Session", use_container_width=True, key="hdr_new_session"):
             if st.session_state.messages and not st.session_state.session_saved:
-                save_session_to_firebase(
+                saved_old_session = save_session_to_firebase(
+                    st.session_state.session_id,
                     st.session_state.messages,
                     st.session_state.current_phase,
                     st.session_state.detected_tier,
+                    st.session_state.knowledge_asset,
+                    enabled=st.session_state.storage_consent,
                 )
+                if saved_old_session and st.session_state.session_id not in st.session_state.stored_session_ids:
+                    st.session_state.stored_session_ids.append(st.session_state.session_id)
             st.session_state.messages = []
             st.session_state.current_phase = 1
             st.session_state.detected_tier = 3
@@ -2039,7 +2090,25 @@ with hdr_new:
             st.session_state.hint_level = 0
             st.session_state.mvc_validated = False
             st.session_state.active_model = None
+            st.session_state.knowledge_asset = AdvaitianSession().to_dict()
+            st.session_state.session_id = uuid.uuid4().hex
             st.rerun()
+        st.checkbox(
+            "Save this learning session",
+            key="storage_consent",
+            help="Off by default. When enabled, the conversation and structured learning asset are stored in Firebase.",
+        )
+        st.caption("Private by default")
+        if st.button("Delete stored copy", key="delete_stored_session", use_container_width=True):
+            targets = set(st.session_state.stored_session_ids) | {st.session_state.session_id}
+            deletion_results = [delete_session_from_firebase(session_id) for session_id in targets]
+            deleted = any(deletion_results)
+            if deleted:
+                st.session_state.session_saved = False
+                st.session_state.stored_session_ids = []
+                st.success("Stored copies created in this browser session were deleted.")
+            else:
+                st.info("No stored copy was found for this session.")
 
 with hdr_progress:
     with st.container(border=True):
@@ -2104,10 +2173,55 @@ if st.session_state.messages:
         unsafe_allow_html=True,
     )
 
+asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+with st.expander("Your structural workbench", expanded=bool(st.session_state.messages)):
+    st.caption(
+        "This is the current source of truth for your reasoning. You remain the author; "
+        "ThinkMath may propose updates, but only you can confirm the MVC."
+    )
+    if asset.seed_hypotheses:
+        st.markdown("**Candidate seed:** " + " · ".join(asset.seed_hypotheses))
+    if asset.archetypes:
+        st.markdown("**Archetype map:** " + " · ".join(
+            f"{item.name} ({item.role})" for item in asset.archetypes
+        ))
+    with st.form("mvc_workbench"):
+        mvc_cols = st.columns(3)
+        with mvc_cols[0]:
+            mvc_setup = st.text_area("1. Setup", value=asset.mvc.setup, help="How will you reframe the problem?")
+        with mvc_cols[1]:
+            mvc_move = st.text_area("2. Move", value=asset.mvc.move, help="What exact transformation or operation will you make?")
+        with mvc_cols[2]:
+            mvc_closure = st.text_area("3. Closure", value=asset.mvc.closure, help="What forces the conclusion or terminates the process?")
+        confirm_mvc = st.form_submit_button("Confirm my MVC", use_container_width=True)
+    if confirm_mvc:
+        asset.mvc = MVCState(
+            setup=mvc_setup.strip(),
+            move=mvc_move.strip(),
+            closure=mvc_closure.strip(),
+            family=asset.mvc.family,
+            validated=all(item.strip() for item in (mvc_setup, mvc_move, mvc_closure)),
+        )
+        if asset.mvc.validated:
+            asset.phase = max(asset.phase, SessionPhase.DIRECTIONS)
+            st.session_state.mvc_validated = True
+            st.success("MVC recorded. ThinkMath will still verify the mathematical closure before shipping commentary.")
+        else:
+            st.session_state.mvc_validated = False
+            st.warning("Complete Setup, Move and Closure before confirming the MVC.")
+        st.session_state.knowledge_asset = asset.to_dict()
+
 st.markdown("---")
 
 
-def render_mentor(content: str, model_label: str | None = None, critic: dict | None = None, original_draft: str | None = None):
+def render_mentor(
+    content: str,
+    model_label: str | None = None,
+    critic: dict | None = None,
+    original_draft: str | None = None,
+    verification: list | None = None,
+    proof_status: str | None = None,
+):
     """Render a mentor card: native st.markdown body so KaTeX renders.
     In admin mode, expose the critic verdict and the pre-critic draft."""
     with st.chat_message("assistant"):
@@ -2115,6 +2229,14 @@ def render_mentor(content: str, model_label: str | None = None, critic: dict | N
         st.markdown(normalise_math(content))
         if model_label:
             st.markdown(f"<div class='card-footer'>Powered by {model_label}</div>", unsafe_allow_html=True)
+        if proof_status:
+            badge = "🟡 Partially verified" if proof_status == "partially_verified" else "🔴 Unverified"
+            st.caption(f"Proof assurance: {badge}")
+        if verification:
+            with st.expander("Verification evidence", expanded=False):
+                for check in verification:
+                    icon = {"pass": "✓", "review": "△", "fail": "✗"}.get(check.get("status"), "•")
+                    st.markdown(f"{icon} **{check.get('name', 'check')}** — {check.get('detail', '')}")
         # Admin-only critic transparency panel
         if ADMIN_MODE and critic is not None:
             status = critic.get("status", "?")
@@ -2124,6 +2246,7 @@ def render_mentor(content: str, model_label: str | None = None, critic: dict | N
                 "UNSAFE": "🔴 UNSAFE",
                 "UNAVAILABLE": "⚪ UNAVAILABLE",
                 "ERROR": "⚪ ERROR",
+                "UNVERIFIED": "⚪ UNVERIFIED",
             }.get(status, status)
             label = f"Critic: {badge} · {critic.get('model', 'n/a')}"
             with st.expander(label, expanded=False):
@@ -2161,6 +2284,8 @@ else:
                 msg.get("model"),
                 critic=msg.get("critic"),
                 original_draft=msg.get("original_draft"),
+                verification=msg.get("verification"),
+                proof_status=msg.get("proof_status"),
             )
 
 st.markdown("---")
@@ -2194,11 +2319,8 @@ if st.session_state.mvc_validated and st.session_state.current_phase < 3:
 
 # Process turn
 if user_input:
-    if not (GEMINI_KEY or GROQ_KEY or SAMBA_KEY):
-        st.error("No API keys configured. Add at least one of GEMINI_API_KEY / GROQ_API_KEY / SAMBANOVA_API_KEY.")
-        st.stop()
     if not ALL_MODELS:
-        st.error("No models discovered. Check your API keys.")
+        st.error("No open model is available. Start Ollama locally or configure a no-cost Groq/SambaNova key.")
         st.stop()
 
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -2215,10 +2337,31 @@ if user_input:
                 ALL_MODELS,
                 status_writer=status,
             )
-            clean, phase, tier = parse_metadata(raw)
-            clean = normalise_math(clean)
+            envelope = parse_model_response(raw)
+            clean = normalise_math(envelope.visible_text)
             if not clean:
                 clean = "[Empty response. Please rephrase and try again.]"
+
+            asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+            if not asset.problem:
+                asset.problem = next(
+                    (m["content"] for m in st.session_state.messages if m["role"] == "user"),
+                    user_input,
+                )
+            asset.apply_model_update(envelope.state_update)
+            if envelope.suggested_phase >= 2 and not asset.seed_hypotheses:
+                # The phase recommendation is evidence that the latest student
+                # turn contains a structural hypothesis. Preserve the student's
+                # own words rather than inventing a model-authored seed.
+                asset.seed_hypotheses = [user_input.strip()]
+            if asset.mvc.complete and "ready for stage 2" in clean.lower():
+                asset.mvc.validated = True
+
+            transition = evaluate_transition(asset, user_input, envelope.suggested_phase)
+            phase = int(transition.phase)
+            tier = envelope.tier
+            asset.phase = transition.phase
+            asset.tier = tier
 
             # ────────── PROOF CRITIC PASS (Phase 3 only) ──────────
             # When the engine ships a Six-Point Commentary, run it past an
@@ -2227,6 +2370,7 @@ if user_input:
             # student to walk through the proof together.
             critic_result = None
             original_draft = None
+            deterministic_checks = []
             if phase == 3 and "TAKEAWAY" in clean.upper():
                 problem_statement = next(
                     (m["content"] for m in st.session_state.messages if m["role"] == "user"),
@@ -2241,10 +2385,20 @@ if user_input:
                 )
                 original_draft = clean
                 clean = annotate_with_critic(clean, critic_result)
+                deterministic_checks = verify_commentary(problem_statement, original_draft)
+                asset.verification_results = [check.to_dict() for check in deterministic_checks]
+                asset.proof_status = verification_label(
+                    deterministic_checks,
+                    critic_result.get("status") if critic_result else None,
+                )
+
+            if explicitly_requests_commentary(user_input) and not transition.allowed:
+                clean += f"\n\n> **Stage 2 gate:** {transition.reason}"
 
             st.session_state.current_phase = phase
             st.session_state.detected_tier = tier
             st.session_state.active_model = f"{provider} · {model}"
+            st.session_state.knowledge_asset = asset.to_dict()
 
             mentor_msg = {
                 "role": "mentor",
@@ -2254,10 +2408,11 @@ if user_input:
             if critic_result is not None:
                 mentor_msg["critic"] = critic_result
                 mentor_msg["original_draft"] = original_draft
+                mentor_msg["verification"] = [check.to_dict() for check in deterministic_checks]
+                mentor_msg["proof_status"] = asset.proof_status
             st.session_state.messages.append(mentor_msg)
 
-            if "ready for stage 2" in clean.lower():
-                st.session_state.mvc_validated = True
+            st.session_state.mvc_validated = asset.mvc.validated
 
             # Save to Firebase only if the commentary was NOT refused as UNSAFE.
             if phase == 3 and "TAKEAWAY" in clean.upper():
@@ -2265,8 +2420,16 @@ if user_input:
                     (m["content"] for m in st.session_state.messages if m["role"] == "user"),
                     "",
                 )
-                save_commentary_to_firebase(problem, clean, tier)
-                st.session_state.session_saved = True
+                saved = save_commentary_to_firebase(
+                    st.session_state.session_id,
+                    problem,
+                    clean,
+                    tier,
+                    enabled=st.session_state.storage_consent,
+                )
+                st.session_state.session_saved = saved
+                if saved and st.session_state.session_id not in st.session_state.stored_session_ids:
+                    st.session_state.stored_session_ids.append(st.session_state.session_id)
 
             status.update(label=f"✓ {provider} · {model}", state="complete")
             st.rerun()
@@ -2290,7 +2453,15 @@ if st.session_state.messages and st.session_state.current_phase == 3:
                 (m["content"] for m in reversed(st.session_state.messages) if m["role"] == "mentor"),
                 "",
             )
-            if save_commentary_to_firebase(problem, last_mentor, st.session_state.detected_tier):
+            if save_commentary_to_firebase(
+                st.session_state.session_id,
+                problem,
+                last_mentor,
+                st.session_state.detected_tier,
+                enabled=True,
+            ):
+                if st.session_state.session_id not in st.session_state.stored_session_ids:
+                    st.session_state.stored_session_ids.append(st.session_state.session_id)
                 st.success("Commentary committed to the Advaitian Bible.")
                 st.balloons()
             else:

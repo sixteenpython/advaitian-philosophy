@@ -97,7 +97,7 @@ This is the architecture that makes ThinkMath ship-worthy for proof problems:
 
 ### UI
 
-- **Admin gate**: `?admin=<PIN>` query parameter; PIN from `st.secrets["ADMIN_PIN"]` (default `vriddhi-2026`); CSS hides sidebar for non-admin users
+- **Admin gate (superseded)**: the original query-parameter fallback was removed in Engine v2. Admin access now fails closed, uses a password control, and requires `st.secrets["ADMIN_PIN"]`.
 - **Header bar (3 cards):** Session (with "New Session" button) · Session Progress (phase indicators) · Support the Mission (donate)
 - **Expanded chat input:** `min-height: 110px` for multi-paragraph problems
 - **Donate buttons:** $5 / $10 / $15 / $20 + custom (min $2) via `paypal.me/vasumathiiK`

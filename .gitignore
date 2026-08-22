@@ -1,6 +1,7 @@
 _overleaf-downloads/
 # Secrets
-AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt
+AIza*.txt
+gemini_api_key.txt
 advaitian-commentary-engine-firebase-adminsdk-fbsvc-70e4298d89.json
 *_api_key.txt
 # Local key modules — NEVER commit these

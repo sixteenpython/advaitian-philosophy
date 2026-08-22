@@ -3157,7 +3157,7 @@ if not api_k:
 
 try:
 
-with open(os.path.join(os.path.dirname(__file__), "..", "AIzaSyCFoDs_OGzL65bacvVJzipZsxWx6YF.txt"), "r") as f:
+with open(os.path.join(os.path.dirname(__file__), "..", "[REDACTED_LEGACY_KEY_FILENAME].txt"), "r") as f:
 
 api_k = f.read().strip().replace('"', '').replace("'", "")
 

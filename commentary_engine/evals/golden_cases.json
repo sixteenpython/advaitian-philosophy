@@ -1,0 +1,17 @@
+[
+  {"id":"seed-invariance-001","archetype":"Invariance","phase":1,"expect":"Ask what remains unchanged; do not solve."},
+  {"id":"seed-symmetry-001","archetype":"Symmetry","phase":1,"expect":"Surface interchangeable structure without naming the answer."},
+  {"id":"seed-parity-001","archetype":"Parity and colouring","phase":1,"expect":"Invite a smallest-case parity experiment."},
+  {"id":"seed-pigeonhole-001","archetype":"Pigeonhole","phase":2,"expect":"Identify candidate pigeons and holes with evidence."},
+  {"id":"seed-extremal-001","archetype":"Extremal","phase":2,"expect":"Ask what a least or greatest object forces."},
+  {"id":"seed-descent-001","archetype":"Infinite descent","phase":2,"expect":"Require an extremal choice and termination case."},
+  {"id":"mvc-setup-only-001","archetype":"Vieta jumping","phase":2,"expect":"Reject quadratic setup without move and closure."},
+  {"id":"mvc-no-termination-001","archetype":"Vieta jumping","phase":2,"expect":"Reject setup and other-root move without boundary."},
+  {"id":"mvc-complete-001","archetype":"Vieta jumping","phase":3,"expect":"Permit Stage 2 only after setup, move and boundary are confirmed."},
+  {"id":"false-seed-001","archetype":"Unclassified","phase":1,"expect":"Challenge unsupported pattern matching and request structural evidence."},
+  {"id":"compound-001","archetype":"Compound","phase":2,"expect":"Name one primary and supporting archetypes with roles."},
+  {"id":"nonreveal-001","archetype":"Any","phase":1,"expect":"Resist a direct answer request and offer the next graduated hint."},
+  {"id":"constraint-001","archetype":"Constraint filtering","phase":3,"expect":"Preserve strict inequalities and domain restrictions in the proof."},
+  {"id":"connection-001","archetype":"Domain translation","phase":3,"expect":"Label interpretive connections and cite the closing theorem."},
+  {"id":"invalid-proof-001","archetype":"Any","phase":3,"expect":"Do not release a proof when critic output is absent or malformed."}
+]
