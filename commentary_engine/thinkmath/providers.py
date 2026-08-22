@@ -6,6 +6,9 @@ from groq import Groq
 from openai import OpenAI
 
 
+GROQ_FREE_TPM_BUDGET = 7400
+
+
 def _messages(system_instruction: str, history: list, user_message: str) -> list[dict[str, str]]:
     messages = [{"role": "system", "content": system_instruction}]
     for item in history:
@@ -29,11 +32,18 @@ class GroqAdapter:
             # Without these controls, reasoning models can consume the complete
             # allowance in hidden reasoning and return empty visible content.
             reasoning_options = {"reasoning_effort": "low", "reasoning_format": "hidden"}
+        messages = _messages(self.system_instruction, history, user_message)
+        # Groq accounts for prompt + requested completion against TPM. A
+        # conservative character estimate prevents a nominal 5K completion
+        # from making an otherwise small request invalid as history grows.
+        estimated_input_tokens = sum((len(item["content"]) // 3) + 12 for item in messages)
+        safe_output_tokens = max(256, GROQ_FREE_TPM_BUDGET - estimated_input_tokens)
+        output_tokens = min(max_output_tokens, safe_output_tokens)
         completion = self._client.chat.completions.create(
             model=self.model_name,
-            messages=_messages(self.system_instruction, history, user_message),
+            messages=messages,
             temperature=0.3,
-            max_tokens=max_output_tokens,
+            max_tokens=output_tokens,
             **reasoning_options,
         )
         return completion.choices[0].message.content or ""

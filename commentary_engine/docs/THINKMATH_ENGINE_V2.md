@@ -81,6 +81,12 @@ payment method.
 Models are promoted by the Advaitian golden evaluation suite, not by name,
 parameter count or generic benchmarks.
 
+The Groq adapter uses low, hidden reasoning so reasoning tokens cannot consume
+the visible-response allowance. It also caps prompt plus requested completion
+to a conservative 7,400-token budget for the free tier. The full doctrine is
+preserved in the repository; inference receives a compact core protocol plus a
+prioritised knowledge supplement to avoid duplicating the same rules.
+
 ## Security and privacy
 
 - No credential-shaped filename or fallback administrator PIN is in source.

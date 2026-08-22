@@ -84,6 +84,22 @@ class CoreArchitectureTests(unittest.TestCase):
         self.assertEqual(result, "Visible Socratic question")
         self.assertEqual(recorded["reasoning_effort"], "low")
         self.assertEqual(recorded["reasoning_format"], "hidden")
+        self.assertLessEqual(recorded["max_tokens"], 300)
+
+    def test_groq_adapter_caps_completion_to_free_tpm_budget(self):
+        recorded = {}
+
+        class FakeCompletions:
+            def create(self, **kwargs):
+                recorded.update(kwargs)
+                return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="ok"))])
+
+        client = SimpleNamespace(chat=SimpleNamespace(completions=FakeCompletions()))
+        adapter = GroqAdapter("openai/gpt-oss-120b", "x" * 9000, client=client)
+        adapter.send("problem", [], 5000)
+        self.assertLess(recorded["max_tokens"], 5000)
+        estimated_input = (9000 // 3) + 12 + (len("problem") // 3) + 12
+        self.assertLessEqual(estimated_input + recorded["max_tokens"], 7400)
 
     def test_golden_eval_catalog_is_well_formed(self):
         path = Path(__file__).parents[1] / "evals" / "golden_cases.json"
