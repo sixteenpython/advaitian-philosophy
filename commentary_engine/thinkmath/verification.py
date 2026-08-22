@@ -156,8 +156,8 @@ def verify_commentary(problem: str, commentary: str) -> list[VerificationCheck]:
 
 
 def verification_label(checks: list[VerificationCheck], critic_status: str | None) -> str:
-    if any(check.status == "fail" for check in checks) or critic_status in {"UNSAFE", "ERROR", "UNAVAILABLE", "UNVERIFIED"}:
+    if any(check.status == "fail" for check in checks) or critic_status == "UNSAFE":
         return "unverified"
     if critic_status == "SOLID" and checks and all(check.status in {"pass", "review"} for check in checks):
         return "partially_verified"
-    return "unverified"
+    return "structural_draft"

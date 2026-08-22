@@ -72,6 +72,25 @@ class CommentarySection:
     body: str
 
 
+def assurance_copy(status: str | None) -> tuple[str, str]:
+    labels = {
+        "partially_verified": (
+            "Structurally checked",
+            "The architecture and available checks passed; independent proof review is still recommended.",
+        ),
+        "structural_draft": (
+            "Structural draft",
+            "This captures the intended mathematical architecture; technical steps may still require verification.",
+        ),
+        "unverified": (
+            "Needs mathematical review",
+            "At least one load-bearing proof check remains unresolved.",
+        ),
+        "demonstration": ("Curated demonstration", "This example is part of ThinkMath's reviewed learning journey."),
+    }
+    return labels.get(status or "", ("Exploratory", "Treat this as a direction to test, not a certified proof."))
+
+
 def build_thinking_map(asset: AdvaitianSession) -> ThinkingMap:
     phase_name, phase_question = PHASE_LABELS[asset.phase]
     directions = tuple(

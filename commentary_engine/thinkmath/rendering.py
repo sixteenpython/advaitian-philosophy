@@ -15,6 +15,7 @@ MISSING_BLOCK_OPEN_RE = re.compile(
 SIX_POINT_INLINE_RE = re.compile(r"\s*(\*\*[🌱⚙️💡⚠️🔗🏆][^*]*\*\*)")
 NUMBERED_ITEM_RE = re.compile(r"(?<!\n)\s+(\d+\.\s+\*\*)")
 BULLET_ITEM_RE = re.compile(r"(?<!\n)\s+(-\s+\*\*)")
+TAGGED_EQUATION_RE = re.compile(r"(?m)^(?!\s*\$)(\s*[^\n$]+\\tag\{[^}]+\}[^\n$]*)$")
 
 
 def prepare_markdown(text: str) -> str:
@@ -34,6 +35,9 @@ def prepare_markdown(text: str) -> str:
         return f'{match.group("indent")}$${body}'
 
     rendered = MISSING_BLOCK_OPEN_RE.sub(add_block_open, rendered)
+    # Models occasionally emit a numbered TeX equation without delimiters.
+    # A \tag is unambiguous enough to repair without guessing at ordinary prose.
+    rendered = TAGGED_EQUATION_RE.sub(lambda match: f"$${match.group(1).strip()}$$", rendered)
     rendered = SIX_POINT_INLINE_RE.sub(r"\n\n\1\n", rendered)
     rendered = NUMBERED_ITEM_RE.sub(r"\n\1", rendered)
     rendered = BULLET_ITEM_RE.sub(r"\n\1", rendered)

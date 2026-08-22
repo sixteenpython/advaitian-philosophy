@@ -57,12 +57,14 @@ from thinkmath.mentor_engine import (
     validate_state_proposal,
 )
 from thinkmath.providers import GroqAdapter, OllamaAdapter
+from thinkmath.pedagogy import assess_mvc, stage2_gate_message
 from thinkmath.resilience import classify_error, retry_seconds, run_model_ladder
 from thinkmath.rendering import prepare_markdown
 from thinkmath.security import admin_enabled, env_truthy
 from thinkmath.state_machine import evaluate_transition, explicitly_requests_commentary
 from thinkmath.student_experience import (
     HINT_LADDER,
+    assurance_copy,
     build_thinking_map,
     demonstration,
     friendly_provider_error,
@@ -90,7 +92,7 @@ from thinkmath.verification import verify_commentary, verification_label, verify
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.2.1"
+ENGINE_VERSION = "3.3.0"
 
 
 # =============================================================================
@@ -2226,9 +2228,9 @@ def render_mentor(
             st.markdown(normalise_math(content))
         if ADMIN_MODE and model_label:
             st.markdown(f"<div class='card-footer'>{model_label}</div>", unsafe_allow_html=True)
-        if proof_status and proof_status != "demonstration":
-            badge = "🟡 Partially verified" if proof_status == "partially_verified" else "🔴 Unverified"
-            st.caption(f"Proof assurance: {badge}")
+        if proof_status:
+            label, detail = assurance_copy(proof_status)
+            st.caption(f"Proof assurance: {label} — {detail}")
         if verification:
             with st.expander("Verification evidence", expanded=False):
                 for check in verification:
@@ -2390,21 +2392,40 @@ with thinking_tab:
                 value=asset.mvc.closure,
             )
             confirm_mvc = st.form_submit_button("Confirm my Setup–Move–Closure", use_container_width=True)
+        existing_assessment = assess_mvc(asset.mvc)
+        with st.expander("Closure checklist", expanded=not asset.mvc.validated):
+            st.caption("A structural safeguard—not a claim of formal proof certification.")
+            for check in existing_assessment.checks:
+                icon = "✓" if check.status == "pass" else ("○" if check.status == "review" else "△")
+                st.markdown(f"{icon} **{check.label}** — {check.detail}")
         if confirm_mvc:
-            asset.mvc = MVCState(
+            proposed_mvc = MVCState(
                 setup=mvc_setup.strip(),
                 move=mvc_move.strip(),
                 closure=mvc_closure.strip(),
                 family=asset.mvc.family,
-                validated=all(item.strip() for item in (mvc_setup, mvc_move, mvc_closure)),
+            )
+            closure_assessment = assess_mvc(proposed_mvc)
+            asset.mvc = MVCState(
+                setup=proposed_mvc.setup,
+                move=proposed_mvc.move,
+                closure=proposed_mvc.closure,
+                family=asset.mvc.family,
+                validated=closure_assessment.ready,
+                validation_notes=[
+                    f"{check.label}: {check.detail}"
+                    for check in closure_assessment.checks
+                    if check.status != "pass"
+                ],
             )
             if asset.mvc.validated:
                 asset.phase = max(asset.phase, SessionPhase.DIRECTIONS)
                 st.session_state.mvc_validated = True
-                st.success("The structural spine is recorded. ThinkMath will still verify the mathematics.")
+                asset.proof_status = "structural_draft"
+                st.success("The structural spine is recorded. It remains a structural draft until its proof steps are checked.")
             else:
                 st.session_state.mvc_validated = False
-                st.warning("Complete all three load-bearing parts before confirming.")
+                st.warning(f"One load-bearing obligation remains: {closure_assessment.next_obligation}")
             st.session_state.knowledge_asset = asset.to_dict()
             st.rerun()
     else:
@@ -2424,8 +2445,19 @@ with commentary_tab:
         st.caption("The visible payoff of the reasoning you established—not an answer dropped from above.")
         render_structured_commentary(normalise_math(last_commentary["content"]))
         proof_status = last_commentary.get("proof_status")
-        if proof_status and proof_status != "demonstration":
-            st.caption(f"Proof assurance: {proof_status.replace('_', ' ').title()}")
+        assurance_label, assurance_detail = assurance_copy(proof_status)
+        st.info(f"**{assurance_label}.** {assurance_detail}")
+        st.markdown("#### Make the insight yours")
+        with st.form("commentary_reflection"):
+            reflection = st.text_input(
+                "I would recognise this pattern again when…",
+                value=asset.reflection,
+            )
+            save_reflection = st.form_submit_button("Save my reflection")
+        if save_reflection:
+            asset.reflection = reflection.strip()
+            st.session_state.knowledge_asset = asset.to_dict()
+            st.success("Reflection saved to your learning journey.")
         render_transfer(asset)
     else:
         st.info("Your Six-Point Commentary will appear here after Setup, Move and Closure are validated.")
@@ -2645,7 +2677,7 @@ if user_input:
                 )
 
             if explicitly_requests_commentary(user_input) and not transition.allowed:
-                clean += f"\n\n> **Stage 2 gate:** {transition.reason}"
+                clean = stage2_gate_message(asset.mvc)
 
             st.session_state.current_phase = phase
             st.session_state.detected_tier = tier
@@ -2698,6 +2730,10 @@ if user_input:
                 current_asset.mentor_history,
                 user_input,
             )
+            if explicitly_requests_commentary(user_input) and not (
+                current_asset.mvc.complete and current_asset.mvc.validated
+            ):
+                fallback = stage2_gate_message(current_asset.mvc)
             current_asset.problem_map = working_map.to_dict()
             claim_checks = verify_student_claims(user_input)
             update_claim_ledger(current_asset, user_input, mentor_decision, claim_checks)

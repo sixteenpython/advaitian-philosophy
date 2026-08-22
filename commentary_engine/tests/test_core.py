@@ -130,6 +130,10 @@ class CoreArchitectureTests(unittest.TestCase):
         self.assertIn("\n- **LOGARITHMS**", rendered)
         self.assertNotIn("suggested_phase", rendered)
 
+    def test_tagged_equation_receives_display_delimiters(self):
+        rendered = prepare_markdown("The equation is\n\n" + r"a^{2}-kab+b^{2}=k. \tag{1}")
+        self.assertIn(r"$$a^{2}-kab+b^{2}=k. \tag{1}$$", rendered)
+
     def test_state_is_removed_from_existing_rendered_messages(self):
         rendered = prepare_markdown(
             "Visible explanation.\n```thinkmath-state\n"

@@ -7,6 +7,7 @@ from commentary_engine.thinkmath.domain import (
     SessionPhase,
 )
 from commentary_engine.thinkmath.student_experience import (
+    assurance_copy,
     build_thinking_map,
     demonstration,
     friendly_provider_error,
@@ -18,6 +19,11 @@ from commentary_engine.thinkmath.student_experience import (
 
 
 class StudentExperienceTests(unittest.TestCase):
+    def test_structural_draft_sets_honest_expectation(self):
+        label, detail = assurance_copy("structural_draft")
+        self.assertIn("Structural", label)
+        self.assertIn("verification", detail)
+
     def test_empty_thinking_map_starts_with_problem_prompt(self):
         view = build_thinking_map(AdvaitianSession())
         self.assertEqual(view.phase_name, "Notice Structure")

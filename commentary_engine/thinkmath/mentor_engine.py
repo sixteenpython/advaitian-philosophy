@@ -18,6 +18,7 @@ from typing import Any
 
 from .conversation import StudentTurn, TurnKind
 from .domain import AdvaitianSession, SessionPhase
+from .pedagogy import substantial_work_summary
 
 
 _PROBLEM_MAP_CACHE: OrderedDict[str, dict[str, Any]] = OrderedDict()
@@ -462,7 +463,11 @@ def deterministic_fallback(
         MentorAction.COMPLETE_MVC: "We have a direction, but one link is still missing. What operation turns the setup into something that forces the conclusion?",
         MentorAction.RESPOND_TO_IDEA: "Let’s test that idea at its load-bearing step. Which implication would make the argument fail if it were false?",
         MentorAction.RELEASE_COMMENTARY: "The proof path is retained, but a checked full commentary needs an available reasoning model. We can still verify it one step at a time—what step should we inspect first?",
-        MentorAction.TEST_CLAIM: f"Your direction may be useful, but this is the load-bearing gap: {obligation}. What would establish that step without assuming it?",
+        MentorAction.TEST_CLAIM: (
+            f"You’ve proposed {substantial_work_summary(user_text)}. That is a substantial direction, "
+            f"so let’s inspect its load-bearing gap: {obligation}. "
+            "What would establish that step without assuming it?"
+        ),
         MentorAction.CORRECT_MISCONCEPTION: (
             f"There’s a useful idea here, but one claim needs correcting: {decision.correction} "
             f"For example: {decision.counterexample} The exact step we need now is: "
@@ -496,6 +501,9 @@ def ensure_teacher_response(
         return deterministic_fallback(decision, problem_map, user_text)
     cleaned = (text or "").strip()
     if not cleaned:
+        cleaned = deterministic_fallback(decision, problem_map, user_text)
+    generic_reset = bool(re.search(r"what changes.{0,30}what (?:stays|remains)", cleaned, re.I | re.S))
+    if decision.action == MentorAction.TEST_CLAIM and len(user_text.split()) >= 35 and generic_reset:
         cleaned = deterministic_fallback(decision, problem_map, user_text)
     first_question = re.search(r"\?", cleaned)
     if first_question and "?" in cleaned[first_question.end():]:
