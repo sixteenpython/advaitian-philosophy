@@ -6,7 +6,8 @@ from groq import Groq
 from openai import OpenAI
 
 
-GROQ_FREE_TPM_BUDGET = 7400
+GROQ_FREE_TPM_BUDGET = 7800
+MIN_COMPLETION_TOKENS = 384
 
 
 def _messages(system_instruction: str, history: list, user_message: str) -> list[dict[str, str]]:
@@ -16,6 +17,21 @@ def _messages(system_instruction: str, history: list, user_message: str) -> list
         messages.append({"role": role, "content": item["content"]})
     messages.append({"role": "user", "content": user_message})
     return messages
+
+
+def _estimated_tokens(messages: list[dict[str, str]]) -> int:
+    return sum((len(item["content"]) // 3) + 12 for item in messages)
+
+
+def _fit_groq_budget(messages: list[dict[str, str]]) -> tuple[list[dict[str, str]], int]:
+    """Drop oldest history until a useful completion fits the free TPM cap."""
+    fitted = list(messages)
+    while len(fitted) > 2 and _estimated_tokens(fitted) + MIN_COMPLETION_TOKENS > GROQ_FREE_TPM_BUDGET:
+        fitted.pop(1)
+    available = GROQ_FREE_TPM_BUDGET - _estimated_tokens(fitted)
+    if available < MIN_COMPLETION_TOKENS:
+        raise ValueError("request too large for the configured Groq token budget")
+    return fitted, available
 
 
 class GroqAdapter:
@@ -32,13 +48,13 @@ class GroqAdapter:
             # Without these controls, reasoning models can consume the complete
             # allowance in hidden reasoning and return empty visible content.
             reasoning_options = {"reasoning_effort": "low", "reasoning_format": "hidden"}
-        messages = _messages(self.system_instruction, history, user_message)
+        messages, available_output_tokens = _fit_groq_budget(
+            _messages(self.system_instruction, history, user_message)
+        )
         # Groq accounts for prompt + requested completion against TPM. A
         # conservative character estimate prevents a nominal 5K completion
         # from making an otherwise small request invalid as history grows.
-        estimated_input_tokens = sum((len(item["content"]) // 3) + 12 for item in messages)
-        safe_output_tokens = max(256, GROQ_FREE_TPM_BUDGET - estimated_input_tokens)
-        output_tokens = min(max_output_tokens, safe_output_tokens)
+        output_tokens = min(max_output_tokens, available_output_tokens)
         completion = self._client.chat.completions.create(
             model=self.model_name,
             messages=messages,

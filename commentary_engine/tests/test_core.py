@@ -8,13 +8,22 @@ from commentary_engine.thinkmath.domain import AdvaitianSession, MVCState, Sessi
 from commentary_engine.thinkmath.model_registry import (
     capability_for,
     ollama_base_url,
+    stability_for,
     supports_role,
 )
-from commentary_engine.thinkmath.providers import GroqAdapter
+from commentary_engine.thinkmath.providers import (
+    GROQ_FREE_TPM_BUDGET,
+    MIN_COMPLETION_TOKENS,
+    GroqAdapter,
+)
+from commentary_engine.thinkmath.resilience import retry_seconds, run_model_ladder
 from commentary_engine.thinkmath.rendering import prepare_markdown
 from commentary_engine.thinkmath.security import admin_enabled
 from commentary_engine.thinkmath.state_machine import evaluate_transition
-from commentary_engine.thinkmath.structured_output import parse_model_response
+from commentary_engine.thinkmath.structured_output import (
+    parse_model_response,
+    safe_visible_fallback,
+)
 from commentary_engine.thinkmath.verification import (
     verification_label,
     verify_commentary,
@@ -73,6 +82,25 @@ class CoreArchitectureTests(unittest.TestCase):
         self.assertNotIn("suggested_phase", parsed.visible_text)
         self.assertNotIn("```json", parsed.visible_text)
 
+    def test_bare_state_only_archetype_nudge_is_hidden_and_rendered_safely(self):
+        raw = (
+            '{"suggested_phase":1,"tier":3,"student_observations":[],'
+            '"seed_hypotheses":[],"archetypes":[{"name":"INVARIANCE",'
+            '"evidence":"The sum of interior angles stays fixed",'
+            '"role":"candidate"}],"mvc":{"setup":"secret setup",'
+            '"move":"secret move","closure":"secret closure","family":""}}'
+        )
+        parsed = parse_model_response(raw)
+
+        self.assertEqual(parsed.parse_status, "structured")
+        self.assertEqual(parsed.visible_text, "")
+        rendered = safe_visible_fallback(parsed.state_update)
+        self.assertEqual(
+            rendered,
+            "**INVARIANCE**\n\nThe sum of interior angles stays fixed",
+        )
+        self.assertNotIn("secret", rendered)
+
     def test_ordinary_json_example_remains_visible(self):
         raw = 'An example:\n```json\n{"number": 12}\n```'
         parsed = parse_model_response(raw)
@@ -116,12 +144,15 @@ class CoreArchitectureTests(unittest.TestCase):
         self.assertTrue(supports_role("Ollama", "qwen3:8b", "mentor"))
         self.assertFalse(supports_role("Ollama", "qwen3:8b", "critic"))
         self.assertTrue(supports_role("Ollama", "qwen2.5-math:7b", "critic"))
+        self.assertFalse(supports_role("Groq", "unreviewed/open-model", "mentor"))
 
     def test_public_groq_models_have_task_roles(self):
         self.assertTrue(supports_role("Groq", "qwen/qwen3.6-27b", "mentor"))
         self.assertFalse(supports_role("Groq", "openai/gpt-oss-120b", "mentor"))
         self.assertTrue(supports_role("Groq", "openai/gpt-oss-120b", "commentary"))
         self.assertEqual(capability_for("Groq", "openai/gpt-oss-120b", 0), 10)
+        self.assertEqual(stability_for("Groq", "openai/gpt-oss-20b"), "production")
+        self.assertEqual(stability_for("Groq", "qwen/qwen3.6-27b"), "preview")
 
     def test_groq_reasoning_models_return_visible_content(self):
         recorded = {}
@@ -154,7 +185,71 @@ class CoreArchitectureTests(unittest.TestCase):
         adapter.send("problem", [], 5000)
         self.assertLess(recorded["max_tokens"], 5000)
         estimated_input = (9000 // 3) + 12 + (len("problem") // 3) + 12
-        self.assertLessEqual(estimated_input + recorded["max_tokens"], 7400)
+        self.assertLessEqual(estimated_input + recorded["max_tokens"], GROQ_FREE_TPM_BUDGET)
+
+    def test_groq_adapter_drops_old_history_before_exceeding_tpm(self):
+        recorded = {}
+
+        class FakeCompletions:
+            def create(self, **kwargs):
+                recorded.update(kwargs)
+                return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content="ok"))])
+
+        client = SimpleNamespace(chat=SimpleNamespace(completions=FakeCompletions()))
+        adapter = GroqAdapter("openai/gpt-oss-20b", "system", client=client)
+        history = [
+            {"role": "user" if index % 2 == 0 else "mentor", "content": "x" * 6000}
+            for index in range(8)
+        ]
+        adapter.send("problem", history, 5000)
+
+        self.assertLess(len(recorded["messages"]), len(history) + 2)
+        estimated = sum((len(item["content"]) // 3) + 12 for item in recorded["messages"])
+        self.assertGreaterEqual(recorded["max_tokens"], MIN_COMPLETION_TOKENS)
+        self.assertLessEqual(estimated + recorded["max_tokens"], GROQ_FREE_TPM_BUDGET)
+
+    def test_groq_adapter_rejects_irreducibly_oversized_prompt(self):
+        adapter = GroqAdapter("openai/gpt-oss-20b", "x" * 30000, client=SimpleNamespace())
+        with self.assertRaisesRegex(ValueError, "request too large"):
+            adapter.send("problem", [], 700)
+
+    def test_retry_after_header_controls_cooldown(self):
+        error = RuntimeError("429 rate limit")
+        error.response = SimpleNamespace(headers={"retry-after": "7"})
+        self.assertEqual(retry_seconds(error), 8)
+
+    def test_rate_limit_reset_header_controls_daily_cooldown(self):
+        error = RuntimeError("429 RPD exhausted")
+        error.response = SimpleNamespace(
+            headers={"x-ratelimit-reset-requests": "2m59.5s"}
+        )
+        self.assertEqual(retry_seconds(error), 180)
+
+    def test_model_ladder_retries_transient_then_falls_back(self):
+        candidates = [{"model": "first"}, {"model": "second"}]
+        attempts = []
+        failures = []
+        sleeps = []
+
+        def send(candidate):
+            attempts.append(candidate["model"])
+            if candidate["model"] == "first":
+                raise RuntimeError("503 upstream unavailable")
+            return "recovered"
+
+        text, selected = run_model_ladder(
+            candidates,
+            send,
+            lambda candidate, error, kind: failures.append((candidate["model"], kind)),
+            sleep=sleeps.append,
+            jitter=lambda low, high: 0.2,
+        )
+
+        self.assertEqual(text, "recovered")
+        self.assertEqual(selected["model"], "second")
+        self.assertEqual(attempts, ["first", "first", "second"])
+        self.assertEqual(failures, [("first", "transient")])
+        self.assertEqual(sleeps, [0.2])
 
     def test_golden_eval_catalog_is_well_formed(self):
         path = Path(__file__).parents[1] / "evals" / "golden_cases.json"

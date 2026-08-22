@@ -19,6 +19,7 @@ import time
 import hashlib
 import importlib.util
 import json
+import threading
 import urllib.request
 import urllib.error
 import uuid
@@ -30,8 +31,14 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from groq import Groq
 from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
-from thinkmath.model_registry import OPEN_MODEL_REGISTRY, capability_for, ollama_base_url, supports_role
+from thinkmath.model_registry import (
+    OPEN_MODEL_REGISTRY,
+    ollama_base_url,
+    stability_for,
+    supports_role,
+)
 from thinkmath.providers import GroqAdapter, OllamaAdapter
+from thinkmath.resilience import classify_error, retry_seconds, run_model_ladder
 from thinkmath.rendering import prepare_markdown
 from thinkmath.security import admin_enabled, env_truthy
 from thinkmath.state_machine import evaluate_transition, explicitly_requests_commentary
@@ -54,7 +61,7 @@ from thinkmath.student_ui import (
     render_transfer,
     render_zero_state,
 )
-from thinkmath.structured_output import parse_model_response
+from thinkmath.structured_output import parse_model_response, safe_visible_fallback
 from thinkmath.verification import verify_commentary, verification_label
 
 
@@ -64,7 +71,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.0.0"
+ENGINE_VERSION = "3.0.1"
 
 
 # =============================================================================
@@ -956,6 +963,9 @@ FIREBASE_CRED, GROQ_KEY = get_credentials()
 def discover_models(groq_key):
     models = []
     dynamic_discovery = env_truthy("THINKMATH_DYNAMIC_MODEL_DISCOVERY", True)
+    registered = {
+        (spec.provider, spec.model): spec for spec in OPEN_MODEL_REGISTRY
+    }
 
     # Local-first inference. Ollama is optional: the public Streamlit deployment
     # may use hosted free-tier fallbacks, while a private deployment can keep
@@ -966,17 +976,17 @@ def discover_models(groq_key):
             f"{ollama_base_url()}/api/tags", timeout=1.5
         ) as response:
             payload = json.loads(response.read().decode("utf-8"))
-        registered = {spec.model: spec for spec in OPEN_MODEL_REGISTRY}
         for item in payload.get("models", []):
             name = str(item.get("name", "")).strip()
-            if not name:
+            spec = registered.get(("Ollama", name))
+            if not name or not spec:
                 continue
-            spec = registered.get(name)
             models.append({
                 "provider": "Ollama",
                 "model": name,
-                "score": spec.capability if spec else _score_model(name),
-                "context": spec.context if spec else 32768,
+                "score": spec.capability,
+                "context": spec.context,
+                "stability": spec.stability,
             })
     except (OSError, ValueError, urllib.error.URLError):
         pass
@@ -993,6 +1003,8 @@ def discover_models(groq_key):
                     continue
                 if not any(x in m.id.lower() for x in OPEN_MODEL_NAME_MARKERS):
                     continue
+                if ("Groq", m.id) not in registered:
+                    continue
                 groq_names.append(m.id)
         except Exception:
             groq_names = []
@@ -1001,9 +1013,13 @@ def discover_models(groq_key):
     groq_names = sorted(set(groq_names))
 
     for name in groq_names:
+        spec = registered.get(("Groq", name))
+        if not spec:
+            continue
         models.append({
             "provider": "Groq", "model": name,
-            "score": capability_for("Groq", name, _score_model(name)), "context": 131072,
+            "score": spec.capability, "context": spec.context,
+            "stability": spec.stability,
         })
 
     return models
@@ -1035,6 +1051,27 @@ def _score_model(name: str) -> int:
 # QUOTA STATE
 # =============================================================================
 
+@st.cache_resource
+def _shared_quota_store():
+    """Share provider cooldowns across browser sessions in this app process."""
+    return {"models": {}, "lock": threading.RLock()}
+
+
+def _quota_models() -> dict:
+    return _shared_quota_store()["models"]
+
+
+def _quota_snapshot() -> dict:
+    store = _shared_quota_store()
+    with store["lock"]:
+        return dict(store["models"])
+
+
+def reset_circuit_breakers() -> None:
+    store = _shared_quota_store()
+    with store["lock"]:
+        store["models"].clear()
+
 def _now_ts() -> float:
     return datetime.now(timezone.utc).timestamp()
 
@@ -1052,53 +1089,28 @@ def _model_key(provider: str, model: str) -> str:
 
 
 def is_blocked(provider: str, model: str) -> bool:
-    state = st.session_state.quota_state.get(_model_key(provider, model))
+    store = _shared_quota_store()
+    with store["lock"]:
+        state = store["models"].get(_model_key(provider, model))
     if not state:
         return False
     return _now_ts() < state["blocked_until"]
 
 
 def block_model(provider: str, model: str, seconds: int, reason: str):
-    st.session_state.quota_state[_model_key(provider, model)] = {
-        "blocked_until": _now_ts() + max(5, seconds),
-        "reason": reason,
-        "blocked_at": _now_ts(),
-    }
+    store = _shared_quota_store()
+    with store["lock"]:
+        store["models"][_model_key(provider, model)] = {
+            "blocked_until": _now_ts() + max(5, seconds),
+            "reason": reason,
+            "blocked_at": _now_ts(),
+        }
 
 
 def block_provider(provider: str, models: list, seconds: int, reason: str):
     for candidate in models:
         if candidate["provider"] == provider:
             block_model(provider, candidate["model"], seconds, reason)
-
-
-def parse_retry_seconds(error_str: str) -> int:
-    m = re.search(r"retry_delay\s*\{\s*seconds:\s*(\d+)", error_str)
-    if m: return int(m.group(1)) + 1
-    m = re.search(r"retry in (\d+(?:\.\d+)?)s", error_str, re.I)
-    if m: return int(float(m.group(1))) + 1
-    m = re.search(r"try again in (\d+(?:\.\d+)?)\s*(?:s|sec|second)", error_str, re.I)
-    if m: return int(float(m.group(1))) + 1
-    return 60
-
-
-def classify_error(error_str: str) -> str:
-    s = error_str.lower()
-    if "402" in s or "payment_method_required" in s or "billing" in s:
-        return "billing_required"
-    if "limit: 0" in s or "perdayper" in s.replace(" ", "") or "rpd" in s or "per day" in s:
-        return "daily_quota"
-    if "request too large" in s or "413" in s or "tokens per minute" in s:
-        return "tpm_too_small"
-    if "429" in s or "quota" in s or "rate limit" in s or "rate_limit" in s:
-        return "minute_quota"
-    if "401" in s or "403" in s or "api_key" in s or "unauthorized" in s or "permission" in s:
-        return "auth"
-    if "404" in s or "not found" in s or "model not found" in s:
-        return "not_found"
-    if "500" in s or "502" in s or "503" in s or "504" in s or "timeout" in s or "network" in s:
-        return "transient"
-    return "fatal"
 
 
 # =============================================================================
@@ -1149,6 +1161,13 @@ PHASE3_MIN_SCORE = 9          # ideal: 120B+, Gemini Pro, DeepSeek-class
 PHASE3_FALLBACK_SCORE = 7     # acceptable degradation: 70B-class with critic backstop
 
 
+def _model_rank(model: dict, *, fastest_first: bool = False) -> tuple:
+    stability = model.get("stability") or stability_for(model["provider"], model["model"])
+    stability_rank = 1 if stability == "preview" else 0
+    score = model["score"] if fastest_first else -model["score"]
+    return stability_rank, score, model["model"]
+
+
 def build_ladder(intent: str, all_models: list, phase: int = 1) -> list:
     available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
     target_role = "commentary" if phase == 3 else "mentor"
@@ -1157,22 +1176,22 @@ def build_ladder(intent: str, all_models: list, phase: int = 1) -> list:
         return []
     if intent == "greeting":
         fast = [m for m in available if m["score"] <= 5]
-        return sorted(fast or available, key=lambda m: (m["score"], m["model"]))
+        return sorted(fast or available, key=lambda m: _model_rank(m, fastest_first=True))
 
     # Phase-3 turns: prefer top-tier capability models. Fall through to mid-tier
     # only if no top-tier are available; refuse entirely if even mid-tier empty.
     if phase == 3:
         top_tier = [m for m in available if m["score"] >= PHASE3_MIN_SCORE]
         if top_tier:
-            ranked = sorted(top_tier, key=lambda m: -m["score"])
+            ranked = sorted(top_tier, key=_model_rank)
             return _interleave_by_provider(ranked)
         mid_tier = [m for m in available if m["score"] >= PHASE3_FALLBACK_SCORE]
         if mid_tier:
-            ranked = sorted(mid_tier, key=lambda m: -m["score"])
+            ranked = sorted(mid_tier, key=_model_rank)
             return _interleave_by_provider(ranked)
         return []  # let chat() raise a Phase-3-specific error
 
-    ranked = sorted(available, key=lambda m: -m["score"])
+    ranked = sorted(available, key=_model_rank)
     return _interleave_by_provider(ranked)
 
 
@@ -1257,43 +1276,61 @@ def chat(user_input: str, history: list, all_models: list, knowledge_asset=None,
             f"Output cap: {max_tok} tokens"
         )
 
-    last_error = None
-    for m in ladder:
-        provider, model = m["provider"], m["model"]
-        if status_writer:
-            status_writer.write(f"→ Trying **{provider}** · `{model}` (score {m['score']})")
-        try:
-            short_history = history[-6:]
-            wrapper = get_wrapper(provider, model, system_prompt)
-            text = wrapper.send(user_input, short_history, max_tok)
-            if not text or not text.strip():
-                raise RuntimeError("empty response")
-            return text, provider, model
-        except Exception as e:
-            err = str(e)
-            kind = classify_error(err)
-            last_error = e
-            if status_writer:
-                status_writer.write(f"   ✗ {kind}: {err[:120]}")
-            if kind == "daily_quota":
-                block_model(provider, model, _seconds_until_pt_midnight(), "daily quota exhausted")
-            elif kind == "billing_required":
-                block_provider(provider, all_models, 24 * 3600, "provider requires billing")
-            elif kind == "minute_quota":
-                block_model(provider, model, parse_retry_seconds(err), "rate-limited per minute")
-            elif kind == "tpm_too_small":
-                block_model(provider, model, 6 * 3600, "TPM cap < prompt size")
-            elif kind == "not_found":
-                block_model(provider, model, 24 * 3600, "model id no longer valid")
-            elif kind == "auth":
-                block_model(provider, model, 3600, "auth failure")
-            elif kind == "transient":
-                block_model(provider, model, 30, "transient error")
-            else:
-                block_model(provider, model, 60, f"fatal: {err[:60]}")
-            continue
+    short_history = history[-6:]
 
-    raise RuntimeError(f"All {len(ladder)} models failed. Last error: {last_error}")
+    def send(candidate):
+        provider, model = candidate["provider"], candidate["model"]
+        wrapper = get_wrapper(provider, model, system_prompt)
+        return wrapper.send(user_input, short_history, max_tok)
+
+    def on_attempt(candidate):
+        if status_writer:
+            status_writer.write(
+                f"→ Trying **{candidate['provider']}** · `{candidate['model']}` "
+                f"(score {candidate['score']})"
+            )
+
+    def on_retry(candidate, error, delay):
+        if status_writer:
+            status_writer.write(
+                f"   ↻ transient failure; retrying `{candidate['model']}` shortly"
+            )
+
+    def on_failure(candidate, error, kind):
+        provider, model = candidate["provider"], candidate["model"]
+        err = str(error)
+        if status_writer:
+            status_writer.write(f"   ✗ {kind}: {err[:120]}")
+        if kind == "daily_quota":
+            block_model(
+                provider,
+                model,
+                retry_seconds(error, default=_seconds_until_pt_midnight()),
+                "daily quota exhausted",
+            )
+        elif kind == "billing_required":
+            block_provider(provider, all_models, 24 * 3600, "provider requires billing")
+        elif kind == "minute_quota":
+            block_model(provider, model, retry_seconds(error), "rate-limited per minute")
+        elif kind == "tpm_too_small":
+            block_model(provider, model, 6 * 3600, "TPM cap < prompt size")
+        elif kind == "not_found":
+            block_model(provider, model, 24 * 3600, "model id no longer valid")
+        elif kind == "auth":
+            block_model(provider, model, 3600, "auth failure")
+        elif kind == "transient":
+            block_model(provider, model, 30, "transient error")
+        else:
+            block_model(provider, model, 60, f"fatal: {err[:60]}")
+
+    text, selected = run_model_ladder(
+        ladder,
+        send,
+        on_failure,
+        on_attempt=on_attempt,
+        on_retry=on_retry,
+    )
+    return text, selected["provider"], selected["model"]
 
 
 # =============================================================================
@@ -1914,7 +1951,6 @@ def _init_state():
         "hint_level": 0,
         "mvc_validated": False,
         "active_model": None,
-        "quota_state": {},
         "wrapper_cache": {},
         "knowledge_asset": AdvaitianSession().to_dict(),
         "storage_consent": False,
@@ -1979,7 +2015,7 @@ if ADMIN_MODE:
             status = "✓" if live > 0 else "✗"
             st.markdown(f"{status} **{p}** — {live}/{count} live")
         if st.button("Reset circuit breakers", use_container_width=True):
-            st.session_state.quota_state = {}
+            reset_circuit_breakers()
             st.rerun()
 
     # Live doctrine (knowledge_base/)
@@ -2113,7 +2149,7 @@ render_hero(ENGINE_VERSION)
 asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
 blocked_keys = {
     key
-    for key, value in st.session_state.quota_state.items()
+    for key, value in _quota_snapshot().items()
     if _now_ts() < value.get("blocked_until", 0)
 }
 readiness = provider_readiness(ALL_MODELS, blocked_keys)
@@ -2357,6 +2393,8 @@ if user_input:
             )
             envelope = parse_model_response(raw)
             clean = normalise_math(envelope.visible_text)
+            if not clean:
+                clean = safe_visible_fallback(envelope.state_update)
             if not clean:
                 clean = "[Empty response. Please rephrase and try again.]"
 

@@ -24,6 +24,16 @@ def _is_state_payload(payload: object) -> bool:
 
 
 def strip_private_state_blocks(text: str) -> str:
+    # Some providers occasionally ignore the requested fence and return only
+    # the state object.  It is still private application state and must never
+    # be rendered in the chat transcript.
+    try:
+        standalone = json.loads(text.strip())
+        if _is_state_payload(standalone):
+            return ""
+    except (json.JSONDecodeError, TypeError):
+        pass
+
     visible = STATE_BLOCK_RE.sub("", text)
 
     def strip_generic(match: re.Match) -> str:
@@ -33,6 +43,27 @@ def strip_private_state_blocks(text: str) -> str:
             return match.group(0)
 
     return JSON_BLOCK_RE.sub(strip_generic, visible)
+
+
+def safe_visible_fallback(state: dict[str, Any]) -> str:
+    """Build a minimal student-facing reply when a model emits state only.
+
+    Only archetype names and their evidence are eligible.  In particular, MVC
+    fields remain private so an Archetype Nudge cannot accidentally reveal the
+    operational move.
+    """
+    candidates = state.get("archetypes")
+    if not isinstance(candidates, list):
+        return ""
+    for item in candidates:
+        if not isinstance(item, dict):
+            continue
+        name = str(item.get("name", "")).strip()
+        if not name:
+            continue
+        evidence = str(item.get("evidence", "")).strip()
+        return f"**{name}**\n\n{evidence}" if evidence else f"**{name}**"
+    return ""
 
 
 @dataclass
@@ -72,6 +103,18 @@ def parse_model_response(text: str | None) -> ModelEnvelope:
                     break
             except json.JSONDecodeError:
                 continue
+
+        # Last-resort compatibility for providers that return the state object
+        # without any Markdown fence.  Accept it only when it is the complete
+        # response and has a recognized ThinkMath state key.
+        if not state:
+            try:
+                parsed = json.loads(raw.strip())
+                if _is_state_payload(parsed):
+                    state = parsed
+                    status = "structured"
+            except (json.JSONDecodeError, TypeError):
+                pass
 
     metadata = LEGACY_METADATA_RE.search(raw)
     phase = state.get("suggested_phase", 1)
