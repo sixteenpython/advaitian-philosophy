@@ -31,6 +31,14 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 from groq import Groq
 from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
+from thinkmath.conversation import (
+    accepted_phase_suggestion,
+    accepted_state_update,
+    classify_student_turn,
+    first_substantive_user_message,
+    mentor_conversation_context,
+    next_support_level,
+)
 from thinkmath.model_registry import (
     OPEN_MODEL_REGISTRY,
     ollama_base_url,
@@ -71,7 +79,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.0.2"
+ENGINE_VERSION = "3.1.0"
 
 
 # =============================================================================
@@ -127,6 +135,19 @@ directions at once.
 - Make the student feel they discovered the truth — because they did.
 - Name the trap, never shame the person.
 - No closing signature. No "I am the engine" self-declarations.
+
+# NATURAL TEACHER DIALOGUE
+- Sound like an attentive teacher in a real conversation, not a protocol report.
+- Begin by responding to the student's actual words or idea; do not begin every
+  turn with a label such as "Seed" or "Diagnostic question".
+- In Phases 1 and 2, prefer short natural paragraphs. Use headings or tables only
+  when the student asks for a comparison or the structure genuinely needs them.
+- Ask at most ONE question per turn. If the student is overwhelmed, replace an
+  open question with a tiny task or two concrete choices.
+- Encouragement must be specific and earned. Never use automatic praise such as
+  "Great job!" or imply that confusion is a mathematical claim.
+- Contractions and brief conversational transitions are welcome. Precision and
+  proof safeguards remain unchanged.
 
 # MATH FORMATTING (CRITICAL — wrong delimiters render as raw text)
 - Inline math, in flowing prose: $x$, $a^2$, $n_1$, $\\sum a_i$.
@@ -486,6 +507,17 @@ The Seed is the reusable structural pattern; the brute path is the tempting
 mechanical route; the elegant pivot is the move that exposes the problem's
 centre. Help the student discover the structure instead of solving prematurely.
 After the student closes the reasoning, a full commentary may be compiled.
+
+NATURAL TEACHER DIALOGUE
+Respond to the student's actual words before introducing the next mathematical
+move. In Phases 1 and 2, sound like a teacher beside the student: use short,
+natural paragraphs and at most one focused question. Do not label ordinary
+replies "Seed", "Diagnostic question", or "Conversation move". Do not use a
+table unless the student asks to compare directions. Use specific, earned
+encouragement rather than automatic praise. If the student is uncertain,
+confused, asks for repetition, requests an example, or disagrees, reduce the
+cognitive step and change the representation instead of repeating the same
+question. Never treat emotional or recovery language as mathematical evidence.
 
 THREE PHASES
 1 — SEED: Mirror the problem briefly. Ask exactly one diagnostic question about
@@ -1211,8 +1243,22 @@ def _interleave_by_provider(models: list) -> list:
 # ORCHESTRATOR
 # =============================================================================
 
-def chat(user_input: str, history: list, all_models: list, knowledge_asset=None, status_writer=None):
-    intent = detect_intent(user_input)
+def chat(
+    user_input: str,
+    history: list,
+    all_models: list,
+    knowledge_asset=None,
+    conversation_turn=None,
+    support_level: int = 0,
+    status_writer=None,
+):
+    # Short recovery utterances such as "confused" would otherwise look like
+    # greetings. They need the full mathematical context and mentor prompt.
+    intent = (
+        "math"
+        if conversation_turn is not None and conversation_turn.is_recovery
+        else detect_intent(user_input)
+    )
 
     if intent == "greeting" and not history:
         return CANNED_GREETING + "\n\nPHASE:1 TIER:3", "Local", "canned"
@@ -1232,6 +1278,11 @@ def chat(user_input: str, history: list, all_models: list, knowledge_asset=None,
                 + asset_json[:5000]
                 + "\nFor Stage 2, explicitly reconcile the commentary with this MVC. "
                 "If its setup, move or closure is inconsistent, stop and explain the exact conflict."
+            )
+        if conversation_turn is not None:
+            system_prompt += (
+                "\n\nCURRENT CONVERSATIONAL GUIDANCE (private; never quote or name it):\n"
+                + mentor_conversation_context(conversation_turn, support_level)
             )
         phase = st.session_state.get("current_phase", 1)
         # Stage-2 / Six-Point requests need Phase-3 budget regardless of current_phase.
@@ -1940,6 +1991,8 @@ def _init_state():
         "detected_tier": 3,
         "session_saved": False,
         "hint_level": 0,
+        "support_level": 0,
+        "last_turn_kind": "substantive",
         "mvc_validated": False,
         "active_model": None,
         "wrapper_cache": {},
@@ -2074,6 +2127,8 @@ def reset_learning_session() -> None:
     st.session_state.detected_tier = 3
     st.session_state.session_saved = False
     st.session_state.hint_level = 0
+    st.session_state.support_level = 0
+    st.session_state.last_turn_kind = "substantive"
     st.session_state.mvc_validated = False
     st.session_state.active_model = None
     st.session_state.knowledge_asset = AdvaitianSession().to_dict()
@@ -2090,6 +2145,8 @@ def load_demonstration(demo_id: str) -> None:
     st.session_state.mvc_validated = True
     st.session_state.active_model = "Curated demonstration"
     st.session_state.demo_id = demo_id
+    st.session_state.support_level = 0
+    st.session_state.last_turn_kind = "substantive"
 
 
 def render_mentor(
@@ -2379,9 +2436,15 @@ if user_input:
         st.error(f"**{error_title}.** {error_detail}")
         st.stop()
 
+    conversation_turn = classify_student_turn(user_input)
+    st.session_state.support_level = next_support_level(
+        st.session_state.support_level,
+        conversation_turn,
+    )
+    st.session_state.last_turn_kind = conversation_turn.kind.value
     st.session_state.messages.append({"role": "user", "content": user_input})
 
-    with st.status("Thinking structurally…", expanded=False) as status:
+    with st.status("Thinking with you…", expanded=False) as status:
         try:
             history_for_api = [
                 {"role": m["role"], "content": m["content"]}
@@ -2398,6 +2461,8 @@ if user_input:
                 history_for_api,
                 ALL_MODELS,
                 knowledge_asset=current_asset.to_dict(),
+                conversation_turn=conversation_turn,
+                support_level=st.session_state.support_level,
                 status_writer=status,
             )
             envelope = parse_model_response(raw)
@@ -2409,22 +2474,38 @@ if user_input:
 
             asset = current_asset
             if not asset.problem:
-                asset.problem = next(
-                    (m["content"] for m in st.session_state.messages if m["role"] == "user"),
-                    user_input,
+                asset.problem = first_substantive_user_message(
+                    st.session_state.messages,
+                    "" if conversation_turn.is_recovery else user_input,
                 )
-            asset.apply_model_update(envelope.state_update)
-            if envelope.suggested_phase >= 2 and not asset.seed_hypotheses:
+            # Recovery language changes the teaching move, never mathematical
+            # truth. Ignore any state advancement a model emits on such a turn.
+            state_update = accepted_state_update(
+                conversation_turn,
+                envelope.state_update,
+            )
+            if state_update:
+                asset.apply_model_update(state_update)
+            suggested_phase = accepted_phase_suggestion(
+                conversation_turn,
+                int(current_asset.phase),
+                envelope.suggested_phase,
+            )
+            if suggested_phase >= 2 and not asset.seed_hypotheses and not conversation_turn.is_recovery:
                 # The phase recommendation is evidence that the latest student
                 # turn contains a structural hypothesis. Preserve the student's
                 # own words rather than inventing a model-authored seed.
                 asset.seed_hypotheses = [user_input.strip()]
-            if asset.mvc.complete and "ready for stage 2" in clean.lower():
+            if (
+                not conversation_turn.is_recovery
+                and asset.mvc.complete
+                and "ready for stage 2" in clean.lower()
+            ):
                 asset.mvc.validated = True
 
-            transition = evaluate_transition(asset, user_input, envelope.suggested_phase)
+            transition = evaluate_transition(asset, user_input, suggested_phase)
             phase = int(transition.phase)
-            tier = envelope.tier
+            tier = current_asset.tier if conversation_turn.is_recovery else envelope.tier
             asset.phase = transition.phase
             asset.tier = tier
 
