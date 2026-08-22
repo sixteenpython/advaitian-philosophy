@@ -5,8 +5,10 @@ from commentary_engine.thinkmath.conversation import (
     accepted_phase_suggestion,
     accepted_state_update,
     classify_student_turn,
+    ensure_recovery_acknowledgement,
     first_substantive_user_message,
     mentor_conversation_context,
+    model_user_message,
     next_support_level,
 )
 
@@ -55,6 +57,22 @@ class ConversationTests(unittest.TestCase):
         update = {"seed_hypotheses": ["I don't know"], "archetypes": ["Guess"]}
         self.assertEqual(accepted_state_update(turn, update), {})
         self.assertEqual(accepted_phase_suggestion(turn, 1, 3), 1)
+
+    def test_recovery_prompt_and_visible_reply_begin_humanely(self):
+        turn = classify_student_turn("I don't know")
+        model_input = model_user_message(turn, 1)
+        self.assertIn("Begin your student-facing reply exactly with", model_input)
+        visible = ensure_recovery_acknowledgement(
+            turn,
+            "Try adding the next odd number.",
+        )
+        self.assertTrue(visible.startswith("That's okay"))
+        self.assertIn("Try adding", visible)
+
+    def test_existing_humane_opening_is_not_duplicated(self):
+        turn = classify_student_turn("I don't know")
+        response = "That's okay—let's make the next step smaller.\n\nTry $1+3$."
+        self.assertEqual(ensure_recovery_acknowledgement(turn, response), response)
 
     def test_partial_answer_may_update_math_state(self):
         turn = classify_student_turn("Not sure, but maybe symmetry")

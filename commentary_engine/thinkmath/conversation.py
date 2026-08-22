@@ -123,6 +123,40 @@ def mentor_conversation_context(turn: StudentTurn, support_level: int) -> str:
     )
 
 
+def recovery_acknowledgement(turn: StudentTurn) -> str:
+    openings = {
+        TurnKind.STUCK: "That's okay—let's make the next step smaller.",
+        TurnKind.CONFUSED: "I can see where this became unclear—let's step back one step.",
+        TurnKind.REPEAT: "Of course—let me explain it a different way.",
+        TurnKind.EXAMPLE: "Let's make it concrete with a small example.",
+        TurnKind.DISAGREE: "That's a fair challenge—let's check the disputed step carefully.",
+    }
+    return openings.get(turn.kind, "")
+
+
+def model_user_message(turn: StudentTurn, support_level: int) -> str:
+    """Wrap recovery turns so small open models reliably follow the teacher move."""
+    if not turn.is_recovery:
+        return turn.text
+    opening = recovery_acknowledgement(turn)
+    return (
+        f'The student\'s exact message is: "{turn.text}"\n\n'
+        f'Begin your student-facing reply exactly with: "{opening}"\n'
+        f"Then follow this private teaching instruction: "
+        f"{mentor_conversation_context(turn, support_level)}\n"
+        "Return only the student-facing reply followed by the required private state block."
+    )
+
+
+def ensure_recovery_acknowledgement(turn: StudentTurn, visible_text: str) -> str:
+    """Guarantee a humane opening even when a small model ignores the instruction."""
+    opening = recovery_acknowledgement(turn)
+    text = (visible_text or "").strip()
+    if not opening or text.casefold().startswith(opening.casefold()):
+        return text
+    return f"{opening}\n\n{text}" if text else opening
+
+
 def first_substantive_user_message(messages: list[dict], fallback: str = "") -> str:
     for message in messages:
         if message.get("role") != "user":

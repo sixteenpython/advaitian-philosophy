@@ -35,8 +35,10 @@ from thinkmath.conversation import (
     accepted_phase_suggestion,
     accepted_state_update,
     classify_student_turn,
+    ensure_recovery_acknowledgement,
     first_substantive_user_message,
     mentor_conversation_context,
+    model_user_message,
     next_support_level,
 )
 from thinkmath.model_registry import (
@@ -79,7 +81,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.1.0"
+ENGINE_VERSION = "3.1.1"
 
 
 # =============================================================================
@@ -1332,7 +1334,12 @@ def chat(
     def send(candidate):
         provider, model = candidate["provider"], candidate["model"]
         wrapper = get_wrapper(provider, model, system_prompt)
-        return wrapper.send(user_input, short_history, max_tok)
+        model_input = (
+            model_user_message(conversation_turn, support_level)
+            if conversation_turn is not None
+            else user_input
+        )
+        return wrapper.send(model_input, short_history, max_tok)
 
     def on_attempt(candidate):
         if status_writer:
@@ -2471,6 +2478,8 @@ if user_input:
                 clean = safe_visible_fallback(envelope.state_update)
             if not clean:
                 clean = "[Empty response. Please rephrase and try again.]"
+            if conversation_turn.is_recovery:
+                clean = ensure_recovery_acknowledgement(conversation_turn, clean)
 
             asset = current_asset
             if not asset.problem:
