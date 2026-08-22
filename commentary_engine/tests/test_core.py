@@ -6,6 +6,7 @@ from types import SimpleNamespace
 from commentary_engine.thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
 from commentary_engine.thinkmath.model_registry import capability_for, supports_role
 from commentary_engine.thinkmath.providers import GroqAdapter
+from commentary_engine.thinkmath.rendering import prepare_markdown
 from commentary_engine.thinkmath.security import admin_enabled
 from commentary_engine.thinkmath.state_machine import evaluate_transition
 from commentary_engine.thinkmath.structured_output import parse_model_response
@@ -46,6 +47,46 @@ class CoreArchitectureTests(unittest.TestCase):
         parsed = parse_model_response("Hello\n```thinkmath-state\n{bad json}\n```")
         self.assertEqual(parsed.parse_status, "invalid")
         self.assertEqual(parsed.suggested_phase, 1)
+
+    def test_generic_json_state_block_is_hidden(self):
+        raw = (
+            "🏆 TAKEAWAY\nKeep the invariant visible.\n"
+            '```json\n{"suggested_phase": 3, "tier": 3, "mvc": {}}\n```'
+        )
+        parsed = parse_model_response(raw)
+        self.assertEqual(parsed.parse_status, "structured")
+        self.assertEqual(parsed.suggested_phase, 3)
+        self.assertNotIn("suggested_phase", parsed.visible_text)
+        self.assertNotIn("```json", parsed.visible_text)
+
+    def test_ordinary_json_example_remains_visible(self):
+        raw = 'An example:\n```json\n{"number": 12}\n```'
+        parsed = parse_model_response(raw)
+        self.assertIn('"number": 12', parsed.visible_text)
+
+    def test_captured_stage_two_rendering_is_repaired(self):
+        malformed = (
+            "💡 ELEGANT PIVOT\n"
+            r"\frac{27}{12}=d^{p-r},\qquad \frac{8}{12}=d^{q-r}.$$ "
+            "All expressions use one base. **⚠️ PITFALLS** 1. **Ignoring signs** – check them. "
+            "**🔗 CONNECTIONS** - **LOGARITHMS** linearise the powers. "
+            "**🏆 TAKEAWAY** Preserve the common ratio. "
+            '```json {"suggested_phase": 3, "tier": 3, "mvc": {}} ```'
+        )
+        rendered = prepare_markdown(malformed)
+        self.assertIn(r"$$\frac{27}{12}", rendered)
+        self.assertIn("\n\n**⚠️ PITFALLS**\n", rendered)
+        self.assertIn("\n1. **Ignoring signs**", rendered)
+        self.assertIn("\n\n**🔗 CONNECTIONS**\n", rendered)
+        self.assertIn("\n- **LOGARITHMS**", rendered)
+        self.assertNotIn("suggested_phase", rendered)
+
+    def test_state_is_removed_from_existing_rendered_messages(self):
+        rendered = prepare_markdown(
+            "Visible explanation.\n```thinkmath-state\n"
+            '{"suggested_phase": 2, "tier": 2}\n```'
+        )
+        self.assertEqual(rendered, "Visible explanation.")
 
     def test_descent_without_termination_fails_verification(self):
         commentary = "SEED BRUTE PIVOT use Vieta jumping descent PITFALL CONNECTION TAKEAWAY"

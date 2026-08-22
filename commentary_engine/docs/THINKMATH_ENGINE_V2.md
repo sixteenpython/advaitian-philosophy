@@ -53,6 +53,11 @@ LLM responsibilities:
 
 No LLM result silently overrides deterministic state or calculations.
 
+The current canonical MVC is injected into each mathematical turn as an
+explicitly untrusted claim. Stage 2 must reconcile its proof with that MVC or
+stop and identify the conflict; form edits are no longer invisible to the
+commentary generator.
+
 ## Proof release policy
 
 The critic parser defaults to `UNVERIFIED`, never `SOLID`. If a qualified
@@ -86,6 +91,11 @@ the visible-response allowance. It also caps prompt plus requested completion
 to a conservative 7,400-token budget for the free tier. The full doctrine is
 preserved in the repository; inference receives a compact core protocol plus a
 prioritised knowledge supplement to avoid duplicating the same rules.
+
+The renderer repairs unmatched display-math openers and inline Six-Point
+headings produced by open models. Both `thinkmath-state` and schema-matching
+generic JSON fences are removed from the visible response, including messages
+already held in a live Streamlit session.
 
 ## Security and privacy
 

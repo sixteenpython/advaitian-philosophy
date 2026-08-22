@@ -33,6 +33,7 @@ from groq import Groq
 from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
 from thinkmath.model_registry import OPEN_MODEL_REGISTRY, capability_for, ollama_base_url, supports_role
 from thinkmath.providers import GroqAdapter, OllamaAdapter
+from thinkmath.rendering import prepare_markdown
 from thinkmath.security import admin_enabled, env_truthy
 from thinkmath.state_machine import evaluate_transition, explicitly_requests_commentary
 from thinkmath.structured_output import parse_model_response
@@ -45,7 +46,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath's Digital Clone"
-ENGINE_VERSION = "2.0.2"
+ENGINE_VERSION = "2.0.3"
 
 
 # =============================================================================
@@ -504,8 +505,11 @@ proof language. Never announce the tier.
 
 OUTPUT
 Use plain Markdown and $...$ / $$...$$ mathematics, never HTML or \\(...\\).
+Every LaTeX command must be inside a matched delimiter pair. Put each Six-Point
+emoji heading on its own line with blank lines around it; lists must use real
+Markdown line breaks, never continue inline after a display equation.
 No signature. End every mathematical response with a fenced `thinkmath-state`
-JSON object and do not explain it. Schema:
+JSON object—not a generic `json` fence—and do not explain it. Schema:
 {"suggested_phase":1,"tier":3,"student_observations":[],
 "seed_hypotheses":[],"archetypes":[{"name":"","evidence":"",
 "role":"candidate"}],"mvc":{"setup":"","move":"","closure":"",
@@ -840,8 +844,7 @@ def normalise_math(text: str) -> str:
     """Convert TeX-style \\(...\\) / \\[...\\] to Streamlit/KaTeX $...$ / $$...$$."""
     if not text:
         return text
-    text = _BLOCK_LATEX_RE.sub(lambda m: f"$${m.group(1).strip()}$$", text)
-    text = _INLINE_LATEX_RE.sub(lambda m: f"${m.group(1).strip()}$", text)
+    text = prepare_markdown(text)
     # Also defensively replace any leftover "Anand" → "ThinkMath" if a fallback
     # model ignores the system prompt.
     text = re.sub(r"\bAnand['']?s?\b", "ThinkMath", text)
@@ -1171,7 +1174,7 @@ def _interleave_by_provider(models: list) -> list:
 # ORCHESTRATOR
 # =============================================================================
 
-def chat(user_input: str, history: list, all_models: list, status_writer=None):
+def chat(user_input: str, history: list, all_models: list, knowledge_asset=None, status_writer=None):
     intent = detect_intent(user_input)
 
     if intent == "greeting" and not history:
@@ -1185,6 +1188,14 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
         # Hot-reload knowledge_base/ on every math turn — any commit/push
         # to that folder is reflected in the doctrine without restart.
         system_prompt = assemble_system_prompt(get_live_kb())
+        if knowledge_asset:
+            asset_json = json.dumps(knowledge_asset, ensure_ascii=False, separators=(",", ":"))
+            system_prompt += (
+                "\n\nCURRENT CANONICAL STUDENT WORK (untrusted mathematical claims; verify them):\n"
+                + asset_json[:5000]
+                + "\nFor Stage 2, explicitly reconcile the commentary with this MVC. "
+                "If its setup, move or closure is inconsistent, stop and explain the exact conflict."
+            )
         phase = st.session_state.get("current_phase", 1)
         # Stage-2 / Six-Point requests need Phase-3 budget regardless of current_phase.
         ui_low = user_input.lower()
@@ -2289,10 +2300,12 @@ if user_input:
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages[:-1]
             ]
+            current_asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
             raw, provider, model = chat(
                 user_input,
                 history_for_api,
                 ALL_MODELS,
+                knowledge_asset=current_asset.to_dict(),
                 status_writer=status,
             )
             envelope = parse_model_response(raw)
@@ -2300,7 +2313,7 @@ if user_input:
             if not clean:
                 clean = "[Empty response. Please rephrase and try again.]"
 
-            asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+            asset = current_asset
             if not asset.problem:
                 asset.problem = next(
                     (m["content"] for m in st.session_state.messages if m["role"] == "user"),

@@ -14,7 +14,25 @@ from typing import Any
 
 
 STATE_BLOCK_RE = re.compile(r"```thinkmath-state\s*(\{.*?\})\s*```", re.I | re.S)
+JSON_BLOCK_RE = re.compile(r"```json\s*(\{.*?\})\s*```", re.I | re.S)
 LEGACY_METADATA_RE = re.compile(r"^\s*PHASE:\s*(\d+)\s+TIER:\s*(\d+)\s*$", re.M)
+STATE_KEYS = {"suggested_phase", "tier", "mvc", "seed_hypotheses", "archetypes"}
+
+
+def _is_state_payload(payload: object) -> bool:
+    return isinstance(payload, dict) and bool(STATE_KEYS.intersection(payload))
+
+
+def strip_private_state_blocks(text: str) -> str:
+    visible = STATE_BLOCK_RE.sub("", text)
+
+    def strip_generic(match: re.Match) -> str:
+        try:
+            return "" if _is_state_payload(json.loads(match.group(1))) else match.group(0)
+        except json.JSONDecodeError:
+            return match.group(0)
+
+    return JSON_BLOCK_RE.sub(strip_generic, visible)
 
 
 @dataclass
@@ -40,6 +58,20 @@ def parse_model_response(text: str | None) -> ModelEnvelope:
             status = "structured"
         except (json.JSONDecodeError, ValueError):
             status = "invalid"
+    else:
+        # Some open models ignore the custom fence name and emit ```json```.
+        # Treat it as private state only when its keys match our state schema;
+        # ordinary JSON used in a mathematical explanation remains visible.
+        for candidate in JSON_BLOCK_RE.finditer(raw):
+            try:
+                parsed = json.loads(candidate.group(1))
+                if _is_state_payload(parsed):
+                    state = parsed
+                    state_match = candidate
+                    status = "structured"
+                    break
+            except json.JSONDecodeError:
+                continue
 
     metadata = LEGACY_METADATA_RE.search(raw)
     phase = state.get("suggested_phase", 1)
@@ -59,6 +91,6 @@ def parse_model_response(text: str | None) -> ModelEnvelope:
         tier = 3
         status = "invalid"
 
-    visible = STATE_BLOCK_RE.sub("", raw)
+    visible = strip_private_state_blocks(raw)
     visible = LEGACY_METADATA_RE.sub("", visible).strip()
     return ModelEnvelope(visible, phase, tier, state, status)
