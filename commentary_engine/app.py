@@ -45,6 +45,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath's Digital Clone"
+ENGINE_VERSION = "2.0.1"
 
 
 # =============================================================================
@@ -1947,6 +1948,7 @@ with title_col_text:
     st.markdown(
         "##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*"
     )
+    st.caption(f"Engine v{ENGINE_VERSION} · Free/open-model routing")
     st.markdown(
         "<div class='desktop-note'>"
         "ThinkMath.ai is a desktop application. "
