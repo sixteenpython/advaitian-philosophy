@@ -1,9 +1,11 @@
 import unittest
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 from commentary_engine.thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
-from commentary_engine.thinkmath.model_registry import supports_role
+from commentary_engine.thinkmath.model_registry import capability_for, supports_role
+from commentary_engine.thinkmath.providers import GroqAdapter
 from commentary_engine.thinkmath.security import admin_enabled
 from commentary_engine.thinkmath.state_machine import evaluate_transition
 from commentary_engine.thinkmath.structured_output import parse_model_response
@@ -59,6 +61,29 @@ class CoreArchitectureTests(unittest.TestCase):
         self.assertTrue(supports_role("Ollama", "qwen3:8b", "mentor"))
         self.assertFalse(supports_role("Ollama", "qwen3:8b", "critic"))
         self.assertTrue(supports_role("Ollama", "qwen2.5-math:7b", "critic"))
+
+    def test_public_groq_models_have_task_roles(self):
+        self.assertTrue(supports_role("Groq", "qwen/qwen3.6-27b", "mentor"))
+        self.assertFalse(supports_role("Groq", "openai/gpt-oss-120b", "mentor"))
+        self.assertTrue(supports_role("Groq", "openai/gpt-oss-120b", "commentary"))
+        self.assertEqual(capability_for("Groq", "openai/gpt-oss-120b", 0), 10)
+
+    def test_groq_reasoning_models_return_visible_content(self):
+        recorded = {}
+
+        class FakeCompletions:
+            def create(self, **kwargs):
+                recorded.update(kwargs)
+                message = SimpleNamespace(content="Visible Socratic question")
+                return SimpleNamespace(choices=[SimpleNamespace(message=message)])
+
+        fake_client = SimpleNamespace(chat=SimpleNamespace(completions=FakeCompletions()))
+        adapter = GroqAdapter("openai/gpt-oss-20b", "system", client=fake_client)
+        result = adapter.send("problem", [], 300)
+
+        self.assertEqual(result, "Visible Socratic question")
+        self.assertEqual(recorded["reasoning_effort"], "low")
+        self.assertEqual(recorded["reasoning_format"], "hidden")
 
     def test_golden_eval_catalog_is_well_formed(self):
         path = Path(__file__).parents[1] / "evals" / "golden_cases.json"

@@ -23,6 +23,9 @@ OPEN_MODEL_REGISTRY = (
     ModelSpec("Ollama", "gpt-oss:20b", ("mentor", "commentary"), 9, "Apache-2.0", True, 32768),
     ModelSpec("Ollama", "qwen2.5-math:7b", ("critic",), 8, "Apache-2.0", True, 32768),
     ModelSpec("Ollama", "deepseek-r1:14b", ("critic", "commentary"), 8, "MIT", True, 32768),
+    ModelSpec("Groq", "qwen/qwen3.6-27b", ("mentor", "commentary", "critic"), 9, "Apache-2.0", False, 131072),
+    ModelSpec("Groq", "openai/gpt-oss-20b", ("mentor", "critic"), 8, "Apache-2.0", False, 131072),
+    ModelSpec("Groq", "openai/gpt-oss-120b", ("commentary", "critic"), 10, "Apache-2.0", False, 131072),
 )
 
 
@@ -37,3 +40,8 @@ def registry_rows() -> list[dict]:
 def supports_role(provider: str, model: str, role: str) -> bool:
     matches = [spec for spec in OPEN_MODEL_REGISTRY if spec.provider == provider and spec.model == model]
     return not matches or role in matches[0].roles
+
+
+def capability_for(provider: str, model: str, fallback: int) -> int:
+    matches = [spec for spec in OPEN_MODEL_REGISTRY if spec.provider == provider and spec.model == model]
+    return matches[0].capability if matches else fallback

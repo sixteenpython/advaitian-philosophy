@@ -13,10 +13,11 @@ verification evidence and provenance.
 4. For an independent critic, pull `qwen2.5-math:7b`.
 5. Install `requirements.txt` and run `streamlit run app.py` from this folder.
 
-`OLLAMA_BASE_URL` may point at another private Ollama host. Hosted Groq and
-SambaNova adapters are optional, no-cost fallbacks for the public demo and are
-restricted to registered open/open-weight model families. The application has
-no paid-LLM dependency.
+`OLLAMA_BASE_URL` may point at another private Ollama host. Groq is the optional
+no-cost hosted fallback for the public demo and is restricted to registered
+open/open-weight models. SambaNova is intentionally unsupported because its
+current service requires billing configuration. The application has no
+paid-LLM dependency.
 
 ## Privacy
 

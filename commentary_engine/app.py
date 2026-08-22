@@ -3,8 +3,8 @@ ThinkMath.ai — Socratic Mentor (Optimised Edition)
 
 Architecture
 ------------
-1. Local-first open-model registry with Ollama and optional no-cost hosted
-   open-weight fallbacks through Groq and SambaNova.
+1. Local-first open-model registry with Ollama and an optional no-cost hosted
+   open-weight fallback through Groq.
 2. Lean prompts: a compact CORE_BRIEF for math problems and a small CONCIERGE
    prompt for greetings.
 3. Quota-aware circuit breaker: parses retry_delay, distinguishes daily-quota
@@ -29,10 +29,10 @@ import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
 from groq import Groq
-from openai import OpenAI
 
 from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
-from thinkmath.model_registry import OPEN_MODEL_REGISTRY, ollama_base_url, supports_role
+from thinkmath.model_registry import OPEN_MODEL_REGISTRY, capability_for, ollama_base_url, supports_role
+from thinkmath.providers import GroqAdapter, OllamaAdapter
 from thinkmath.security import admin_enabled, env_truthy
 from thinkmath.state_machine import evaluate_transition, explicitly_requests_commentary
 from thinkmath.structured_output import parse_model_response
@@ -604,10 +604,7 @@ CANNED_GREETING = (
 )
 
 KNOWN_GROQ_MODELS = [
-    "qwen-qwq-32b",
-]
-KNOWN_SAMBANOVA_MODELS = [
-    "DeepSeek-V3-0324", "DeepSeek-R1", "Qwen3-32B",
+    "qwen/qwen3.6-27b", "openai/gpt-oss-20b", "openai/gpt-oss-120b",
 ]
 
 OPEN_MODEL_NAME_MARKERS = ("qwen", "deepseek", "gpt-oss", "ministral")
@@ -628,9 +625,7 @@ EXCLUDE_SUBSTRINGS = (
 KB_DIR_NAME = "knowledge_base"
 # Total budget chosen so that:
 #   CORE_BRIEF (~4.4K tokens) + KB doctrine (~2.7K tokens) + history + user input
-#   ≈ 7K-8K input tokens — fits Groq 70B/120B (32K-128K ctx) and all SambaNova /
-#   Gemini models comfortably. Groq 8B (8K ctx) drops out of the ladder for
-#   long turns; the circuit breaker handles that automatically.
+#   ≈ 7K-8K input tokens — fits the registered 128K-context Groq models.
 KB_BUDGET_CHARS = 11000     # ~2750 tokens total across all files
 KB_PER_FILE_CAP = 10500     # ~2625 tokens per file (enough for the full Master Framework)
 KB_FILE_EXTS = (".md", ".txt")
@@ -802,7 +797,7 @@ def _try_load_keys_module(path: str) -> dict:
         spec.loader.exec_module(mod)  # type: ignore[union-attr]
         return {
             k: getattr(mod, k)
-            for k in ("GROQ_API_KEY", "SAMBANOVA_API_KEY")
+            for k in ("GROQ_API_KEY",)
             if hasattr(mod, k)
         }
     except Exception:
@@ -815,13 +810,12 @@ def _clean(val):
 
 @st.cache_resource
 def get_credentials():
-    groq_k = samba_k = None
+    groq_k = None
     fb_cred = None
 
     try:
         if hasattr(st, "secrets") and st.secrets:
             groq_k = groq_k or st.secrets.get("GROQ_API_KEY")
-            samba_k = samba_k or st.secrets.get("SAMBANOVA_API_KEY")
             if "firebase" in st.secrets:
                 fb_cred = dict(st.secrets["firebase"])
     except Exception:
@@ -837,14 +831,12 @@ def get_credentials():
     for path in candidates:
         keys = _try_load_keys_module(path)
         groq_k = groq_k or keys.get("GROQ_API_KEY")
-        samba_k = samba_k or keys.get("SAMBANOVA_API_KEY")
 
     search_paths = [here, os.path.dirname(here), os.getcwd()]
     # Generic legacy filenames remain supported locally. Never encode a secret
     # value into source code, even as a filename.
     plain_files = {
         "GROQ_API_KEY": ["groq_api_key.txt", "groq_key.txt"],
-        "SAMBANOVA_API_KEY": ["samba_api_key.txt", "samba_key.txt", "sambanova_api_key.txt"],
     }
     for key_name, filenames in plain_files.items():
         for p in search_paths:
@@ -856,13 +848,10 @@ def get_credentials():
                             val = f.read()
                         if key_name == "GROQ_API_KEY" and not groq_k:
                             groq_k = val
-                        elif key_name == "SAMBANOVA_API_KEY" and not samba_k:
-                            samba_k = val
                     except Exception:
                         pass
 
     groq_k = groq_k or os.environ.get("GROQ_API_KEY")
-    samba_k = samba_k or os.environ.get("SAMBANOVA_API_KEY")
 
     if not fb_cred:
         for p in search_paths:
@@ -871,10 +860,10 @@ def get_credentials():
                 fb_cred = fp
                 break
 
-    return fb_cred, _clean(groq_k), _clean(samba_k)
+    return fb_cred, _clean(groq_k)
 
 
-FIREBASE_CRED, GROQ_KEY, SAMBA_KEY = get_credentials()
+FIREBASE_CRED, GROQ_KEY = get_credentials()
 
 
 # =============================================================================
@@ -882,7 +871,7 @@ FIREBASE_CRED, GROQ_KEY, SAMBA_KEY = get_credentials()
 # =============================================================================
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def discover_models(groq_key, samba_key):
+def discover_models(groq_key):
     models = []
     dynamic_discovery = env_truthy("THINKMATH_DYNAMIC_MODEL_DISCOVERY", True)
 
@@ -929,35 +918,7 @@ def discover_models(groq_key, samba_key):
     for name in groq_names:
         models.append({
             "provider": "Groq", "model": name,
-            "score": _score_model(name), "context": 8192,
-        })
-
-    samba_names = list(KNOWN_SAMBANOVA_MODELS) if samba_key else []
-    if samba_key and dynamic_discovery:
-        try:
-            client = OpenAI(
-                api_key=samba_key,
-                base_url="https://api.sambanova.ai/v1",
-                timeout=4.0,
-                max_retries=0,
-            )
-            resp = client.models.list()
-            for m in (resp.data or []):
-                if any(x in m.id.lower() for x in EXCLUDE_SUBSTRINGS):
-                    continue
-                if not any(x in m.id.lower() for x in OPEN_MODEL_NAME_MARKERS):
-                    continue
-                samba_names.append(m.id)
-        except Exception:
-            samba_names = []
-    if not samba_names and samba_key:
-        samba_names = list(KNOWN_SAMBANOVA_MODELS)
-    samba_names = sorted(set(samba_names))
-
-    for name in samba_names:
-        models.append({
-            "provider": "SambaNova", "model": name,
-            "score": _score_model(name), "context": 8192,
+            "score": capability_for("Groq", name, _score_model(name)), "context": 131072,
         })
 
     return models
@@ -1020,6 +981,12 @@ def block_model(provider: str, model: str, seconds: int, reason: str):
     }
 
 
+def block_provider(provider: str, models: list, seconds: int, reason: str):
+    for candidate in models:
+        if candidate["provider"] == provider:
+            block_model(provider, candidate["model"], seconds, reason)
+
+
 def parse_retry_seconds(error_str: str) -> int:
     m = re.search(r"retry_delay\s*\{\s*seconds:\s*(\d+)", error_str)
     if m: return int(m.group(1)) + 1
@@ -1032,6 +999,8 @@ def parse_retry_seconds(error_str: str) -> int:
 
 def classify_error(error_str: str) -> str:
     s = error_str.lower()
+    if "402" in s or "payment_method_required" in s or "billing" in s:
+        return "billing_required"
     if "limit: 0" in s or "perdayper" in s.replace(" ", "") or "rpd" in s or "per day" in s:
         return "daily_quota"
     if "request too large" in s or "413" in s or "tokens per minute" in s:
@@ -1051,96 +1020,16 @@ def classify_error(error_str: str) -> str:
 # PROVIDER WRAPPERS
 # =============================================================================
 
-class BaseWrapper:
-    provider: str = "Base"
-
-    def __init__(self, model_name: str, system_instruction: str):
-        self.model_name = model_name
-        self.system_instruction = system_instruction
-
-    def send(self, user_message: str, history: list, max_output_tokens: int) -> str:
-        raise NotImplementedError
-
-
-class GroqWrapper(BaseWrapper):
-    provider = "Groq"
-
-    def __init__(self, model_name, system_instruction):
-        super().__init__(model_name, system_instruction)
-        self._client = Groq(api_key=GROQ_KEY)
-
-    def send(self, user_message, history, max_output_tokens):
-        msgs = [{"role": "system", "content": self.system_instruction}]
-        for m in history:
-            role = "user" if m["role"] == "user" else "assistant"
-            msgs.append({"role": role, "content": m["content"]})
-        msgs.append({"role": "user", "content": user_message})
-        completion = self._client.chat.completions.create(
-            model=self.model_name,
-            messages=msgs,
-            temperature=0.3,
-            max_tokens=max_output_tokens,
-        )
-        return completion.choices[0].message.content or ""
-
-
-class SambaWrapper(BaseWrapper):
-    provider = "SambaNova"
-
-    def __init__(self, model_name, system_instruction):
-        super().__init__(model_name, system_instruction)
-        self._client = OpenAI(api_key=SAMBA_KEY, base_url="https://api.sambanova.ai/v1")
-
-    def send(self, user_message, history, max_output_tokens):
-        msgs = [{"role": "system", "content": self.system_instruction}]
-        for m in history:
-            role = "user" if m["role"] == "user" else "assistant"
-            msgs.append({"role": role, "content": m["content"]})
-        msgs.append({"role": "user", "content": user_message})
-        completion = self._client.chat.completions.create(
-            model=self.model_name,
-            messages=msgs,
-            temperature=0.3,
-            max_tokens=max_output_tokens,
-        )
-        return completion.choices[0].message.content or ""
-
-
-class OllamaWrapper(BaseWrapper):
-    provider = "Ollama"
-
-    def __init__(self, model_name, system_instruction):
-        super().__init__(model_name, system_instruction)
-        self._client = OpenAI(api_key="ollama-local", base_url=f"{ollama_base_url()}/v1")
-
-    def send(self, user_message, history, max_output_tokens):
-        msgs = [{"role": "system", "content": self.system_instruction}]
-        for m in history:
-            role = "user" if m["role"] == "user" else "assistant"
-            msgs.append({"role": role, "content": m["content"]})
-        msgs.append({"role": "user", "content": user_message})
-        completion = self._client.chat.completions.create(
-            model=self.model_name,
-            messages=msgs,
-            temperature=0.25,
-            max_tokens=max_output_tokens,
-        )
-        return completion.choices[0].message.content or ""
-
-
-WRAPPER_CLASS = {
-    "Groq": GroqWrapper,
-    "SambaNova": SambaWrapper,
-    "Ollama": OllamaWrapper,
-}
-
-
-def get_wrapper(provider: str, model: str, system_prompt: str) -> BaseWrapper:
+def get_wrapper(provider: str, model: str, system_prompt: str):
     cache = st.session_state.wrapper_cache
     key = f"{provider}::{model}::{sha1(system_prompt.encode()).hexdigest()[:8]}"
     if key not in cache:
-        cls = WRAPPER_CLASS[provider]
-        cache[key] = cls(model, system_prompt)
+        if provider == "Groq":
+            cache[key] = GroqAdapter(model, system_prompt, api_key=GROQ_KEY)
+        elif provider == "Ollama":
+            cache[key] = OllamaAdapter(model, system_prompt, base_url=ollama_base_url())
+        else:
+            raise ValueError(f"Unsupported provider: {provider}")
     return cache[key]
 
 
@@ -1295,6 +1184,8 @@ def chat(user_input: str, history: list, all_models: list, status_writer=None):
                 status_writer.write(f"   ✗ {kind}: {err[:120]}")
             if kind == "daily_quota":
                 block_model(provider, model, _seconds_until_pt_midnight(), "daily quota exhausted")
+            elif kind == "billing_required":
+                block_provider(provider, all_models, 24 * 3600, "provider requires billing")
             elif kind == "minute_quota":
                 block_model(provider, model, parse_retry_seconds(err), "rate-limited per minute")
             elif kind == "tpm_too_small":
@@ -1360,6 +1251,7 @@ def run_critic(
     commentary: str,
     all_models: list,
     generator_provider: str | None = None,
+    generator_model: str | None = None,
     status_writer=None,
 ) -> dict:
     """Independent second-LLM pass over a Phase-3 commentary.
@@ -1396,8 +1288,11 @@ def run_critic(
         }
 
     def _critic_priority(m):
-        diff_provider = 0 if (generator_provider and m["provider"] == generator_provider) else 1
-        return (-diff_provider, -m["score"])
+        same_model = bool(
+            generator_provider and generator_model
+            and m["provider"] == generator_provider and m["model"] == generator_model
+        )
+        return (same_model, -m["score"])
 
     candidates = sorted(capable, key=_critic_priority)[:CRITIC_MAX_ATTEMPTS]
 
@@ -1951,7 +1846,7 @@ _init_state()
 
 
 # Discover models (cached 1h)
-ALL_MODELS = discover_models(GROQ_KEY, SAMBA_KEY)
+ALL_MODELS = discover_models(GROQ_KEY)
 
 
 # ---------------------------------------------------------------------------
@@ -1975,8 +1870,6 @@ if ADMIN_MODE:
 
     if GROQ_KEY:
         st.sidebar.markdown("<div class='status-pill'>● Groq Connected</div>", unsafe_allow_html=True)
-    if SAMBA_KEY:
-        st.sidebar.markdown("<div class='status-pill'>● SambaNova Connected</div>", unsafe_allow_html=True)
 
     # Engine status
     st.sidebar.markdown("#### Engine Status")
@@ -2320,7 +2213,7 @@ if st.session_state.mvc_validated and st.session_state.current_phase < 3:
 # Process turn
 if user_input:
     if not ALL_MODELS:
-        st.error("No open model is available. Start Ollama locally or configure a no-cost Groq/SambaNova key.")
+        st.error("No open model is available. Start Ollama locally or configure a no-cost Groq key.")
         st.stop()
 
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -2381,6 +2274,7 @@ if user_input:
                     commentary=clean,
                     all_models=ALL_MODELS,
                     generator_provider=provider,
+                    generator_model=model,
                     status_writer=status,
                 )
                 original_draft = clean

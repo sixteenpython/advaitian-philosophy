@@ -74,7 +74,9 @@ The local-first registry currently recognises:
 
 Ollama is the private default. A public Streamlit host cannot provide unlimited
 GPU inference merely because weights are free; optional no-cost hosted
-fallbacks therefore remain operationally separate and quota-bound.
+fallbacks therefore remain operationally separate and quota-bound. The public
+demo currently uses Groq only; SambaNova is excluded because it requires a
+payment method.
 
 Models are promoted by the Advaitian golden evaluation suite, not by name,
 parameter count or generic benchmarks.
