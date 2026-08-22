@@ -71,7 +71,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.0.1"
+ENGINE_VERSION = "3.0.2"
 
 
 # =============================================================================
@@ -1633,15 +1633,6 @@ except Exception:
     ADMIN_PIN = None
 
 ADMIN_MODE = bool(st.session_state.get("admin_authenticated", False))
-if ADMIN_PIN and not ADMIN_MODE:
-    with st.popover("Team access"):
-        supplied_admin_pin = st.text_input("Admin PIN", type="password", key="admin_pin_input")
-        if st.button("Sign in", key="admin_sign_in", use_container_width=True):
-            if admin_enabled(ADMIN_PIN, supplied_admin_pin):
-                st.session_state.admin_authenticated = True
-                st.rerun()
-            else:
-                st.error("Invalid credentials.")
 
 # When NOT in admin mode, hide the sidebar AND its toggle entirely.
 if not ADMIN_MODE:
@@ -2145,6 +2136,24 @@ def render_user(content: str) -> None:
 
 inject_student_theme()
 render_hero(ENGINE_VERSION)
+
+# Keep authentication inside the themed document flow. Rendering it before the
+# hero places the first control beneath Streamlit Cloud's fixed header on narrow
+# screens, making the label appear clipped or completely blank.
+if ADMIN_PIN and not ADMIN_MODE:
+    with st.popover("🔐 Team login"):
+        st.caption("Authorized team members")
+        supplied_admin_pin = st.text_input(
+            "Admin PIN",
+            type="password",
+            key="admin_pin_input",
+        )
+        if st.button("Sign in", key="admin_sign_in", use_container_width=True):
+            if admin_enabled(ADMIN_PIN, supplied_admin_pin):
+                st.session_state.admin_authenticated = True
+                st.rerun()
+            else:
+                st.error("Invalid credentials.")
 
 asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
 blocked_keys = {
