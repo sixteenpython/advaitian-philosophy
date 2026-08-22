@@ -21,6 +21,7 @@ class ConversationTests(unittest.TestCase):
             "I don’t know": TurnKind.STUCK,
             "I have no clue": TurnKind.STUCK,
             "I am confused": TurnKind.CONFUSED,
+            "I cannot think of a way to proceed": TurnKind.STUCK,
             "That doesn't make sense": TurnKind.CONFUSED,
             "Can you explain again?": TurnKind.REPEAT,
             "Show me a small example": TurnKind.EXAMPLE,
@@ -73,6 +74,8 @@ class ConversationTests(unittest.TestCase):
         turn = classify_student_turn("I don't know")
         response = "That's okay—let's make the next step smaller.\n\nTry $1+3$."
         self.assertEqual(ensure_recovery_acknowledgement(turn, response), response)
+        curly = "That’s okay—let’s make the next step smaller. What do we know?"
+        self.assertEqual(ensure_recovery_acknowledgement(turn, curly), curly)
 
     def test_partial_answer_may_update_math_state(self):
         turn = classify_student_turn("Not sure, but maybe symmetry")

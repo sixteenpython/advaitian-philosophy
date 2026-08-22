@@ -18,7 +18,7 @@ JSON_BLOCK_RE = re.compile(r"```json\s*(\{.*?\})\s*```", re.I | re.S)
 LEGACY_METADATA_RE = re.compile(r"^\s*PHASE:\s*(\d+)\s+TIER:\s*(\d+)\s*$", re.M)
 STATE_KEYS = {
     "suggested_phase", "tier", "mvc", "seed_hypotheses", "archetypes",
-    "mentor_action", "problem_map",
+    "mentor_action", "problem_map", "claims", "proof_obligation",
 }
 
 
@@ -26,12 +26,58 @@ def _is_state_payload(payload: object) -> bool:
     return isinstance(payload, dict) and bool(STATE_KEYS.intersection(payload))
 
 
+def _escape_control_chars_in_strings(text: str) -> str:
+    result, in_string, escaped = [], False, False
+    for char in text:
+        if in_string and char in "\n\r\t":
+            result.append({"\n": "\\n", "\r": "\\r", "\t": "\\t"}[char])
+            continue
+        result.append(char)
+        if escaped:
+            escaped = False
+        elif char == "\\" and in_string:
+            escaped = True
+        elif char == '"':
+            in_string = not in_string
+    return "".join(result)
+
+
+def _loads_tolerant(text: str) -> object:
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return json.loads(_escape_control_chars_in_strings(text))
+
+
+def _balanced_json_prefix(text: str) -> tuple[str, str] | None:
+    start = text.find("{")
+    if start < 0 or text[:start].strip(" `\n\r\t"):
+        return None
+    depth, in_string, escaped = 0, False, False
+    for index in range(start, len(text)):
+        char = text[index]
+        if escaped:
+            escaped = False
+            continue
+        if in_string and char == "\\":
+            escaped = True
+        elif char == '"':
+            in_string = not in_string
+        elif not in_string:
+            if char == "{": depth += 1
+            elif char == "}":
+                depth -= 1
+                if depth == 0:
+                    return text[start:index + 1], text[index + 1:]
+    return None
+
+
 def strip_private_state_blocks(text: str) -> str:
     # Some providers occasionally ignore the requested fence and return only
     # the state object.  It is still private application state and must never
     # be rendered in the chat transcript.
     try:
-        standalone = json.loads(text.strip())
+        standalone = _loads_tolerant(text.strip())
         if _is_state_payload(standalone):
             return ""
     except (json.JSONDecodeError, TypeError):
@@ -44,8 +90,17 @@ def strip_private_state_blocks(text: str) -> str:
             return "" if _is_state_payload(json.loads(match.group(1))) else match.group(0)
         except json.JSONDecodeError:
             return match.group(0)
-
-    return JSON_BLOCK_RE.sub(strip_generic, visible)
+    visible = JSON_BLOCK_RE.sub(strip_generic, visible)
+    balanced = _balanced_json_prefix(visible.strip())
+    if balanced:
+        candidate, remainder = balanced
+        try:
+            if _is_state_payload(_loads_tolerant(candidate)) and not remainder.strip(". `\n\r\t"):
+                return ""
+        except json.JSONDecodeError:
+            if any(f'"{key}"' in candidate for key in STATE_KEYS) and not remainder.strip(". `\n\r\t"):
+                return ""
+    return visible
 
 
 def safe_visible_fallback(state: dict[str, Any]) -> str:
@@ -85,7 +140,7 @@ def parse_model_response(text: str | None) -> ModelEnvelope:
     status = "legacy"
     if state_match:
         try:
-            parsed = json.loads(state_match.group(1))
+            parsed = _loads_tolerant(state_match.group(1))
             if not isinstance(parsed, dict):
                 raise ValueError("state update must be an object")
             state = parsed
@@ -98,7 +153,7 @@ def parse_model_response(text: str | None) -> ModelEnvelope:
         # ordinary JSON used in a mathematical explanation remains visible.
         for candidate in JSON_BLOCK_RE.finditer(raw):
             try:
-                parsed = json.loads(candidate.group(1))
+                parsed = _loads_tolerant(candidate.group(1))
                 if _is_state_payload(parsed):
                     state = parsed
                     state_match = candidate
@@ -112,7 +167,9 @@ def parse_model_response(text: str | None) -> ModelEnvelope:
         # response and has a recognized ThinkMath state key.
         if not state:
             try:
-                parsed = json.loads(raw.strip())
+                balanced = _balanced_json_prefix(raw.strip())
+                candidate = balanced[0] if balanced and not balanced[1].strip(". `\n\r\t") else raw.strip()
+                parsed = _loads_tolerant(candidate)
                 if _is_state_payload(parsed):
                     state = parsed
                     status = "structured"

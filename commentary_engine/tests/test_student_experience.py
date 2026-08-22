@@ -39,6 +39,16 @@ class StudentExperienceTests(unittest.TestCase):
         )
         self.assertGreater(view.progress, 0.5)
 
+    def test_map_prioritizes_current_proof_obligation_and_claim_status(self):
+        asset = AdvaitianSession(
+            problem="Prove P",
+            current_proof_obligation="justify the reduction",
+            claim_ledger=[{"text": "It always works", "status": "needs_proof", "reason": "gap"}],
+        )
+        view = build_thinking_map(asset)
+        self.assertEqual(view.open_question, "justify the reduction")
+        self.assertEqual(view.claim_ledger[0]["status"], "needs_proof")
+
     def test_demo_is_complete_without_model_inference(self):
         asset, messages = demonstration("odd-layers")
         self.assertTrue(asset.mvc.validated)

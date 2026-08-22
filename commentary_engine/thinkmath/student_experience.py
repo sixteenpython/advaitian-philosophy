@@ -52,6 +52,8 @@ class ThinkingMap:
     setup: str
     move: str
     closure: str
+    claim_ledger: tuple[dict[str, str], ...]
+    proof_obligation: str
     open_question: str
     complete: bool
 
@@ -89,7 +91,9 @@ def build_thinking_map(asset: AdvaitianSession) -> ThinkingMap:
         )
     )
     progress = min(1.0, established / 7)
-    if not asset.problem:
+    if asset.current_proof_obligation:
+        open_question = asset.current_proof_obligation
+    elif not asset.problem:
         open_question = "Bring one problem into the workspace."
     elif not asset.student_observations:
         open_question = "What changes, and what appears to remain fixed?"
@@ -118,6 +122,8 @@ def build_thinking_map(asset: AdvaitianSession) -> ThinkingMap:
         setup=asset.mvc.setup,
         move=asset.mvc.move,
         closure=asset.mvc.closure,
+        claim_ledger=tuple(asset.claim_ledger),
+        proof_obligation=asset.current_proof_obligation,
         open_question=open_question,
         complete=asset.mvc.validated and asset.phase == SessionPhase.CONVERGENCE,
     )

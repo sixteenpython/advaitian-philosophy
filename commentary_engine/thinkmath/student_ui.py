@@ -154,6 +154,20 @@ def render_thinking_map(view: ThinkingMap) -> None:
         view.directions,
         "No mathematical direction has been confirmed.",
     )
+    if view.claim_ledger:
+        labels = {
+            "verified": "✓ Verified",
+            "promising": "◇ Promising",
+            "needs_proof": "△ Needs proof",
+            "corrected": "↺ Corrected",
+        }
+        with st.container(border=True):
+            st.markdown('<div class="tm-map-label">Claim Check</div>', unsafe_allow_html=True)
+            for claim in view.claim_ledger[-5:]:
+                label = labels.get(claim.get("status", ""), "△ Review")
+                st.markdown(f"**{label}:** {claim.get('text', '')}")
+                if claim.get("reason"):
+                    st.caption(claim["reason"])
     if view.phase_number >= int(SessionPhase.DIRECTIONS) or any(
         (view.setup, view.move, view.closure)
     ):

@@ -41,7 +41,7 @@ def classify_student_turn(text: str | None) -> StudentTurn:
     lowered = re.sub(r"\s+", " ", raw.casefold().replace("’", "'"))
 
     uncertain = re.search(
-        r"\b(i (?:do not|don't|dont) know|i (?:do not|don't|dont) get it|no idea|no clue|not sure|unsure|i(?:'| a)?m stuck|can't do|cannot do|help me)\b",
+        r"\b(i (?:do not|don't|dont) know|i (?:do not|don't|dont) get it|i (?:cannot|can't) think|no idea|no clue|not sure|unsure|i(?:'| a)?m stuck|can't do|cannot do|help me)\b",
         lowered,
     )
     if uncertain and (
@@ -152,7 +152,9 @@ def ensure_recovery_acknowledgement(turn: StudentTurn, visible_text: str) -> str
     """Guarantee a humane opening even when a small model ignores the instruction."""
     opening = recovery_acknowledgement(turn)
     text = (visible_text or "").strip()
-    if not opening or text.casefold().startswith(opening.casefold()):
+    normalized_text = text.casefold().replace("’", "'").replace("–", "-").replace("—", "-")
+    normalized_opening = opening.casefold().replace("’", "'").replace("–", "-").replace("—", "-")
+    if not opening or normalized_text.startswith(normalized_opening):
         return text
     return f"{opening}\n\n{text}" if text else opening
 

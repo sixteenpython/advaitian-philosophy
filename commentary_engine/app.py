@@ -51,6 +51,9 @@ from thinkmath.mentor_engine import (
     cached_problem_map,
     choose_mentor_action,
     deterministic_fallback,
+    ensure_teacher_response,
+    extract_last_question,
+    update_claim_ledger,
     validate_state_proposal,
 )
 from thinkmath.providers import GroqAdapter, OllamaAdapter
@@ -87,7 +90,7 @@ from thinkmath.verification import verify_commentary, verification_label, verify
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.2.0"
+ENGINE_VERSION = "3.2.1"
 
 
 # =============================================================================
@@ -154,6 +157,11 @@ directions at once.
   open question with a tiny task or two concrete choices.
 - Encouragement must be specific and earned. Never use automatic praise such as
   "Great job!" or imply that confusion is a mathematical claim.
+- Check a mathematical claim before praising it. For a partly correct idea,
+  name the useful part and then the exact proof gap. For a false universal
+  claim, correct it gently with the smallest counterexample you can verify.
+- Do not ask a question the student has already answered. Advance the current
+  proof obligation instead of rewarding mathematical vocabulary on its own.
 - Contractions and brief conversational transitions are welcome. Precision and
   proof safeguards remain unchanged.
 
@@ -2216,7 +2224,7 @@ def render_mentor(
             st.success("Your complete structural commentary is ready in the **Commentary** tab.")
         else:
             st.markdown(normalise_math(content))
-        if model_label:
+        if ADMIN_MODE and model_label:
             st.markdown(f"<div class='card-footer'>{model_label}</div>", unsafe_allow_html=True)
         if proof_status and proof_status != "demonstration":
             badge = "🟡 Partially verified" if proof_status == "partially_verified" else "🔴 Unverified"
@@ -2541,6 +2549,13 @@ if user_input:
                 clean = deterministic_fallback(mentor_decision, working_map)
             if conversation_turn.is_recovery:
                 clean = ensure_recovery_acknowledgement(conversation_turn, clean)
+            clean = ensure_teacher_response(
+                clean,
+                mentor_decision,
+                working_map,
+                current_asset.mentor_history,
+                user_input,
+            )
 
             asset = current_asset
             # The model proposes; the engine accepts only claims grounded in
@@ -2560,12 +2575,16 @@ if user_input:
                 cache_problem_map(asset.problem, proposed_map)
             else:
                 asset.problem_map = working_map.to_dict()
+            claim_checks = verify_student_claims(user_input)
+            update_claim_ledger(asset, user_input, mentor_decision, claim_checks)
             asset.mentor_history = [
                 *asset.mentor_history[-19:],
                 {
                     "action": mentor_decision.action.value,
                     "reason": mentor_decision.reason,
                     "turn_kind": conversation_turn.kind.value,
+                    "question": extract_last_question(clean),
+                    "proof_obligation": asset.current_proof_obligation,
                 },
             ]
             for note in proposal_notes[-6:]:
@@ -2573,7 +2592,6 @@ if user_input:
                     "source": "mentor-engine",
                     "detail": note,
                 })
-            claim_checks = verify_student_claims(user_input)
             if claim_checks:
                 asset.verification_results = [
                     *asset.verification_results[-17:],
@@ -2670,14 +2688,27 @@ if user_input:
 
         except Exception as e:
             error_title, error_detail = friendly_provider_error(e)
-            fallback = deterministic_fallback(mentor_decision, working_map)
+            fallback = deterministic_fallback(mentor_decision, working_map, user_input)
+            if conversation_turn.is_recovery:
+                fallback = ensure_recovery_acknowledgement(conversation_turn, fallback)
+            fallback = ensure_teacher_response(
+                fallback,
+                mentor_decision,
+                working_map,
+                current_asset.mentor_history,
+                user_input,
+            )
             current_asset.problem_map = working_map.to_dict()
+            claim_checks = verify_student_claims(user_input)
+            update_claim_ledger(current_asset, user_input, mentor_decision, claim_checks)
             current_asset.mentor_history = [
                 *current_asset.mentor_history[-19:],
                 {
                     "action": mentor_decision.action.value,
                     "reason": mentor_decision.reason,
                     "turn_kind": conversation_turn.kind.value,
+                    "question": extract_last_question(fallback),
+                    "proof_obligation": current_asset.current_proof_obligation,
                 },
             ]
             st.session_state.knowledge_asset = current_asset.to_dict()

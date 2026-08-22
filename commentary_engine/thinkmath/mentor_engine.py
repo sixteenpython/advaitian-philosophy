@@ -37,6 +37,8 @@ class MentorAction(str, Enum):
     COMPARE_DIRECTIONS = "compare_directions"
     COMPLETE_MVC = "complete_mvc"
     RELEASE_COMMENTARY = "release_commentary"
+    TEST_CLAIM = "test_claim"
+    CORRECT_MISCONCEPTION = "correct_misconception"
 
 
 @dataclass(frozen=True, slots=True)
@@ -46,20 +48,31 @@ class MentorDecision:
     reveal_limit: str
     reason: str
     routing_profile: str = "reasoning"
+    correction: str = ""
+    counterexample: str = ""
+    proof_obligation: str = ""
 
     def to_dict(self) -> dict[str, str]:
         return {**asdict(self), "action": self.action.value}
 
     def prompt_instruction(self) -> str:
-        return (
+        instruction = (
             "ALGORITHMIC MENTOR DECISION (binding):\n"
             f"- Action: {self.action.value}\n"
             f"- Teaching objective: {self.objective}\n"
             f"- Reveal boundary: {self.reveal_limit}\n"
             f"- Policy reason: {self.reason}\n"
             "You may reason creatively and phrase this naturally, but do not replace "
-            "the selected action or cross its reveal boundary. Return at most one question."
+            "the selected action or cross its reveal boundary. Return at most one question. "
+            "Never praise a claim before checking it. Separate the useful idea from the exact gap."
         )
+        if self.correction:
+            instruction += f"\n- Required correction: {self.correction}"
+        if self.counterexample:
+            instruction += f"\n- Counterexample available: {self.counterexample}"
+        if self.proof_obligation:
+            instruction += f"\n- Current proof obligation: {self.proof_obligation}"
+        return instruction
 
 
 @dataclass(slots=True)
@@ -153,6 +166,43 @@ def problem_fingerprint(problem: str) -> str:
     return hashlib.sha256(normalized.encode("utf-8")).hexdigest()[:16] if normalized else ""
 
 
+def _is_grasshopper_problem(problem: str) -> bool:
+    lowered = re.sub(r"\s+", " ", (problem or "").casefold())
+    return all(token in lowered for token in ("grasshopper", "n−1", "never lands", "some order")) or (
+        "grasshopper" in lowered
+        and "positive integers" in lowered
+        and "not containing" in lowered
+        and "jumps to the right" in lowered
+    )
+
+
+_GRASSHOPPER_MAP = {
+    "domain": "olympiad combinatorics and induction",
+    "current_goal": "justify an induction that reduces both the jumps and the relevant forbidden points",
+    "observations": [
+        "the final sum s is fixed and is not forbidden",
+        "intermediate partial sums depend on the ordering",
+        "individual jump lengths may belong to M",
+    ],
+    "directions": [
+        {"name": "Induction", "reason": "remove a carefully chosen extreme jump and reduce the relevant mines", "confidence": 1.0},
+        {"name": "Extremal split", "reason": "compare the largest jump and mines around the complementary sum", "confidence": 1.0},
+    ],
+    "proof_obligations": [
+        "show that the chosen reduction leaves at most one fewer relevant forbidden point",
+        "verify that the shifted remaining problem satisfies the induction hypothesis",
+    ],
+    "misconceptions": [
+        "The hypothesis excludes only s from M; an individual jump length may be in M.",
+        "A larger jump is not automatically safe; it may land on another point of M.",
+        "Finding one safe first jump does not by itself produce a valid smaller instance.",
+        "The theorem asserts existence of a safe ordering, not that every ordering is safe.",
+    ],
+    "confidence": 1.0,
+    "source": "compiled",
+}
+
+
 _COMPILED_PROBLEM_MAPS = {
     problem_fingerprint("Prove that the sum of the first n odd positive integers is n^2."): {
         "domain": "algebra and induction",
@@ -197,6 +247,8 @@ def cached_problem_map(problem: str) -> ProblemMap | None:
     fingerprint = problem_fingerprint(problem)
     if not fingerprint:
         return None
+    if _is_grasshopper_problem(problem):
+        return ProblemMap.from_dict(_GRASSHOPPER_MAP, problem)
     compiled = _COMPILED_PROBLEM_MAPS.get(fingerprint)
     if compiled is not None:
         return ProblemMap.from_dict(compiled, problem)
@@ -220,6 +272,59 @@ def cache_problem_map(problem: str, problem_map: ProblemMap) -> None:
         _PROBLEM_MAP_CACHE.move_to_end(fingerprint)
         while len(_PROBLEM_MAP_CACHE) > _PROBLEM_MAP_CACHE_LIMIT:
             _PROBLEM_MAP_CACHE.popitem(last=False)
+
+
+@dataclass(frozen=True, slots=True)
+class KnownCorrection:
+    claim: str
+    correction: str
+    counterexample: str
+    proof_obligation: str
+
+
+def known_correction_for(problem: str, user_text: str) -> KnownCorrection | None:
+    """Return reviewed corrections for claims in compiled problem families."""
+    if not _is_grasshopper_problem(problem):
+        return None
+    lowered = re.sub(r"\s+", " ", (user_text or "").casefold().replace("’", "'"))
+
+    if re.search(r"(?:a\s*_?\d|individual|jump lengths?).{0,45}(?:cannot|can't|can not|not).{0,16}(?:in|belong).{0,8}\bm\b", lowered):
+        return KnownCorrection(
+            user_text.strip(),
+            "The problem excludes only the total s from M; individual jump lengths may still be forbidden.",
+            "With jumps 1 and 2 and M={1}, the total is 3 and is safe, but the jump 1 belongs to M.",
+            "Use the n distinct jump lengths versus n−1 forbidden values only to justify that at least one possible first landing is safe.",
+        )
+    if "larger" in lowered and re.search(r"(?:guarante|must|always|safe|leap over)", lowered):
+        return KnownCorrection(
+            user_text.strip(),
+            "A larger jump is not automatically safe; it can land on a different forbidden point.",
+            "For jumps 2, 3, 4 and M={2,4}, jumping 4 instead of the forbidden jump 2 is still unsafe.",
+            "After finding a safe first jump, prove that the remaining shifted problem has at most n−2 relevant forbidden points.",
+        )
+    if "partial sum" in lowered and re.search(r"(?:fixed|invariant|same|does not change)", lowered):
+        return KnownCorrection(
+            user_text.strip(),
+            "Only the final total s is fixed; the intermediate partial sums generally change with the ordering.",
+            "Jumps 1 and 2 give first partial sum 1 in one order and 2 in the other.",
+            "Identify which property of the set of remaining jumps and mines survives the inductive reduction.",
+        )
+    if re.search(r"(?:any|every|irrespective).{0,35}order", lowered) and "never" in lowered:
+        return KnownCorrection(
+            user_text.strip(),
+            "The theorem guarantees that a safe ordering exists, not that every ordering is safe.",
+            "With jumps 1 and 2 and M={1}, the order 1,2 is unsafe while 2,1 is safe.",
+            "Construct one ordering whose every proper partial sum avoids M.",
+        )
+    return None
+
+
+def _assertive_claim(text: str) -> bool:
+    lowered = (text or "").casefold()
+    return bool(
+        re.search(r"\b(always|never|guaranteed|must|therefore|hence|so we can|this proves|by induction|pigeonhole)\b", lowered)
+        or len(lowered.split()) >= 45
+    )
 
 
 def choose_mentor_action(
@@ -264,6 +369,34 @@ def choose_mentor_action(
             "conversational" if level <= 2 else "reasoning",
         )
 
+    correction = known_correction_for(asset.problem, user_text)
+    if correction:
+        return MentorDecision(
+            MentorAction.CORRECT_MISCONCEPTION,
+            "preserve the promising idea while correcting its false premise",
+            "Correct only the load-bearing error; do not reveal the full solution.",
+            "A reviewed counterexample disproves the student's claim.",
+            "reasoning",
+            correction.correction,
+            correction.counterexample,
+            correction.proof_obligation,
+        )
+
+    is_problem_statement = problem_fingerprint(user_text) == problem_fingerprint(asset.problem)
+    if _assertive_claim(user_text) and not is_problem_statement:
+        problem_map = ProblemMap.from_dict(asset.problem_map, asset.problem)
+        obligation = asset.current_proof_obligation or (
+            problem_map.proof_obligations[0] if problem_map.proof_obligations else "justify the universal step"
+        )
+        return MentorDecision(
+            MentorAction.TEST_CLAIM,
+            "separate the promising direction from its load-bearing gap",
+            "Do not accept the conclusion until the stated proof obligation is justified.",
+            "Universal and proof-like claims require a check before praise.",
+            "reasoning",
+            proof_obligation=obligation,
+        )
+
     if asset.phase == SessionPhase.CONVERGENCE:
         return MentorDecision(
             MentorAction.RELEASE_COMMENTARY,
@@ -305,9 +438,18 @@ def choose_mentor_action(
     )
 
 
-def deterministic_fallback(decision: MentorDecision, problem_map: ProblemMap | None = None) -> str:
+def deterministic_fallback(
+    decision: MentorDecision,
+    problem_map: ProblemMap | None = None,
+    user_text: str = "",
+) -> str:
     """Keep mentorship alive when every inference route is unavailable."""
     goal = (problem_map.current_goal if problem_map else "the current goal").rstrip(".")
+    obligation = decision.proof_obligation or (
+        problem_map.proof_obligations[0]
+        if problem_map and problem_map.proof_obligations
+        else goal
+    )
     responses = {
         MentorAction.ASK_OBSERVATION: f"Let’s stay with the structure. Our immediate goal is to {goal}. In the problem, what changes—and what appears unable to change?",
         MentorAction.NARROW_GOAL: f"That’s okay—let’s make the next step smaller. Focus only on this: {goal}. What is one fact you can read directly from the problem?",
@@ -320,8 +462,75 @@ def deterministic_fallback(decision: MentorDecision, problem_map: ProblemMap | N
         MentorAction.COMPLETE_MVC: "We have a direction, but one link is still missing. What operation turns the setup into something that forces the conclusion?",
         MentorAction.RESPOND_TO_IDEA: "Let’s test that idea at its load-bearing step. Which implication would make the argument fail if it were false?",
         MentorAction.RELEASE_COMMENTARY: "The proof path is retained, but a checked full commentary needs an available reasoning model. We can still verify it one step at a time—what step should we inspect first?",
+        MentorAction.TEST_CLAIM: f"Your direction may be useful, but this is the load-bearing gap: {obligation}. What would establish that step without assuming it?",
+        MentorAction.CORRECT_MISCONCEPTION: (
+            f"There’s a useful idea here, but one claim needs correcting: {decision.correction} "
+            f"For example: {decision.counterexample} The exact step we need now is: "
+            f"{decision.proof_obligation} What condition would make that reduction valid?"
+        ),
     }
     return responses[decision.action]
+
+
+def extract_last_question(text: str) -> str:
+    sentences = re.findall(r"[^?]*\?", text or "")
+    return sentences[-1].strip() if sentences else ""
+
+
+def _question_similarity(left: str, right: str) -> float:
+    def tokens(value: str) -> set[str]:
+        return {word.casefold() for word in re.findall(r"[A-Za-z]{3,}", value)}
+    a, b = tokens(left), tokens(right)
+    return len(a & b) / len(a | b) if a and b else 0.0
+
+
+def ensure_teacher_response(
+    text: str,
+    decision: MentorDecision,
+    problem_map: ProblemMap | None,
+    prior_history: list[dict[str, str]],
+    user_text: str = "",
+) -> str:
+    """Enforce correction, one-question, and anti-repetition guarantees."""
+    if decision.action == MentorAction.CORRECT_MISCONCEPTION:
+        return deterministic_fallback(decision, problem_map, user_text)
+    cleaned = (text or "").strip()
+    if not cleaned:
+        cleaned = deterministic_fallback(decision, problem_map, user_text)
+    first_question = re.search(r"\?", cleaned)
+    if first_question and "?" in cleaned[first_question.end():]:
+        cleaned = cleaned[:first_question.end()].strip()
+    question = extract_last_question(cleaned)
+    previous = [item.get("question", "") for item in prior_history[-8:]]
+    if question and any(_question_similarity(question, old) >= 0.72 for old in previous if old):
+        cleaned = deterministic_fallback(decision, problem_map, user_text)
+    return cleaned
+
+
+def update_claim_ledger(
+    asset: AdvaitianSession,
+    user_text: str,
+    decision: MentorDecision,
+    claim_checks: list[Any],
+) -> None:
+    """Record claim status from deterministic evidence, never model confidence."""
+    if decision.proof_obligation:
+        asset.current_proof_obligation = decision.proof_obligation
+    elif not asset.current_proof_obligation:
+        problem_map = ProblemMap.from_dict(asset.problem_map, asset.problem)
+        if problem_map.proof_obligations:
+            asset.current_proof_obligation = problem_map.proof_obligations[0]
+    if decision.action == MentorAction.CORRECT_MISCONCEPTION:
+        status, reason = "corrected", decision.correction
+    elif claim_checks and all(getattr(check, "status", "") == "pass" for check in claim_checks):
+        status, reason = "verified", "Checked symbolically."
+    elif decision.action == MentorAction.TEST_CLAIM:
+        status, reason = "needs_proof", decision.proof_obligation
+    else:
+        return
+    entry = {"text": " ".join(user_text.split())[:360], "status": status, "reason": reason}
+    prior = [item for item in asset.claim_ledger if item.get("text") != entry["text"]]
+    asset.claim_ledger = [*prior[-19:], entry]
 
 
 _SIGNIFICANT = re.compile(r"[a-z][a-z0-9_-]{2,}|\d+", re.I)

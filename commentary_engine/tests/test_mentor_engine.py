@@ -14,13 +14,21 @@ from commentary_engine.thinkmath.mentor_engine import (
     cached_problem_map,
     choose_mentor_action,
     deterministic_fallback,
+    ensure_teacher_response,
     problem_fingerprint,
+    update_claim_ledger,
     validate_state_proposal,
 )
 from commentary_engine.thinkmath.verification import verify_student_claims
 
 
 class MentorEngineTests(unittest.TestCase):
+    GRASSHOPPER = (
+        "A grasshopper is to jump along the real axis. Let a1, ..., an be distinct "
+        "positive integers and M a set of n−1 positive integers not containing their "
+        "sum. Prove that in some order it jumps to the right and never lands in M."
+    )
+
     def test_empty_session_asks_for_observation(self):
         decision = choose_mentor_action(
             AdvaitianSession(problem="Prove P"),
@@ -170,6 +178,43 @@ class MentorEngineTests(unittest.TestCase):
         self.assertEqual(result.source, "compiled")
         self.assertEqual(result.confidence, 1.0)
         self.assertTrue(result.proof_obligations)
+
+    def test_grasshopper_problem_has_reviewed_map(self):
+        result = cached_problem_map(self.GRASSHOPPER)
+        self.assertEqual(result.source, "compiled")
+        self.assertIn("induction", result.domain)
+
+    def test_false_grasshopper_claim_is_gently_corrected(self):
+        text = "No, a1 or any ai cannot be in M."
+        decision = choose_mentor_action(
+            AdvaitianSession(problem=self.GRASSHOPPER), classify_student_turn(text), 0, text
+        )
+        self.assertEqual(decision.action, MentorAction.CORRECT_MISCONCEPTION)
+        response = deterministic_fallback(decision, cached_problem_map(self.GRASSHOPPER))
+        self.assertIn("excludes only the total", response)
+        self.assertIn("M={1}", response)
+        self.assertEqual(response.count("?"), 1)
+
+    def test_assertive_claim_becomes_proof_obligation(self):
+        text = "Therefore this always works by induction."
+        asset = AdvaitianSession(problem="Prove P", current_proof_obligation="justify the reduction")
+        decision = choose_mentor_action(asset, classify_student_turn(text), 0, text)
+        self.assertEqual(decision.action, MentorAction.TEST_CLAIM)
+        self.assertEqual(decision.proof_obligation, "justify the reduction")
+
+    def test_correction_is_enforced_and_recorded(self):
+        text = "A larger jump is always safe"
+        asset = AdvaitianSession(problem=self.GRASSHOPPER)
+        decision = choose_mentor_action(asset, classify_student_turn(text), 0, text)
+        response = ensure_teacher_response(
+            "What changes and what stays fixed? What else?", decision,
+            cached_problem_map(self.GRASSHOPPER),
+            [{"question": "What changes and what stays fixed?"}], text,
+        )
+        self.assertIn("not automatically safe", response)
+        self.assertEqual(response.count("?"), 1)
+        update_claim_ledger(asset, text, decision, [])
+        self.assertEqual(asset.claim_ledger[0]["status"], "corrected")
 
     def test_fallback_is_available_for_every_action(self):
         turn = classify_student_turn("I don't know")

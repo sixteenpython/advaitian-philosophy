@@ -101,6 +101,13 @@ class CoreArchitectureTests(unittest.TestCase):
         )
         self.assertNotIn("secret", rendered)
 
+    def test_bare_multiline_state_with_trailing_period_never_leaks(self):
+        raw = '{"suggested_phase":1,"archetypes":[{"name":"Induction","evidence":"first line\nsecond line"}]}.'
+        parsed = parse_model_response(raw)
+        self.assertEqual(parsed.parse_status, "structured")
+        self.assertEqual(parsed.visible_text, "")
+        self.assertEqual(parsed.state_update["archetypes"][0]["name"], "Induction")
+
     def test_ordinary_json_example_remains_visible(self):
         raw = 'An example:\n```json\n{"number": 12}\n```'
         parsed = parse_model_response(raw)
