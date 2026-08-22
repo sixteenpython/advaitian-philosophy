@@ -5,6 +5,22 @@ experience, but chat history is not the source of truth. The canonical
 `AdvaitianSession` records the problem, seed hypotheses, archetype map, MVC,
 verification evidence and provenance.
 
+## Student Experience v3
+
+The public application now treats the evolving reasoning—not provider controls—as the main visual
+object. Its four student views are:
+
+- **Learn:** one-question-at-a-time Socratic conversation and an explicit four-level hint ladder;
+- **Thinking Map:** canonical observations, candidate Seed, direction map and progressively revealed
+  Setup–Move–Closure;
+- **Commentary:** the earned Six-Point payoff rendered as readable learning sections, followed by a
+  same-Seed transfer challenge;
+- **My Journey:** a downloadable Pattern Passport and a visual before/after account of the student's
+  reasoning.
+
+Three curated demonstration journeys remain usable without any model or API capacity. Provider and
+quota failures use student-facing recovery paths instead of exposing raw infrastructure errors.
+
 ## Run locally with open models
 
 1. Install [Ollama](https://ollama.com/).
@@ -38,3 +54,6 @@ python -m unittest discover -s tests -v
 The golden evaluation dataset in `evals/golden_cases.json` is the model
 promotion gate. Generic leaderboard position is not sufficient for a model to
 become the mentor, commentary generator or critic.
+
+Student-experience decisions and release boundaries are documented in
+[`docs/STUDENT_EXPERIENCE_V3.md`](docs/STUDENT_EXPERIENCE_V3.md).

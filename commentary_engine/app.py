@@ -22,20 +22,38 @@ import json
 import urllib.request
 import urllib.error
 import uuid
-from datetime import datetime, timezone, timedelta
-from hashlib import sha1
+from datetime import UTC, datetime, timedelta, timezone
+from hashlib import sha256
 
 import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
 from groq import Groq
-
 from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
 from thinkmath.model_registry import OPEN_MODEL_REGISTRY, capability_for, ollama_base_url, supports_role
 from thinkmath.providers import GroqAdapter, OllamaAdapter
 from thinkmath.rendering import prepare_markdown
 from thinkmath.security import admin_enabled, env_truthy
 from thinkmath.state_machine import evaluate_transition, explicitly_requests_commentary
+from thinkmath.student_experience import (
+    HINT_LADDER,
+    build_thinking_map,
+    demonstration,
+    friendly_provider_error,
+    passport_entry,
+    provider_readiness,
+)
+from thinkmath.student_ui import (
+    inject_student_theme,
+    render_demo_picker,
+    render_hero,
+    render_passport,
+    render_phase_path,
+    render_structured_commentary,
+    render_thinking_map,
+    render_transfer,
+    render_zero_state,
+)
 from thinkmath.structured_output import parse_model_response
 from thinkmath.verification import verify_commentary, verification_label
 
@@ -45,8 +63,8 @@ from thinkmath.verification import verify_commentary, verification_label
 # =============================================================================
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
-MENTOR_DISPLAY_NAME = "ThinkMath's Digital Clone"
-ENGINE_VERSION = "2.0.3"
+MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
+ENGINE_VERSION = "3.0.0"
 
 
 # =============================================================================
@@ -663,12 +681,9 @@ GREETING_PATTERNS = {
 }
 
 CANNED_GREETING = (
-    "Namaste. I am the ThinkMath.ai Socratic Mentor.\n\n"
-    "Share your problem and we will find its **Seed** together.\n\n"
-    "I will not rush to hand you an answer. First, I will help you build the "
-    "structural instinct to discover it—and recognise the same seed when it "
-    "appears in disguise. Once your reasoning closes, we can compile the full commentary.\n\n"
-    "*What problem are you working on today?*"
+    "Bring me the problem exactly as you received it. We will look for what changes, "
+    "what remains fixed, and which hidden structure makes the problem yield.\n\n"
+    "**I will ask one precise question at a time. You remain the mathematician.**"
 )
 
 KNOWN_GROQ_MODELS = [
@@ -946,7 +961,10 @@ def discover_models(groq_key):
     # may use hosted free-tier fallbacks, while a private deployment can keep
     # every problem on the user's machine.
     try:
-        with urllib.request.urlopen(f"{ollama_base_url()}/api/tags", timeout=1.5) as response:
+        # The registry rejects every scheme except HTTP(S) before this request.
+        with urllib.request.urlopen(  # nosec B310
+            f"{ollama_base_url()}/api/tags", timeout=1.5
+        ) as response:
             payload = json.loads(response.read().decode("utf-8"))
         registered = {spec.model: spec for spec in OPEN_MODEL_REGISTRY}
         for item in payload.get("models", []):
@@ -1089,7 +1107,7 @@ def classify_error(error_str: str) -> str:
 
 def get_wrapper(provider: str, model: str, system_prompt: str):
     cache = st.session_state.wrapper_cache
-    key = f"{provider}::{model}::{sha1(system_prompt.encode()).hexdigest()[:8]}"
+    key = f"{provider}::{model}::{sha256(system_prompt.encode()).hexdigest()[:8]}"
     if key not in cache:
         if provider == "Groq":
             cache[key] = GroqAdapter(model, system_prompt, api_key=GROQ_KEY)
@@ -1220,7 +1238,7 @@ def chat(user_input: str, history: list, all_models: list, knowledge_asset=None,
             )
         raise RuntimeError(
             "All models are currently rate-limited. "
-            "Try again in a minute, or add a paid-tier key."
+            "Try again in a minute, explore a curated demonstration, or use local Ollama."
         )
 
     # Telemetry: warn the operator (admin only sees status) when Phase 3
@@ -1887,15 +1905,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-TIER_LABELS = {
-    0: "Tier 0 — Narrative (Ages 6–9)",
-    1: "Tier 1 — Relationship (Ages 10–13)",
-    2: "Tier 2 — Abstract (Ages 14–16)",
-    3: "Tier 3 — Elite (JEE/IMO)",
-    4: "Tier 4 — Competition (IMO/Putnam)",
-}
-
-
 def _init_state():
     defaults = {
         "messages": [],
@@ -1911,6 +1920,9 @@ def _init_state():
         "storage_consent": False,
         "session_id": uuid.uuid4().hex,
         "stored_session_ids": [],
+        "passport_entries": [],
+        "demo_id": None,
+        "student_style": "Guided",
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -2010,177 +2022,47 @@ if ADMIN_MODE:
 
 
 # ---------------------------------------------------------------------------
-# MAIN — public surface (everyone sees this)
+# MAIN — Student Experience v3
 # ---------------------------------------------------------------------------
 
-# Logo + title
-title_col_logo, title_col_text = st.columns([1, 9])
-with title_col_logo:
-    st.image(LOGO_URL, width=70)
-with title_col_text:
-    st.markdown("## ThinkMath.ai")
-    st.markdown(
-        "##### Your Advaitian Socratic Mentor — *Find the Seed. Burn the candle from both ends.*"
-    )
-    st.caption(f"Engine v{ENGINE_VERSION} · Free/open-model routing")
-    st.markdown(
-        "<div class='desktop-note'>"
-        "ThinkMath.ai is a desktop application. "
-        "Math is hard work; it deserves a real keyboard and a real screen."
-        "</div>",
-        unsafe_allow_html=True,
-    )
 
-# ─── HEADER BAR (3 cards: New Session · Session Progress · Support) ───
-hdr_new, hdr_progress, hdr_donate = st.columns([1.1, 1.6, 1.6])
-
-with hdr_new:
-    with st.container(border=True):
-        st.markdown(
-            "<div class='header-title'>Session</div>",
-            unsafe_allow_html=True,
+def reset_learning_session() -> None:
+    current = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+    entry = passport_entry(current)
+    if entry and entry not in st.session_state.passport_entries:
+        st.session_state.passport_entries.append(entry)
+    if st.session_state.messages and not st.session_state.session_saved:
+        saved = save_session_to_firebase(
+            st.session_state.session_id,
+            st.session_state.messages,
+            st.session_state.current_phase,
+            st.session_state.detected_tier,
+            st.session_state.knowledge_asset,
+            enabled=st.session_state.storage_consent,
         )
-        if st.button("🆕 New Session", use_container_width=True, key="hdr_new_session"):
-            if st.session_state.messages and not st.session_state.session_saved:
-                saved_old_session = save_session_to_firebase(
-                    st.session_state.session_id,
-                    st.session_state.messages,
-                    st.session_state.current_phase,
-                    st.session_state.detected_tier,
-                    st.session_state.knowledge_asset,
-                    enabled=st.session_state.storage_consent,
-                )
-                if saved_old_session and st.session_state.session_id not in st.session_state.stored_session_ids:
-                    st.session_state.stored_session_ids.append(st.session_state.session_id)
-            st.session_state.messages = []
-            st.session_state.current_phase = 1
-            st.session_state.detected_tier = 3
-            st.session_state.session_saved = False
-            st.session_state.hint_level = 0
-            st.session_state.mvc_validated = False
-            st.session_state.active_model = None
-            st.session_state.knowledge_asset = AdvaitianSession().to_dict()
-            st.session_state.session_id = uuid.uuid4().hex
-            st.rerun()
-        st.checkbox(
-            "Save this learning session",
-            key="storage_consent",
-            help="Off by default. When enabled, the conversation and structured learning asset are stored in Firebase.",
-        )
-        st.caption("Private by default")
-        if st.button("Delete stored copy", key="delete_stored_session", use_container_width=True):
-            targets = set(st.session_state.stored_session_ids) | {st.session_state.session_id}
-            deletion_results = [delete_session_from_firebase(session_id) for session_id in targets]
-            deleted = any(deletion_results)
-            if deleted:
-                st.session_state.session_saved = False
-                st.session_state.stored_session_ids = []
-                st.success("Stored copies created in this browser session were deleted.")
-            else:
-                st.info("No stored copy was found for this session.")
+        if saved and st.session_state.session_id not in st.session_state.stored_session_ids:
+            st.session_state.stored_session_ids.append(st.session_state.session_id)
+    st.session_state.messages = []
+    st.session_state.current_phase = 1
+    st.session_state.detected_tier = 3
+    st.session_state.session_saved = False
+    st.session_state.hint_level = 0
+    st.session_state.mvc_validated = False
+    st.session_state.active_model = None
+    st.session_state.knowledge_asset = AdvaitianSession().to_dict()
+    st.session_state.session_id = uuid.uuid4().hex
+    st.session_state.demo_id = None
 
-with hdr_progress:
-    with st.container(border=True):
-        st.markdown(
-            "<div class='header-title'>Session Progress</div>",
-            unsafe_allow_html=True,
-        )
-        cur = st.session_state.current_phase
-        phases_meta = {
-            1: "Phase 1: Seed",
-            2: "Phase 2: Directions",
-            3: "Phase 3: Convergence",
-        }
-        rows = []
-        for n, label in phases_meta.items():
-            if n < cur:
-                rows.append(f"<span class='phase-complete'>✓ {label}</span>")
-            elif n == cur:
-                rows.append(f"<span class='phase-active'>▶ {label}</span>")
-            else:
-                rows.append(f"<span class='phase-inactive'>○ {label}</span>")
-        st.markdown(
-            f"<div class='header-progress-row'>{''.join(rows)}</div>",
-            unsafe_allow_html=True,
-        )
 
-PAYPAL_HANDLE = "vasumathiiK"
-PAYPAL_PRESETS = (5, 10, 15, 20)
-PAYPAL_MIN = 2
-
-with hdr_donate:
-    with st.container(border=True):
-        st.markdown(
-            "<p class='header-donate-quote'>"
-            "&ldquo;You&rsquo;ve burned the candle from both ends today. "
-            "Help us put a candle in someone else&rsquo;s hands.&rdquo;"
-            "</p>",
-            unsafe_allow_html=True,
-        )
-        # Quick-pick presets
-        preset_cols = st.columns(len(PAYPAL_PRESETS))
-        for col, amt in zip(preset_cols, PAYPAL_PRESETS):
-            with col:
-                st.link_button(
-                    f"${amt}",
-                    f"https://paypal.me/{PAYPAL_HANDLE}/{amt}",
-                    use_container_width=True,
-                )
-        # Open-ended donation (PayPal page with the minimum pre-filled;
-        # the donor can edit on PayPal before confirming)
-        st.link_button(
-            f"Other amount  (min ${PAYPAL_MIN})",
-            f"https://paypal.me/{PAYPAL_HANDLE}/{PAYPAL_MIN}",
-            use_container_width=True,
-        )
-
-if st.session_state.messages:
-    st.markdown(
-        f"<span class='tier-badge'>"
-        f"{TIER_LABELS.get(st.session_state.detected_tier, 'Tier 3 — Elite')}"
-        f"</span>",
-        unsafe_allow_html=True,
-    )
-
-asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
-with st.expander("Your structural workbench", expanded=bool(st.session_state.messages)):
-    st.caption(
-        "This is the current source of truth for your reasoning. You remain the author; "
-        "ThinkMath may propose updates, but only you can confirm the MVC."
-    )
-    if asset.seed_hypotheses:
-        st.markdown("**Candidate seed:** " + " · ".join(asset.seed_hypotheses))
-    if asset.archetypes:
-        st.markdown("**Archetype map:** " + " · ".join(
-            f"{item.name} ({item.role})" for item in asset.archetypes
-        ))
-    with st.form("mvc_workbench"):
-        mvc_cols = st.columns(3)
-        with mvc_cols[0]:
-            mvc_setup = st.text_area("1. Setup", value=asset.mvc.setup, help="How will you reframe the problem?")
-        with mvc_cols[1]:
-            mvc_move = st.text_area("2. Move", value=asset.mvc.move, help="What exact transformation or operation will you make?")
-        with mvc_cols[2]:
-            mvc_closure = st.text_area("3. Closure", value=asset.mvc.closure, help="What forces the conclusion or terminates the process?")
-        confirm_mvc = st.form_submit_button("Confirm my MVC", use_container_width=True)
-    if confirm_mvc:
-        asset.mvc = MVCState(
-            setup=mvc_setup.strip(),
-            move=mvc_move.strip(),
-            closure=mvc_closure.strip(),
-            family=asset.mvc.family,
-            validated=all(item.strip() for item in (mvc_setup, mvc_move, mvc_closure)),
-        )
-        if asset.mvc.validated:
-            asset.phase = max(asset.phase, SessionPhase.DIRECTIONS)
-            st.session_state.mvc_validated = True
-            st.success("MVC recorded. ThinkMath will still verify the mathematical closure before shipping commentary.")
-        else:
-            st.session_state.mvc_validated = False
-            st.warning("Complete Setup, Move and Closure before confirming the MVC.")
-        st.session_state.knowledge_asset = asset.to_dict()
-
-st.markdown("---")
+def load_demonstration(demo_id: str) -> None:
+    asset, messages = demonstration(demo_id)
+    st.session_state.knowledge_asset = asset.to_dict()
+    st.session_state.messages = messages
+    st.session_state.current_phase = int(asset.phase)
+    st.session_state.detected_tier = asset.tier
+    st.session_state.mvc_validated = True
+    st.session_state.active_model = "Curated demonstration"
+    st.session_state.demo_id = demo_id
 
 
 def render_mentor(
@@ -2190,15 +2072,16 @@ def render_mentor(
     original_draft: str | None = None,
     verification: list | None = None,
     proof_status: str | None = None,
-):
-    """Render a mentor card: native st.markdown body so KaTeX renders.
-    In admin mode, expose the critic verdict and the pre-critic draft."""
+) -> None:
     with st.chat_message("assistant"):
-        st.markdown("<div class='card-role'>" + MENTOR_DISPLAY_NAME + "</div>", unsafe_allow_html=True)
-        st.markdown(normalise_math(content))
+        st.markdown(f"<div class='card-role'>{MENTOR_DISPLAY_NAME}</div>", unsafe_allow_html=True)
+        if "TAKEAWAY" in content.upper() and proof_status:
+            st.success("Your complete structural commentary is ready in the **Commentary** tab.")
+        else:
+            st.markdown(normalise_math(content))
         if model_label:
-            st.markdown(f"<div class='card-footer'>Powered by {model_label}</div>", unsafe_allow_html=True)
-        if proof_status:
+            st.markdown(f"<div class='card-footer'>{model_label}</div>", unsafe_allow_html=True)
+        if proof_status and proof_status != "demonstration":
             badge = "🟡 Partially verified" if proof_status == "partially_verified" else "🔴 Unverified"
             st.caption(f"Proof assurance: {badge}")
         if verification:
@@ -2206,90 +2089,249 @@ def render_mentor(
                 for check in verification:
                     icon = {"pass": "✓", "review": "△", "fail": "✗"}.get(check.get("status"), "•")
                     st.markdown(f"{icon} **{check.get('name', 'check')}** — {check.get('detail', '')}")
-        # Admin-only critic transparency panel
         if ADMIN_MODE and critic is not None:
             status = critic.get("status", "?")
-            badge = {
-                "SOLID": "🟢 SOLID",
-                "NEEDS_NOTE": "🟡 NEEDS_NOTE",
-                "UNSAFE": "🔴 UNSAFE",
-                "UNAVAILABLE": "⚪ UNAVAILABLE",
-                "ERROR": "⚪ ERROR",
-                "UNVERIFIED": "⚪ UNVERIFIED",
-            }.get(status, status)
-            label = f"Critic: {badge} · {critic.get('model', 'n/a')}"
-            with st.expander(label, expanded=False):
+            with st.expander(f"Critic: {status} · {critic.get('model', 'n/a')}", expanded=False):
                 if critic.get("rationale"):
                     st.markdown(f"**Rationale:** {critic['rationale']}")
-                if critic.get("issues"):
-                    st.markdown("**Issues flagged:**")
-                    for i in critic["issues"]:
-                        st.markdown(f"- {i}")
+                for issue in critic.get("issues", []):
+                    st.markdown(f"- {issue}")
                 if original_draft and status == "UNSAFE":
-                    st.markdown("---")
-                    st.markdown("**Original (pre-critic) draft:**")
+                    st.markdown("**Original draft:**")
                     st.markdown(normalise_math(original_draft))
-                if critic.get("raw"):
-                    st.caption("Raw critic output:")
-                    st.code(critic["raw"], language=None)
 
 
-def render_user(content: str):
+def render_user(content: str) -> None:
     with st.chat_message("user"):
         st.markdown("<div class='card-role'>You</div>", unsafe_allow_html=True)
         st.markdown(normalise_math(content))
 
 
-# Intro card (when no messages yet)
-if not st.session_state.messages:
-    render_mentor(CANNED_GREETING)
-else:
-    for msg in st.session_state.messages:
-        if msg["role"] == "user":
-            render_user(msg["content"])
-        else:
-            render_mentor(
-                msg["content"],
-                msg.get("model"),
-                critic=msg.get("critic"),
-                original_draft=msg.get("original_draft"),
-                verification=msg.get("verification"),
-                proof_status=msg.get("proof_status"),
+inject_student_theme()
+render_hero(ENGINE_VERSION)
+
+asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+blocked_keys = {
+    key
+    for key, value in st.session_state.quota_state.items()
+    if _now_ts() < value.get("blocked_until", 0)
+}
+readiness = provider_readiness(ALL_MODELS, blocked_keys)
+
+toolbar_new, toolbar_session, toolbar_status = st.columns([1.1, 1.4, 4.5])
+with toolbar_new:
+    if st.button("New problem", use_container_width=True, key="new_learning_session"):
+        reset_learning_session()
+        st.rerun()
+with toolbar_session:
+    with st.popover("Session & privacy", use_container_width=True):
+        st.selectbox(
+            "Mentor style",
+            ("Gentle", "Guided", "Competition"),
+            key="student_style",
+            help="Changes the level of challenge, never the mathematical standard.",
+        )
+        st.checkbox(
+            "Save this learning session",
+            key="storage_consent",
+            help="Off by default. When enabled, the session is retained for 30 days.",
+        )
+        st.caption("Private by default. No persistence occurs unless you opt in.")
+        if st.button("Delete stored copy", key="delete_stored_session", use_container_width=True):
+            targets = set(st.session_state.stored_session_ids) | {st.session_state.session_id}
+            deleted = any(delete_session_from_firebase(session_id) for session_id in targets)
+            if deleted:
+                st.session_state.session_saved = False
+                st.session_state.stored_session_ids = []
+                st.success("Stored copies created in this browser session were deleted.")
+            else:
+                st.info("No stored copy was found for this session.")
+with toolbar_status:
+    status_icon = "●" if readiness.state == "ready" else "○"
+    st.caption(f"{status_icon} **{readiness.headline}** · {readiness.detail}")
+
+render_phase_path(st.session_state.current_phase)
+
+learn_tab, thinking_tab, commentary_tab, journey_tab = st.tabs(
+    ["Learn", "Thinking Map", "Commentary", "My Journey"]
+)
+user_input = None
+
+with learn_tab:
+    if not st.session_state.messages:
+        render_zero_state(readiness)
+        selected_demo = render_demo_picker()
+        if selected_demo:
+            load_demonstration(selected_demo)
+            st.rerun()
+        with st.expander("How ThinkMath teaches", expanded=False):
+            st.markdown(
+                "ThinkMath does not begin by solving. It helps you notice structure, compare "
+                "mathematical directions, and articulate a complete **Setup → Move → Closure**. "
+                "Only then does it compile the full Six-Point Commentary."
             )
+        render_mentor(CANNED_GREETING)
+    else:
+        for msg in st.session_state.messages:
+            if msg["role"] == "user":
+                render_user(msg["content"])
+            else:
+                render_mentor(
+                    msg["content"],
+                    msg.get("model"),
+                    critic=msg.get("critic"),
+                    original_draft=msg.get("original_draft"),
+                    verification=msg.get("verification"),
+                    proof_status=msg.get("proof_status"),
+                )
 
-st.markdown("---")
+    if st.session_state.demo_id:
+        st.info("This is a curated, offline journey. Start a new problem when you are ready to think with the live mentor.")
+    else:
+        user_input = st.chat_input("Paste your problem—or tell ThinkMath what you notice…")
+        if st.session_state.messages:
+            hint_col, commentary_col = st.columns([1.2, 2.8])
+            with hint_col:
+                with st.popover("Need a hint?", use_container_width=True):
+                    st.caption("Choose how much structure to reveal. The answer remains yours.")
+                    for level, (label, prompt) in enumerate(HINT_LADDER):
+                        if st.button(label, key=f"hint-{level}", use_container_width=True):
+                            user_input = prompt
+                            st.session_state.hint_level = max(st.session_state.hint_level, level + 1)
+            with commentary_col:
+                if st.session_state.mvc_validated and st.session_state.current_phase < 3:
+                    if st.button(
+                        "Build my Six-Point Commentary",
+                        type="primary",
+                        use_container_width=True,
+                    ):
+                        user_input = "Please give me the full Stage 2 Six-Point Commentary now."
 
+with thinking_tab:
+    view = build_thinking_map(asset)
+    render_thinking_map(view)
+    if asset.phase >= SessionPhase.DIRECTIONS or asset.seed_hypotheses:
+        st.subheader("Make the proof operational")
+        st.caption("You author these three load-bearing parts. ThinkMath may propose; only you confirm.")
+        with st.form("mvc_workbench_v3"):
+            mvc_setup = st.text_area(
+                "1. Setup — how will you reframe the problem?",
+                value=asset.mvc.setup,
+            )
+            mvc_move = st.text_area(
+                "2. Move — what exact transformation will you perform?",
+                value=asset.mvc.move,
+            )
+            mvc_closure = st.text_area(
+                "3. Closure — what forces the conclusion?",
+                value=asset.mvc.closure,
+            )
+            confirm_mvc = st.form_submit_button("Confirm my Setup–Move–Closure", use_container_width=True)
+        if confirm_mvc:
+            asset.mvc = MVCState(
+                setup=mvc_setup.strip(),
+                move=mvc_move.strip(),
+                closure=mvc_closure.strip(),
+                family=asset.mvc.family,
+                validated=all(item.strip() for item in (mvc_setup, mvc_move, mvc_closure)),
+            )
+            if asset.mvc.validated:
+                asset.phase = max(asset.phase, SessionPhase.DIRECTIONS)
+                st.session_state.mvc_validated = True
+                st.success("The structural spine is recorded. ThinkMath will still verify the mathematics.")
+            else:
+                st.session_state.mvc_validated = False
+                st.warning("Complete all three load-bearing parts before confirming.")
+            st.session_state.knowledge_asset = asset.to_dict()
+            st.rerun()
+    else:
+        st.info("The operational workspace appears after you establish a candidate Seed.")
 
-# Input + stuck button
-col_input, col_stuck = st.columns([5, 1])
-with col_input:
-    user_input = st.chat_input("Share your math problem or response here…")
-with col_stuck:
-    st.markdown("<br>", unsafe_allow_html=True)
-    stuck_clicked = st.button("I'm stuck", key="stuck_btn", help="Get a structural hint without the answer")
+with commentary_tab:
+    last_commentary = next(
+        (
+            msg
+            for msg in reversed(st.session_state.messages)
+            if msg["role"] == "mentor" and "TAKEAWAY" in msg["content"].upper()
+        ),
+        None,
+    )
+    if last_commentary:
+        st.subheader("Your structural commentary")
+        st.caption("The visible payoff of the reasoning you established—not an answer dropped from above.")
+        render_structured_commentary(normalise_math(last_commentary["content"]))
+        proof_status = last_commentary.get("proof_status")
+        if proof_status and proof_status != "demonstration":
+            st.caption(f"Proof assurance: {proof_status.replace('_', ' ').title()}")
+        render_transfer(asset)
+    else:
+        st.info("Your Six-Point Commentary will appear here after Setup, Move and Closure are validated.")
 
-if stuck_clicked and st.session_state.messages:
-    hints = [
-        "I'm stuck. Give me a Socratic probe — a tiny experiment I can run myself, no reveal.",
-        "Still stuck. Give me the Archetype Nudge — name the primary archetype only, not the move.",
-        "I need the Direction Map — show me the multidirectional structure, not the convergence point.",
-        "Last hint: give me the Pivot Shadow — one-sentence silhouette of the pivot, not the answer.",
-    ]
-    lvl = st.session_state.hint_level
-    user_input = hints[lvl] if lvl < len(hints) else hints[-1]
-    st.session_state.hint_level = min(lvl + 1, len(hints) - 1)
-
-
-# Stage 2 button
-if st.session_state.mvc_validated and st.session_state.current_phase < 3:
-    if st.button("Generate Stage 2 Commentary", type="primary", use_container_width=True):
-        user_input = "Please give me the full Stage 2 Six-Point Commentary now."
+with journey_tab:
+    render_passport(st.session_state.passport_entries, asset)
+    if st.session_state.messages:
+        session_text = (
+            "ThinkMath.ai Learning Journey\n"
+            f"Date: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}\n"
+            + "=" * 50
+            + "\n\n"
+        )
+        for message in st.session_state.messages:
+            role = "YOU" if message["role"] == "user" else "THINKMATH"
+            session_text += f"[{role}]\n{message['content']}\n\n"
+        st.download_button(
+            "Download this learning journey",
+            session_text,
+            file_name=f"thinkmath-journey-{datetime.now(UTC).strftime('%Y%m%d-%H%M')}.txt",
+            mime="text/plain",
+            use_container_width=True,
+        )
+    if asset.mvc.validated:
+        st.markdown("---")
+        st.markdown("#### Your transformation")
+        st.markdown(
+            f"**Initial problem** → {asset.problem}\n\n"
+            f"**Seed recognised** → {asset.seed_hypotheses[0] if asset.seed_hypotheses else 'Still unnamed'}\n\n"
+            f"**Elegant move** → {asset.mvc.move}\n\n"
+            f"**Closure** → {asset.mvc.closure}"
+        )
+        st.markdown("---")
+        st.caption("If ThinkMath helped you see mathematics differently, you can help keep it free.")
+        support_cols = st.columns(4)
+        for support_col, amount in zip(support_cols, (5, 10, 15, 20)):
+            with support_col:
+                st.link_button(
+                    f"Support ${amount}",
+                    f"https://paypal.me/vasumathiiK/{amount}",
+                    use_container_width=True,
+                )
+        if st.session_state.current_phase == 3 and not st.session_state.demo_id:
+            if st.button("Commit to Advaitian Bible", use_container_width=True):
+                last_mentor = next(
+                    (
+                        message["content"]
+                        for message in reversed(st.session_state.messages)
+                        if message["role"] == "mentor"
+                    ),
+                    "",
+                )
+                if save_commentary_to_firebase(
+                    st.session_state.session_id,
+                    asset.problem,
+                    last_mentor,
+                    st.session_state.detected_tier,
+                    enabled=True,
+                ):
+                    st.success("Commentary committed to the Advaitian Bible.")
+                else:
+                    st.error("The commentary could not be committed right now.")
 
 
 # Process turn
 if user_input:
     if not ALL_MODELS:
-        st.error("No open model is available. Start Ollama locally or configure a no-cost Groq key.")
+        error_title, error_detail = friendly_provider_error("no models available")
+        st.error(f"**{error_title}.** {error_detail}")
         st.stop()
 
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -2301,6 +2343,11 @@ if user_input:
                 for m in st.session_state.messages[:-1]
             ]
             current_asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+            current_asset.tier = {
+                "Gentle": 1,
+                "Guided": 2,
+                "Competition": 3,
+            }.get(st.session_state.student_style, 2)
             raw, provider, model = chat(
                 user_input,
                 history_for_api,
@@ -2407,51 +2454,8 @@ if user_input:
             st.rerun()
 
         except Exception as e:
-            status.update(label=f"All providers exhausted: {e}", state="error")
-            st.error(str(e))
-
-
-# Export / commit (Phase 3 only)
-if st.session_state.messages and st.session_state.current_phase == 3:
-    st.markdown("---")
-    col_save, col_export = st.columns(2)
-    with col_save:
-        if st.button("Commit to Advaitian Bible", use_container_width=True):
-            problem = next(
-                (m["content"] for m in st.session_state.messages if m["role"] == "user"),
-                "",
-            )
-            last_mentor = next(
-                (m["content"] for m in reversed(st.session_state.messages) if m["role"] == "mentor"),
-                "",
-            )
-            if save_commentary_to_firebase(
-                st.session_state.session_id,
-                problem,
-                last_mentor,
-                st.session_state.detected_tier,
-                enabled=True,
-            ):
-                if st.session_state.session_id not in st.session_state.stored_session_ids:
-                    st.session_state.stored_session_ids.append(st.session_state.session_id)
-                st.success("Commentary committed to the Advaitian Bible.")
-                st.balloons()
-            else:
-                st.error("Could not commit. Check Firebase credentials.")
-    with col_export:
-        if st.button("Export Session", use_container_width=True):
-            session_text = (
-                f"ThinkMath.ai Session Export\n"
-                f"Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}\n"
-                f"Tier: {TIER_LABELS.get(st.session_state.detected_tier, 'Unknown')}\n"
-                + "=" * 50 + "\n\n"
-            )
-            for msg in st.session_state.messages:
-                role = "YOU" if msg["role"] == "user" else "MENTOR"
-                session_text += f"[{role}]\n{msg['content']}\n\n"
-            st.download_button(
-                "Download Session",
-                session_text,
-                file_name=f"thinkmath_session_{datetime.now().strftime('%Y%m%d_%H%M')}.txt",
-                mime="text/plain",
-            )
+            error_title, error_detail = friendly_provider_error(e)
+            status.update(label=error_title, state="error")
+            st.error(f"**{error_title}.** {error_detail}")
+            if ADMIN_MODE:
+                st.caption(f"Operator detail: {e}")

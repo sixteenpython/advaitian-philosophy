@@ -1,19 +1,33 @@
-import unittest
 import json
+import unittest
 from pathlib import Path
 from types import SimpleNamespace
+from unittest.mock import patch
 
 from commentary_engine.thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
-from commentary_engine.thinkmath.model_registry import capability_for, supports_role
+from commentary_engine.thinkmath.model_registry import (
+    capability_for,
+    ollama_base_url,
+    supports_role,
+)
 from commentary_engine.thinkmath.providers import GroqAdapter
 from commentary_engine.thinkmath.rendering import prepare_markdown
 from commentary_engine.thinkmath.security import admin_enabled
 from commentary_engine.thinkmath.state_machine import evaluate_transition
 from commentary_engine.thinkmath.structured_output import parse_model_response
-from commentary_engine.thinkmath.verification import verification_label, verify_commentary, verify_equivalence
+from commentary_engine.thinkmath.verification import (
+    verification_label,
+    verify_commentary,
+    verify_equivalence,
+)
 
 
 class CoreArchitectureTests(unittest.TestCase):
+    def test_ollama_endpoint_rejects_non_http_schemes(self):
+        with patch.dict("os.environ", {"OLLAMA_BASE_URL": "file:///private/script"}):
+            with self.assertRaises(ValueError):
+                ollama_base_url()
+
     def test_admin_is_fail_closed_without_configured_secret(self):
         self.assertFalse(admin_enabled(None, "anything"))
         self.assertFalse(admin_enabled("secret", None))

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from urllib.parse import urlparse
 
 
 @dataclass(frozen=True)
@@ -30,7 +31,11 @@ OPEN_MODEL_REGISTRY = (
 
 
 def ollama_base_url() -> str:
-    return os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    configured = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434").rstrip("/")
+    parsed = urlparse(configured)
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
+        raise ValueError("OLLAMA_BASE_URL must be an http(s) URL")
+    return configured
 
 
 def registry_rows() -> list[dict]:
