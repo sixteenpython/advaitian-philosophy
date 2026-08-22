@@ -8,6 +8,35 @@ from dataclasses import asdict, dataclass
 import sympy as sp
 
 
+SAFE_EXPRESSION_RE = re.compile(r"^[A-Za-z0-9_+\-*/^().\s]+$")
+SAFE_FUNCTIONS = {
+    "sin": sp.sin,
+    "cos": sp.cos,
+    "tan": sp.tan,
+    "sqrt": sp.sqrt,
+    "log": sp.log,
+    "exp": sp.exp,
+    "pi": sp.pi,
+    "E": sp.E,
+}
+
+
+def _safe_sympify(value: str, *, evaluate: bool = True):
+    expression = str(value or "").strip().replace("^", "**")
+    if not expression or len(expression) > 240 or not SAFE_EXPRESSION_RE.fullmatch(expression):
+        raise ValueError("expression contains unsupported syntax")
+    if "__" in expression or re.search(r"(?<!\d)\.|\.(?!\d)", expression):
+        raise ValueError("attribute access is not allowed")
+    names = set(re.findall(r"[A-Za-z_][A-Za-z0-9_]*", expression))
+    if any(name.startswith("_") for name in names):
+        raise ValueError("private names are not allowed")
+    local_dict = {
+        name: SAFE_FUNCTIONS.get(name, sp.Symbol(name))
+        for name in names
+    }
+    return sp.sympify(expression, locals=local_dict, evaluate=evaluate)
+
+
 @dataclass(frozen=True)
 class VerificationCheck:
     name: str
@@ -24,8 +53,8 @@ def verify_equivalence(lhs: str, rhs: str) -> VerificationCheck:
     This deliberately accepts only expressions, not arbitrary Python code.
     """
     try:
-        left = sp.sympify(lhs, evaluate=True)
-        right = sp.sympify(rhs, evaluate=True)
+        left = _safe_sympify(lhs, evaluate=True)
+        right = _safe_sympify(rhs, evaluate=True)
         difference = sp.simplify(left - right)
         equivalent = difference == 0
         return VerificationCheck(
@@ -36,6 +65,53 @@ def verify_equivalence(lhs: str, rhs: str) -> VerificationCheck:
         )
     except (sp.SympifyError, TypeError, ValueError) as exc:
         return VerificationCheck("symbolic_equivalence", "review", f"Could not parse expression: {exc}")
+
+
+PLAIN_EQUATION_RE = re.compile(
+    r"(?<![<>=!])([A-Za-z0-9_+\-*/^(). ]{1,120})=([A-Za-z0-9_+\-*/^(). ]{1,120})(?![=])"
+)
+
+
+def _parseable_expression_suffix(value: str) -> str:
+    """Drop conversational prose before a plain symbolic expression."""
+    candidates = [value]
+    candidates.extend(value[index + 1:] for index, char in enumerate(value) if char.isspace())
+    for candidate in candidates:
+        candidate = candidate.strip().replace("^", "**")
+        if not candidate:
+            continue
+        if re.match(r"(?i)^(?:i|we|think|perhaps|maybe|suppose|because|so|then|that)\b", candidate):
+            continue
+        try:
+            _safe_sympify(candidate, evaluate=False)
+            return candidate
+        except (sp.SympifyError, TypeError, ValueError, SyntaxError):
+            continue
+    return value.strip().replace("^", "**")
+
+
+def verify_student_claims(text: str) -> list[VerificationCheck]:
+    """Check plain symbolic equalities without pretending to understand prose.
+
+    A failed identity is labelled for review rather than declared false because
+    the surrounding conversation may contain assumptions that SymPy has not
+    encoded. LaTeX and ambiguous prose are deliberately left to the reasoning
+    layer instead of being unsafely coerced.
+    """
+    checks: list[VerificationCheck] = []
+    for match in PLAIN_EQUATION_RE.finditer(text or ""):
+        lhs, rhs = (_parseable_expression_suffix(part) for part in match.groups())
+        if not lhs or not rhs:
+            continue
+        result = verify_equivalence(lhs, rhs)
+        checks.append(VerificationCheck(
+            "student_symbolic_claim",
+            "pass" if result.status == "pass" else "review",
+            result.detail if result.status == "pass" else f"Needs assumptions or revision: {result.detail}",
+        ))
+        if len(checks) >= 3:
+            break
+    return checks
 
 
 def verify_commentary(problem: str, commentary: str) -> list[VerificationCheck]:

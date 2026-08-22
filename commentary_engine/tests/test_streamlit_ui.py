@@ -23,7 +23,7 @@ class StreamlitStudentExperienceTests(unittest.TestCase):
             for element in collection
         )
         self.assertIn("ThinkMath.ai", visible)
-        self.assertIn("Student Experience v3.1.1", visible)
+        self.assertIn("Student Experience v3.2.0", visible)
         self.assertIn("What mathematical problem are you wrestling with?", visible)
         self.assertIn("Private by default", visible)
         demo_button = next(

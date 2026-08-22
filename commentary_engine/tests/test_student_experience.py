@@ -64,6 +64,10 @@ class StudentExperienceTests(unittest.TestCase):
         self.assertEqual(sections[1].body, "Square it.")
 
     def test_provider_readiness_distinguishes_ready_and_resting(self):
+        offline = provider_readiness([], set())
+        self.assertEqual(offline.state, "offline")
+        self.assertIn("offline", offline.headline.lower())
+        self.assertIn("deterministic", offline.detail.lower())
         models = [{"provider": "Groq", "model": "open-model"}]
         self.assertEqual(provider_readiness(models, set()).state, "ready")
         self.assertEqual(

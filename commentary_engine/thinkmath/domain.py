@@ -42,7 +42,7 @@ class ArchetypeHypothesis:
 
 @dataclass
 class AdvaitianSession:
-    schema_version: str = "1.0"
+    schema_version: str = "1.1"
     revision: int = 1
     problem: str = ""
     phase: SessionPhase = SessionPhase.SEED
@@ -57,6 +57,8 @@ class AdvaitianSession:
     proof_status: str = "not_requested"
     verification_results: list[dict[str, Any]] = field(default_factory=list)
     provenance: list[dict[str, str]] = field(default_factory=list)
+    problem_map: dict[str, Any] = field(default_factory=dict)
+    mentor_history: list[dict[str, str]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         data = asdict(self)

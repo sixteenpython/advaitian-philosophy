@@ -134,15 +134,15 @@ def provider_readiness(
     if not models:
         return ProviderReadiness(
             "offline",
-            "Live mentor unavailable",
-            "Use a demonstration journey now, or run the private Ollama profile locally.",
+            "Core mentor ready offline",
+            "Deterministic guidance and demonstrations remain available; open-model language reasoning is offline.",
             0,
         )
     if not available:
         return ProviderReadiness(
             "resting",
-            "Free inference is resting",
-            "Every configured model is temporarily rate-limited. Demonstrations remain available.",
+            "Core mentor continuing",
+            "Open-model inference is temporarily resting; deterministic guidance remains available.",
             0,
         )
     providers = sorted({str(model.get("provider")) for model in available})

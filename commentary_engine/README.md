@@ -5,7 +5,7 @@ experience, but chat history is not the source of truth. The canonical
 `AdvaitianSession` records the problem, seed hypotheses, archetype map, MVC,
 verification evidence and provenance.
 
-## Student Experience v3
+## Student Experience v3.2
 
 The public application now treats the evolving reasoning—not provider controls—as the main visual
 object. Its four student views are:
@@ -20,6 +20,26 @@ object. Its four student views are:
 
 Three curated demonstration journeys remain usable without any model or API capacity. Provider and
 quota failures use student-facing recovery paths instead of exposing raw infrastructure errors.
+
+## Hybrid mentor intelligence
+
+ThinkMath uses open models deliberately, but the model does not own learning state or progression.
+Each turn follows a governed loop:
+
+1. a deterministic policy selects a typed teaching action and reveal boundary;
+2. the model interprets the student's language, reasons about candidate directions, and speaks naturally;
+3. only student-grounded state proposals are accepted;
+4. model-inferred ideas remain in a separate, untrusted working problem map;
+5. SymPy checks supported symbolic claims, while the validated Setup–Move–Closure gate owns progression;
+6. an independent critic remains mandatory before checked Six-Point commentary is released.
+
+Confident problem maps are cached in bounded process memory so identical problems do not require fresh
+analysis while the app instance remains alive. Conversational recovery uses the smallest qualified stable
+model first; deep reasoning and proof release retain stronger routes. If every provider is unavailable,
+the selected teaching action is rendered deterministically and the conversation continues.
+
+The implementation and trust boundary are documented in
+[`docs/HYBRID_MENTOR_ENGINE_V3_2.md`](docs/HYBRID_MENTOR_ENGINE_V3_2.md).
 
 ## Run locally with open models
 

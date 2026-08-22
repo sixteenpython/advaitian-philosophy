@@ -32,8 +32,6 @@ from firebase_admin import credentials, firestore
 from groq import Groq
 from thinkmath.domain import AdvaitianSession, MVCState, SessionPhase
 from thinkmath.conversation import (
-    accepted_phase_suggestion,
-    accepted_state_update,
     classify_student_turn,
     ensure_recovery_acknowledgement,
     first_substantive_user_message,
@@ -46,6 +44,14 @@ from thinkmath.model_registry import (
     ollama_base_url,
     stability_for,
     supports_role,
+)
+from thinkmath.mentor_engine import (
+    ProblemMap,
+    cache_problem_map,
+    cached_problem_map,
+    choose_mentor_action,
+    deterministic_fallback,
+    validate_state_proposal,
 )
 from thinkmath.providers import GroqAdapter, OllamaAdapter
 from thinkmath.resilience import classify_error, retry_seconds, run_model_ladder
@@ -72,7 +78,7 @@ from thinkmath.student_ui import (
     render_zero_state,
 )
 from thinkmath.structured_output import parse_model_response, safe_visible_fallback
-from thinkmath.verification import verify_commentary, verification_label
+from thinkmath.verification import verify_commentary, verification_label, verify_student_claims
 
 
 # =============================================================================
@@ -81,7 +87,7 @@ from thinkmath.verification import verify_commentary, verification_label
 
 LOGO_URL = "https://raw.githubusercontent.com/sixteenpython/advaitian-philosophy/main/figures/imath_logo.png"
 MENTOR_DISPLAY_NAME = "ThinkMath Mentor"
-ENGINE_VERSION = "3.1.1"
+ENGINE_VERSION = "3.2.0"
 
 
 # =============================================================================
@@ -165,7 +171,16 @@ Schema: {"suggested_phase":1|2|3,"tier":0|1|2|3|4,
 "student_observations":["..."],"seed_hypotheses":["..."],
 "archetypes":[{"name":"...","evidence":"...","role":"candidate|primary|supporting"}],
 "mvc":{"setup":"","move":"","closure":"","family":""},
-"rejected_approaches":["..."],"connections":["..."]}.
+"rejected_approaches":["..."],"connections":["..."],
+"mentor_action":"the action you followed",
+"problem_map":{"domain":"...","current_goal":"...","observations":["..."],
+"directions":[{"name":"...","reason":"...","confidence":0.0}],
+"proof_obligations":["..."],"misconceptions":["..."],
+"candidate_mvc":{"setup":"","move":"","closure":"","family":""},
+"confidence":0.0}}.
+The problem_map contains YOUR working hypotheses, not beliefs attributed to the
+student. Keep it compact. On an unseen problem, create it; later, revise only
+what the conversation or verification changes.
 The application, not you, owns phase transitions and MVC validation.
 
 # TIER DETECTION (silent; set TIER 0–4 in metadata)
@@ -1202,7 +1217,12 @@ def _model_rank(model: dict, *, fastest_first: bool = False) -> tuple:
     return stability_rank, score, model["model"]
 
 
-def build_ladder(intent: str, all_models: list, phase: int = 1) -> list:
+def build_ladder(
+    intent: str,
+    all_models: list,
+    phase: int = 1,
+    routing_profile: str = "reasoning",
+) -> list:
     available = [m for m in all_models if not is_blocked(m["provider"], m["model"])]
     target_role = "commentary" if phase == 3 else "mentor"
     available = [m for m in available if supports_role(m["provider"], m["model"], target_role)]
@@ -1211,6 +1231,20 @@ def build_ladder(intent: str, all_models: list, phase: int = 1) -> list:
     if intent == "greeting":
         fast = [m for m in available if m["score"] <= 5]
         return sorted(fast or available, key=lambda m: _model_rank(m, fastest_first=True))
+
+    # Recovery and low-stakes dialogue should not consume the strongest route.
+    # Prefer stable, smaller qualified models; the policy can still escalate to
+    # the rest of the ladder if that route is unavailable.
+    if routing_profile == "conversational" and phase < 3:
+        ranked = sorted(
+            available,
+            key=lambda m: (
+                1 if (m.get("stability") or stability_for(m["provider"], m["model"])) == "preview" else 0,
+                m["score"],
+                m["model"],
+            ),
+        )
+        return _interleave_by_provider(ranked)
 
     # Phase-3 turns: prefer top-tier capability models. Fall through to mid-tier
     # only if no top-tier are available; refuse entirely if even mid-tier empty.
@@ -1252,6 +1286,8 @@ def chat(
     knowledge_asset=None,
     conversation_turn=None,
     support_level: int = 0,
+    mentor_decision=None,
+    problem_map=None,
     status_writer=None,
 ):
     # Short recovery utterances such as "confused" would otherwise look like
@@ -1286,6 +1322,10 @@ def chat(
                 "\n\nCURRENT CONVERSATIONAL GUIDANCE (private; never quote or name it):\n"
                 + mentor_conversation_context(conversation_turn, support_level)
             )
+        if mentor_decision is not None:
+            system_prompt += "\n\n" + mentor_decision.prompt_instruction()
+        if problem_map is not None:
+            system_prompt += "\n\n" + problem_map.prompt_context()
         phase = st.session_state.get("current_phase", 1)
         # Stage-2 / Six-Point requests need Phase-3 budget regardless of current_phase.
         ui_low = user_input.lower()
@@ -1298,7 +1338,13 @@ def chat(
             phase = 3
         max_tok = MAX_OUTPUT_TOKENS.get(phase, 900)
 
-    ladder = build_ladder(intent, all_models, phase=phase)
+    routing_profile = getattr(mentor_decision, "routing_profile", "reasoning")
+    ladder = build_ladder(
+        intent,
+        all_models,
+        phase=phase,
+        routing_profile=routing_profile,
+    )
     if not ladder:
         if intent == "math" and phase == 3:
             raise RuntimeError(
@@ -2438,11 +2484,6 @@ with journey_tab:
 
 # Process turn
 if user_input:
-    if not ALL_MODELS:
-        error_title, error_detail = friendly_provider_error("no models available")
-        st.error(f"**{error_title}.** {error_detail}")
-        st.stop()
-
     conversation_turn = classify_student_turn(user_input)
     st.session_state.support_level = next_support_level(
         st.session_state.support_level,
@@ -2451,18 +2492,36 @@ if user_input:
     st.session_state.last_turn_kind = conversation_turn.kind.value
     st.session_state.messages.append({"role": "user", "content": user_input})
 
+    current_asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
+    current_asset.tier = {
+        "Gentle": 1,
+        "Guided": 2,
+        "Competition": 3,
+    }.get(st.session_state.student_style, 2)
+    if not current_asset.problem:
+        current_asset.problem = first_substantive_user_message(
+            st.session_state.messages,
+            "" if conversation_turn.is_recovery else user_input,
+        )
+    working_map = (
+        ProblemMap.from_dict(current_asset.problem_map, current_asset.problem)
+        if current_asset.problem_map
+        else cached_problem_map(current_asset.problem)
+        or ProblemMap.from_dict({}, current_asset.problem)
+    )
+    mentor_decision = choose_mentor_action(
+        current_asset,
+        conversation_turn,
+        st.session_state.support_level,
+        user_input,
+    )
+
     with st.status("Thinking with you…", expanded=False) as status:
         try:
             history_for_api = [
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages[:-1]
             ]
-            current_asset = AdvaitianSession.from_dict(st.session_state.knowledge_asset)
-            current_asset.tier = {
-                "Gentle": 1,
-                "Guided": 2,
-                "Competition": 3,
-            }.get(st.session_state.student_style, 2)
             raw, provider, model = chat(
                 user_input,
                 history_for_api,
@@ -2470,6 +2529,8 @@ if user_input:
                 knowledge_asset=current_asset.to_dict(),
                 conversation_turn=conversation_turn,
                 support_level=st.session_state.support_level,
+                mentor_decision=mentor_decision,
+                problem_map=working_map,
                 status_writer=status,
             )
             envelope = parse_model_response(raw)
@@ -2477,44 +2538,61 @@ if user_input:
             if not clean:
                 clean = safe_visible_fallback(envelope.state_update)
             if not clean:
-                clean = "[Empty response. Please rephrase and try again.]"
+                clean = deterministic_fallback(mentor_decision, working_map)
             if conversation_turn.is_recovery:
                 clean = ensure_recovery_acknowledgement(conversation_turn, clean)
 
             asset = current_asset
-            if not asset.problem:
-                asset.problem = first_substantive_user_message(
-                    st.session_state.messages,
-                    "" if conversation_turn.is_recovery else user_input,
-                )
-            # Recovery language changes the teaching move, never mathematical
-            # truth. Ignore any state advancement a model emits on such a turn.
-            state_update = accepted_state_update(
+            # The model proposes; the engine accepts only claims grounded in
+            # the student's words. Model-inferred structure belongs in the
+            # working problem map, never silently in student-owned state.
+            state_update, proposed_map, proposal_notes = validate_state_proposal(
+                asset,
                 conversation_turn,
+                user_input,
                 envelope.state_update,
             )
             if state_update:
                 asset.apply_model_update(state_update)
-            suggested_phase = accepted_phase_suggestion(
-                conversation_turn,
-                int(current_asset.phase),
-                envelope.suggested_phase,
-            )
-            if suggested_phase >= 2 and not asset.seed_hypotheses and not conversation_turn.is_recovery:
-                # The phase recommendation is evidence that the latest student
-                # turn contains a structural hypothesis. Preserve the student's
-                # own words rather than inventing a model-authored seed.
-                asset.seed_hypotheses = [user_input.strip()]
-            if (
-                not conversation_turn.is_recovery
-                and asset.mvc.complete
-                and "ready for stage 2" in clean.lower()
-            ):
-                asset.mvc.validated = True
+            if proposed_map is not None:
+                asset.problem_map = proposed_map.to_dict()
+                working_map = proposed_map
+                cache_problem_map(asset.problem, proposed_map)
+            else:
+                asset.problem_map = working_map.to_dict()
+            asset.mentor_history = [
+                *asset.mentor_history[-19:],
+                {
+                    "action": mentor_decision.action.value,
+                    "reason": mentor_decision.reason,
+                    "turn_kind": conversation_turn.kind.value,
+                },
+            ]
+            for note in proposal_notes[-6:]:
+                asset.provenance.append({
+                    "source": "mentor-engine",
+                    "detail": note,
+                })
+            claim_checks = verify_student_claims(user_input)
+            if claim_checks:
+                asset.verification_results = [
+                    *asset.verification_results[-17:],
+                    *(check.to_dict() for check in claim_checks),
+                ]
 
+            # Phase progression follows accepted evidence, never the model's
+            # phase number. An explicit commentary request is still subject to
+            # the validated MVC gate in evaluate_transition().
+            suggested_phase = int(asset.phase)
+            if asset.phase == SessionPhase.SEED and (asset.seed_hypotheses or asset.archetypes):
+                suggested_phase = int(SessionPhase.DIRECTIONS)
+            if explicitly_requests_commentary(user_input):
+                suggested_phase = int(SessionPhase.CONVERGENCE)
             transition = evaluate_transition(asset, user_input, suggested_phase)
             phase = int(transition.phase)
-            tier = current_asset.tier if conversation_turn.is_recovery else envelope.tier
+            # Student-selected style is authoritative; a model cannot silently
+            # reclassify the student or change the teaching difficulty.
+            tier = current_asset.tier
             asset.phase = transition.phase
             asset.tier = tier
 
@@ -2592,7 +2670,24 @@ if user_input:
 
         except Exception as e:
             error_title, error_detail = friendly_provider_error(e)
-            status.update(label=error_title, state="error")
-            st.error(f"**{error_title}.** {error_detail}")
+            fallback = deterministic_fallback(mentor_decision, working_map)
+            current_asset.problem_map = working_map.to_dict()
+            current_asset.mentor_history = [
+                *current_asset.mentor_history[-19:],
+                {
+                    "action": mentor_decision.action.value,
+                    "reason": mentor_decision.reason,
+                    "turn_kind": conversation_turn.kind.value,
+                },
+            ]
+            st.session_state.knowledge_asset = current_asset.to_dict()
+            st.session_state.active_model = "Deterministic mentor fallback"
+            st.session_state.messages.append({
+                "role": "mentor",
+                "content": fallback,
+                "model": st.session_state.active_model,
+            })
+            status.update(label="Mentor continued in offline mode", state="complete")
             if ADMIN_MODE:
-                st.caption(f"Operator detail: {e}")
+                st.caption(f"{error_title}: {error_detail} · Operator detail: {e}")
+            st.rerun()

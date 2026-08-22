@@ -16,7 +16,10 @@ from typing import Any
 STATE_BLOCK_RE = re.compile(r"```thinkmath-state\s*(\{.*?\})\s*```", re.I | re.S)
 JSON_BLOCK_RE = re.compile(r"```json\s*(\{.*?\})\s*```", re.I | re.S)
 LEGACY_METADATA_RE = re.compile(r"^\s*PHASE:\s*(\d+)\s+TIER:\s*(\d+)\s*$", re.M)
-STATE_KEYS = {"suggested_phase", "tier", "mvc", "seed_hypotheses", "archetypes"}
+STATE_KEYS = {
+    "suggested_phase", "tier", "mvc", "seed_hypotheses", "archetypes",
+    "mentor_action", "problem_map",
+}
 
 
 def _is_state_payload(payload: object) -> bool:

@@ -140,6 +140,11 @@ class CoreArchitectureTests(unittest.TestCase):
         self.assertEqual(verify_equivalence("(x + 1)**2", "x**2 + 2*x + 1").status, "pass")
         self.assertEqual(verify_equivalence("x + 1", "x + 2").status, "fail")
 
+    def test_symbolic_equivalence_rejects_attribute_access(self):
+        result = verify_equivalence("x.__class__", "x")
+        self.assertEqual(result.status, "review")
+        self.assertIn("Could not parse", result.detail)
+
     def test_local_model_roles_are_enforced(self):
         self.assertTrue(supports_role("Ollama", "qwen3:8b", "mentor"))
         self.assertFalse(supports_role("Ollama", "qwen3:8b", "critic"))
