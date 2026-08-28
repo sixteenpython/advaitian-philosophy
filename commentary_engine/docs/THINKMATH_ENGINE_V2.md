@@ -1,5 +1,10 @@
 # ThinkMath Engine v2
 
+> **Historical baseline.** This document records the v2 trust boundary. The current humane
+> conversation, recovery escalation, problem-map caching, model resilience, and closure policy are
+> specified in `HYBRID_MENTOR_ENGINE_V3_2.md`; the current interface contract is documented in
+> `STUDENT_EXPERIENCE_V3.md`.
+
 ## Purpose
 
 ThinkMath teaches the structural method expressed in the Advaitian book. It

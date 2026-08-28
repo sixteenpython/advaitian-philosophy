@@ -41,6 +41,29 @@ the selected teaching action is rendered deterministically and the conversation 
 The implementation and trust boundary are documented in
 [`docs/HYBRID_MENTOR_ENGINE_V3_2.md`](docs/HYBRID_MENTOR_ENGINE_V3_2.md).
 
+## Humane teacher contract
+
+The mentor treats “I don’t know,” “I am confused,” uncertainty, and partial attempts as different
+teaching situations rather than failed inputs. It acknowledges the student's position, preserves
+substantial work already offered, and asks one answerable next question. Repeated confusion increases
+support through a deterministic ladder—narrow the goal, test a small case, offer two choices, model
+one micro-step, then change representation—without inventing evidence or advancing the learning phase.
+
+Long student arguments are summarized through the mathematical techniques they actually used before
+the mentor names one load-bearing proof obligation. Generic restarts such as “what changes and what
+stays fixed?” are rejected when the student has already supplied substantial reasoning.
+
+## Proof assurance and operational honesty
+
+ThinkMath distinguishes **Exploratory**, **Structural draft**, **Structurally checked**, **Needs
+mathematical review**, and **Curated demonstration** states. A complete-looking response is never
+presented as formally certified merely because an open model produced it. Commentary release remains
+fail-closed when its deterministic checks or independent review obligations are unavailable.
+
+Open or open-weight models remove licence fees; they do not create unlimited hosted compute. Local
+Ollama is the private, user-funded capacity path. Hosted Groq routes remain optional and quota-bound,
+while curated journeys and deterministic teaching actions preserve continuity when inference rests.
+
 ## Run locally with open models
 
 1. Install [Ollama](https://ollama.com/).
@@ -74,6 +97,10 @@ python -m unittest discover -s tests -v
 The golden evaluation dataset in `evals/golden_cases.json` is the model
 promotion gate. Generic leaderboard position is not sufficient for a model to
 become the mentor, commentary generator or critic.
+
+The regression suite includes recovery-language classification, non-advancing confusion turns,
+substantial-work recognition, closure obligations, proof-assurance copy, model routing, rendering,
+verification, deterministic demonstrations, and the Streamlit student shell.
 
 Student-experience decisions and release boundaries are documented in
 [`docs/STUDENT_EXPERIENCE_V3.md`](docs/STUDENT_EXPERIENCE_V3.md).

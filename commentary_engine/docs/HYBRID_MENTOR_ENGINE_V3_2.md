@@ -42,6 +42,40 @@ Repeated recovery escalates support deterministically:
 
 Recovery never creates mathematical evidence or advances a phase.
 
+## Humane conversational policy
+
+Human-like mentorship is implemented as policy, not left to a persona prompt. The turn classifier
+separates confusion, “I don’t know,” uncertainty, partial mathematical answers, substantial proposed
+proofs, and ordinary substantive reasoning. The visible response must:
+
+- acknowledge the student's present state without judgment;
+- retain and name mathematical techniques already attempted;
+- choose one typed teaching action and one answerable question;
+- avoid repeating an opening diagnostic after useful work exists;
+- increase scaffolding only as the recovery count requires;
+- keep recovery turns outside canonical mathematical evidence and phase progression.
+
+For a substantial argument, `substantial_work_summary` extracts the student's actual techniques and
+the deterministic fallback names one load-bearing obligation. `ensure_teacher_response` rejects a
+generic “what changes / what remains” reset when it would ignore that work.
+
+## Proof closure and assurance
+
+Setup–Move–Closure is a logical gate, not a field-completion checklist. Descent arguments, for example,
+must state both an extremal move and the boundary or termination mechanism. When closure is missing,
+the mentor asks for that precise obligation instead of rendering a polished commentary.
+
+Student-facing assurance labels remain calibrated to recorded evidence:
+
+- **Exploratory** — a direction to test;
+- **Structural draft** — the intended architecture is present but technical checks remain;
+- **Structurally checked** — available architecture and symbolic checks passed, with independent
+  mathematical review still recommended;
+- **Needs mathematical review** — a load-bearing check remains unresolved;
+- **Curated demonstration** — a reviewed, bundled learning journey.
+
+No label claims general formal proof certification.
+
 ## Problem maps and cost control
 
 `ProblemMap` records a bounded set of candidate observations, directions, proof obligations,
@@ -57,6 +91,11 @@ before dynamic session context in the prompt, preserving provider prefix-cache o
 Provider failure does not end a learning turn. The deterministic renderer expresses the already-selected
 teaching action and retains the student's work. Full proof release still fails closed when qualified
 verification is unavailable.
+
+Free model weights and free hosted inference are separate concerns. Ollama provides private capacity
+on hardware controlled by the user; public Groq inference is operationally quota-bound. Curated maps,
+the bounded problem-map cache, and deterministic action rendering reduce inference demand but do not
+misrepresent hosted capacity as unlimited.
 
 ## Deliberate limits
 

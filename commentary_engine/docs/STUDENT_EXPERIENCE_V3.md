@@ -1,4 +1,4 @@
-# ThinkMath Student Experience v3
+# ThinkMath Student Experience v3.2
 
 ## Product intent
 
@@ -11,6 +11,18 @@ The release optimises for one transformation:
 `initial instinct -> observation -> Seed -> direction -> Setup -> Move -> Closure -> transfer`
 
 It deliberately avoids answer-engine behaviour, generic gamification and provider-centric UI.
+
+## Teacher-like conversation
+
+The experience accepts confusion as a legitimate learning state. “I don’t know,” “I am confused,” a
+tentative idea, and a long proof attempt are not collapsed into one fallback. The mentor acknowledges
+what the student has done, preserves their mathematical agency, and offers one appropriately sized
+next move. Repeated confusion reveals progressively stronger scaffolding without silently changing
+the student's canonical mathematical work.
+
+Substantial attempts receive a concise technique-level summary and one explicit proof obligation.
+This prevents the experience from resetting an advanced student to a generic opening question merely
+because the proposed argument is incomplete.
 
 ## Experience architecture
 
@@ -41,6 +53,10 @@ cannot validate their own MVC.
 A completed Six-Point response is removed from the scrolling dialogue and presented as a structured
 learning artifact. Deterministic verification and the independent critic remain unchanged. The UI does
 not imply proof assurance beyond the recorded status.
+
+Visible assurance states distinguish exploratory directions, structural drafts, structurally checked
+work, unresolved mathematical review, and curated demonstrations. These labels describe the checks
+actually performed; none claims general formal certification of an olympiad proof.
 
 Every completed journey ends with a deterministic transfer challenge: the same Seed in a different
 surface form.
